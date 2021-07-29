@@ -1,0 +1,38 @@
+.Oncoview {}
+
+.oncoview_canvas {
+    fill:white;
+}
+
+.label_box {
+    fill:#f2f2f2;
+    rx:0.5em;
+    ry:0.5em;
+    stroke:black;
+    stroke-width:1px;
+}
+
+.label_text {
+    color:black;
+    font-size:1ex;
+    text-anchor:middle;
+    text-align:center;
+}
+
+.column_label {
+    color:black;
+    font-size:1ex;
+    font-style:italic;
+    text-anchor:middle;
+    text-align:center;
+}
+
+.column_line {
+    stroke:#ccc;
+    stroke-width:0.5px;
+}
+
+.arrow {
+    stroke-width:1px;
+    fill:#0055d4;
+}
