@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+
+  frontend:
+    user: $UID:$GID
+    build:
+      context: .
+      args:
+        - NODE_ENV=development
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/opt/app/oncodash-app
+
+      # this is a workaround to prevent host node_modules from accidently getting mounted in container
+      # in case you want to use node/npm both outside container for test/lint etc. and also inside container
+      # this will overwrite the default node_modules dir in container so it won't conflict with our
+      # /opt/app/node_modules location.
+      - notused:/opt/app/oncodash-app/node_modules
+
+    container_name: oncodash-app-container
+    command: >
+      npm start
+
+volumes:
+  notused:
