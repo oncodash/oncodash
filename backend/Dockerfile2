@@ -1,0 +1,31 @@
+# This file is not working with docker-compose yet
+# Some permission wrangling required
+
+FROM python:3.7-alpine
+
+# ERROR logs are sent to terminal
+ENV PYTHONUNBUFFERED=1
+
+# no __pycache__ written by container root in the bindmount
+# Would end up in permission errors when building 
+ENV PYTHONDONTWRITEBYTECODE=1 
+
+ARG UNAME=djangouser
+ARG UID=1000
+ARG GID=1001
+
+RUN adduser -D -u $UID $UNAME
+RUN mkdir /opt/app/ && chown $UNAME:$UNAME /opt/app/
+
+WORKDIR /opt/app
+
+# Init a unpriviliedged non-root user 
+USER $UNAME
+
+# Copy in the source code
+COPY --chown=$UNAME:$UNAME ./requirements.txt /requirements.txt
+ENV PATH /home/$UNAME/.local/bin:$PATH
+COPY --chown=$UNAME:$UNAME . .
+EXPOSE 8000
+
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

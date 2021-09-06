@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+
+  oncodash:
+    user: $UID:$GID
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/opt/app/
+    container_name: django_container
+    command: > 
+      sh -c "python manage.py runserver 0.0.0.0:8000"
+    

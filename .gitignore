@@ -22,3 +22,5 @@ out-tsc/
 
 storybook-static
 custom-elements.json
+
+__pycache__

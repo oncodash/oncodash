@@ -1,6 +1,5 @@
 FROM node:16-alpine
 
-
 # Add Tini. Checkout github
 # https://github.com/krallin/tini
 RUN apk add --no-cache tini
