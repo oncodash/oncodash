@@ -77,4 +77,3 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(spec.spec, str(spec))
-

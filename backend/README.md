@@ -14,8 +14,9 @@ Navigate to the `/backend/` folder
 docker-compose build
 ```
 
-## 4. Make migrations and migrate database
+## 4. Make migrations (Create SQL commands) and migrate (execute the SQL commands)
 ```
+docker-compose run --rm oncodash sh -c "python manage.py makemigrations core"
 docker-compose run --rm oncodash sh -c "python manage.py migrate"
 ```
 
