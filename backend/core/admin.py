@@ -5,7 +5,6 @@ from django.utils.translation import gettext as _
 from core import models
 
 
-@admin.register(models.User)
 class UserAdmin(BaseUserAdmin):
     ordering = ["id"]
     list_display = ["email", "name"]
@@ -24,3 +23,7 @@ class UserAdmin(BaseUserAdmin):
             "fields": ("email", "password1", "password2")
         }),
     )
+
+
+admin.site.register(models.User, UserAdmin)
+admin.site.register(models.NetworkSpec)

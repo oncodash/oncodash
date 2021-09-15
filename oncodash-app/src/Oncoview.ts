@@ -1,6 +1,8 @@
 import * as d3 from 'd3';
 import { LitElement, html, css } from 'lit';
 import { property } from 'lit/decorators.js';
+import { get, post } from './util/rest'
+
 
 // Types
 interface Link {

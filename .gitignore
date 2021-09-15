@@ -24,3 +24,5 @@ storybook-static
 custom-elements.json
 
 __pycache__
+db.sqlite3
+notebooks

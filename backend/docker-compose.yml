@@ -6,12 +6,11 @@ services:
     user: $UID:$GID
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile.dev
     ports:
-      - 8000:8000
+      - "8888:8888"
     volumes:
-      - .:/opt/app/
-    container_name: django_app
-    command: > 
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+      - type: bind
+        source: ./
+        target: /opt/app/
     

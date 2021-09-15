@@ -1,5 +1,6 @@
 .dockerignore
 .git
+npm-debug.log
 *Dockerfile*
 *docker-compose*
 node_modules

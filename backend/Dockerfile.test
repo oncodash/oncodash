@@ -26,6 +26,4 @@ USER $UNAME
 COPY --chown=$UNAME:$UNAME ./requirements.txt /requirements.txt
 ENV PATH /home/$UNAME/.local/bin:$PATH
 COPY --chown=$UNAME:$UNAME . .
-EXPOSE 8000
-
-# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+EXPOSE 8888

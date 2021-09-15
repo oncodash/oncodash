@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  # nodeserver
+  nodeserver:
+    user: $UID:$GID
+    build:
+      context: ./oncodash-app
+      dockerfile: ./Dockerfile.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - type: bind
+        source: ./oncodash-app
+        target: /opt/node_app/app
+
+    #   # this is a workaround to prevent host node_modules from accidently getting mounted in container
+    #   # in case you want to use node/npm both outside container for test/lint etc. and also inside container
+    #   # this will overwrite the default node_modules dir in container so it won't conflict with our
+    #   # /opt/app/node_modules location.
+      - type: volume
+        source: notused
+        target: /app/node_modules
+
+  # django backend gunicorn server (communicates with nginx proxy)
+  backend:
+    user: $UID:$GID
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile.dev
+    ports:
+      - "8888:8888"
+    volumes:
+      - type: bind
+        source: ./backend
+        target: /opt/app/
+
+  # nginx proxy server
+  nginx:
+    restart: always
+    build:
+      context: ./nginx
+      dockerfile: ./Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - nodeserver
+      - backend
+
+volumes:
+  notused:
+
+    
+
