@@ -6,7 +6,7 @@ services:
     user: $UID:$GID
     build:
       context: .
-      dockerfile: ./Dockerfile.dev
+      dockerfile: ./Dockerfile
     ports:
       - "8000:8000"
     volumes:
@@ -21,15 +21,6 @@ services:
       - type: volume
         source: notused
         target: /app/node_modules
-
-  nginx:
-    restart: always
-    build:
-      context: ../nginx
-    ports:
-      - "80:80"
-    depends_on:
-      - nodeserver
 
 volumes:
   notused:

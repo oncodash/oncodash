@@ -9,4 +9,4 @@ class NetworkSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = NetworkSpec
-        fields = ['id', 'json_spec']
+        fields = ['id', 'spec']

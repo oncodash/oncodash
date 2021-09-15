@@ -30,7 +30,7 @@ class NetworkAPiTests(TestCase):
             ]
         }}
 
-        self.network_spec = NetworkSpec(json_spec = self.valid_spec)
+        self.network_spec = NetworkSpec(spec = self.valid_spec)
         self.client = APIClient()
 
     def test_create_network_successful(self) -> None:

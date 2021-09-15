@@ -73,8 +73,8 @@ class ModelTests(TestCase):
         }
 
         spec = models.NetworkSpec.objects.create(
-            json_spec=json.dumps(net)
+            spec=json.dumps(net)
         )
 
-        self.assertEqual(spec.json_spec, str(spec))
+        self.assertEqual(spec.spec, str(spec))
 

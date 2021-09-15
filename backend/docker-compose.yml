@@ -6,7 +6,7 @@ services:
     user: $UID:$GID
     build:
       context: .
-      dockerfile: ./Dockerfile.dev
+      dockerfile: ./Dockerfile
     ports:
       - "8888:8888"
     volumes:
