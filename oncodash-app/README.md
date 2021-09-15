@@ -28,3 +28,23 @@ npm init @open-wc
 For most of the tools, the configuration is in the `package.json` to reduce the amount of files in your project.
 
 If you customize the configuration a lot, you can consider moving them to individual files.
+
+# Instructions to build and run only the frontend with docker-compose
+
+
+## 1. Build the frontend image
+
+Navigate to the `../oncodash-app/` folder
+
+```sh
+docker-compose build
+```
+
+## 2. Run the frontend image in a container
+```sh
+docker-compose up
+```
+
+## 3. Develop
+
+Open up the browser at `localhost:8000`

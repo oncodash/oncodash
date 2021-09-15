@@ -6,7 +6,7 @@ services:
     user: $UID:$GID
     build:
       context: ./oncodash-app
-      dockerfile: ./Dockerfile.dev
+      dockerfile: ./Dockerfile
     ports:
       - "8000:8000"
     volumes:
@@ -27,7 +27,7 @@ services:
     user: $UID:$GID
     build:
       context: ./backend
-      dockerfile: ./Dockerfile.dev
+      dockerfile: ./Dockerfile
     ports:
       - "8888:8888"
     volumes:

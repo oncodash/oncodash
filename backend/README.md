@@ -1,36 +1,40 @@
-# Instructions to build only the backend
-## 1. Download Docker
-    - Download link
+# Instructions to build and run only the backend with docker-compose
 
-## 2. Download docker-compose
-    - Download link
-    - Running compose without sudo privliges
+## 1. Build the backend image
 
-## 3. Build the backend
+Navigate to the `../backend/` folder
 
-Navigate to the `/backend/` folder
-
-```
+```sh
 docker-compose build
 ```
 
-## 4. Make migrations (Create SQL commands) and migrate (execute the SQL commands)
-```
+## 2. Make migrations (Create SQL commands) and migrate (execute the SQL commands)
+
+```sh
 docker-compose run --rm oncodash sh -c "python manage.py makemigrations core"
 docker-compose run --rm oncodash sh -c "python manage.py migrate"
 ```
 
-## 5. Run the backend container
-```
+## 3. Run the backend image in a container
+
+```sh
 docker-compose up
 ```
 
-## 6. Develop
+## 4. Develop
+
 Open up the browser at `localhost:8888`
 Browsable API at the `localhost:8888/api/oncoviz/network/`
 
-## 7. Run tests and linting
-```
+## 5. Run tests and linting for backend
+
+```sh
 docker-compose run --rm oncodash sh -c "python manage.py test && flake8"
 ```
 
+## 6. Run tests and linting for frontend
+
+```sh
+# TODO
+docker-compose run --rm nodeserver sh -c "npm test something something"
+```
