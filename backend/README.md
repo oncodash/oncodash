@@ -23,18 +23,11 @@ docker-compose up
 
 ## 4. Develop
 
-Open up the browser at `localhost:8888`
+Open up the browser at `localhost:8888` 
 Browsable API at the `localhost:8888/api/oncoviz/network/`
 
 ## 5. Run tests and linting for backend
 
 ```sh
 docker-compose run --rm oncodash sh -c "python manage.py test && flake8"
-```
-
-## 6. Run tests and linting for frontend
-
-```sh
-# TODO
-docker-compose run --rm nodeserver sh -c "npm test something something"
 ```

@@ -11,7 +11,7 @@ NETWORK_URL = reverse('oncoviz:network-list')
 
 class NetworkAPiTests(TestCase):
     """
-    Test the network visualization specificatios
+    Test the network visualization specifications
     """
 
     def setUp(self):

@@ -124,11 +124,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = Path(BASE_DIR / 'static')
-# STATICFILES_DIRS = [
-#     Path(BASE_DIR / 'static'),
-#     Path(BASE_DIR / 'djangostuff/static'),
-# ]
-
 
 
 # Default primary key field type
@@ -144,9 +139,4 @@ REST_FRAMEWORK = {
     ]
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:8888",
-    "http://localhost:8888",
-    "http://localhost:80",
-    "http://nginx:80",
-]
+CORS_ALLOWED_ORIGINS = []
