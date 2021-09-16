@@ -20,7 +20,7 @@ services:
     #   # /opt/app/node_modules location.
       - type: volume
         source: notused
-        target: /app/node_modules
+        target: /opt/node_app/app/node_modules
 
   # django backend gunicorn server (communicates with nginx proxy)
   backend:
