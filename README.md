@@ -27,24 +27,24 @@ docker-compose run --rm backend sh -c "python manage.py makemigrations core"
 docker-compose run --rm backend sh -c "python manage.py migrate"
 ```
 
-## 3. Run the oncodash image in a container
+## 5. Run the oncodash image in a container
 
 ```sh
 docker-compose up
 ```
 
-## 4. Develop
+## 6. Develop
 
 - Open up the browser at `localhost` 
 - Browsable API at `localhost/api/oncoviz/network/`
 
-## 5. Run tests and linting for the backend
+## 7. Run tests and linting for the backend
 
 ```sh
 docker-compose run --rm backend sh -c "python manage.py test && flake8"
 ```
 
-## 6. Run tests and linting for frontend
+## 8. Run tests and linting for frontend
 
 ```sh
 docker-compose run --rm nodeserver sh -c "npm test"
