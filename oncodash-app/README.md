@@ -48,3 +48,9 @@ docker-compose up
 ## 3. Develop
 
 Open up the browser at `localhost:8000`
+
+## 4. Run tests and linting for frontend
+
+```sh
+docker-compose run --rm nodeserver sh -c "npm test"
+```

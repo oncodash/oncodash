@@ -11,23 +11,23 @@ docker-compose build
 ## 2. Make migrations (Create SQL commands) and migrate (execute the SQL commands)
 
 ```sh
-docker-compose run --rm oncodash sh -c "python manage.py makemigrations core"
-docker-compose run --rm oncodash sh -c "python manage.py migrate"
+docker-compose run --rm backend sh -c "python manage.py makemigrations core"
+docker-compose run --rm backend sh -c "python manage.py migrate"
 ```
 
 ## 3. Run the backend image in a container
 
 ```sh
-docker-compose up
+$ docker-compose up
 ```
 
 ## 4. Develop
 
-Open up the browser at `localhost:8888` 
-Browsable API at the `localhost:8888/api/oncoviz/network/`
+- Open up the browser at `localhost:8888` 
+- Browsable API at `localhost:8888/api/oncoviz/network/`
 
 ## 5. Run tests and linting for backend
 
 ```sh
-docker-compose run --rm oncodash sh -c "python manage.py test && flake8"
+docker-compose run --rm backend sh -c "python manage.py test && flake8"
 ```

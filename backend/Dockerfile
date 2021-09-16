@@ -21,7 +21,6 @@ COPY --chown=$UNAME:$UNAME . .
 EXPOSE 8888
 
 USER $UNAME
-# RUN python manage.py collectstatic
 
 # Run gunicorn web server
 CMD ["gunicorn", "core.wsgi", "--bind", "0.0.0.0:8888"]

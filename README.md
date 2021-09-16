@@ -35,8 +35,8 @@ docker-compose up
 
 ## 4. Develop
 
-Open up the browser at `localhost` 
-Browsable API at the `localhost/api/oncoviz/network/`
+- Open up the browser at `localhost` 
+- Browsable API at `localhost/api/oncoviz/network/`
 
 ## 5. Run tests and linting for the backend
 
