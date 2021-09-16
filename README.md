@@ -44,7 +44,7 @@ docker-compose up
 docker-compose run --rm backend sh -c "python manage.py test && flake8"
 ```
 
-## 8. Run tests and linting for frontend
+## 8. Run tests and linting for the frontend
 
 ```sh
 docker-compose run --rm nodeserver sh -c "npm test"
