@@ -12,7 +12,7 @@ build and run the backend and frontend webservers and an nginx proxy server that
 **If you installed Docker Desktop (MacOS/Windows) this is not needed**
 
 - [Download docker-compose](https://docs.docker.com/compose/install/)
-- [Running compose without sudo privliges](https://docs.docker.com/engine/install/linux-postinstall/)
+- [Running compose without sudo privileges](https://docs.docker.com/engine/install/linux-postinstall/)
 
 ## 3. Build the app
 
@@ -27,7 +27,7 @@ docker-compose run --rm backend sh -c "python manage.py makemigrations core"
 docker-compose run --rm backend sh -c "python manage.py migrate"
 ```
 
-## 3. Run the backend image in a container
+## 3. Run the oncodash image in a container
 
 ```sh
 docker-compose up
