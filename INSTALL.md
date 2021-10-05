@@ -21,3 +21,18 @@ sudo usermod -aG docker ${USER}
 
 You may need to restart your shell after installation.
 
+MacOS
+=====
+
+Intel chip:
+```bash
+# Download the image
+curl -L "https://desktop.docker.com/mac/main/amd64/Docker.dmg?utm_source=docker&utm_medium=webreferral&utm_campaign=docs-driven-download-mac-amd64" -o Docker.dmg
+# Open the package
+hdiutil attach Docker.dmg
+# Install as an app
+cp -a /Volumes/Docker/Docker.app /Applications/
+```
+
+You will be asked to accept some user contract at first launch.
+
