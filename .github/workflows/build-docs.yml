@@ -1,0 +1,41 @@
+name: build-docs
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+
+    - name: Python SetUp
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.8'
+
+    - name: Install Dependencies
+      run: |
+        pip install sphinx==3.2.1
+        pip install sphinx_rtd_theme==0.5.0
+        pip install sphinx-tabs==1.3.0
+        pip install breathe==4.22.1
+
+    - name: Build (backend) Doc
+      run: |
+        cd backend/docs/sphinx
+        make clean
+        make html
+        rm backend/docs/sphinx/build/html/.buildinfo
+        touch backend/docs/sphinx/build/html/.nojekyll
+
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: backend/docs/sphinx/build/html/
