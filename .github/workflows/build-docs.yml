@@ -31,8 +31,7 @@ jobs:
         cd backend/docs/sphinx
         make clean
         make html
-        rm backend/docs/sphinx/build/html/.buildinfo
-        touch backend/docs/sphinx/build/html/.nojekyll
+        touch build/html/.nojekyll
 
     - name: Deploy
       uses: JamesIves/github-pages-deploy-action@releases/v3
