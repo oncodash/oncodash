@@ -1,4 +1,4 @@
-<a href="https://oncodash.github.io/oncodash/"><img src="https://github.com/oncodash/oncodash/actions/workflows/build-docs/badge.svg?branch=master" alt="Build Status"/></a></td>
+<a href="https://oncodash.github.io/oncodash/"><img src="https://github.com/oncodash/oncodash/actions/workflows/build-docs.yml/badge.svg" alt="Build Status"/></a></td>
 
 # Instructions to build and run the project with docker-compose
 
