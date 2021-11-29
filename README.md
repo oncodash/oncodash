@@ -1,3 +1,5 @@
+<a href="https://oncodash.github.io/oncodash/"><img src="https://github.com/oncodash/oncodash/actions/workflows/build-docs/badge.svg?branch=master" alt="Build Status"/></a></td>
+
 # Instructions to build and run the project with docker-compose
 
 build and run the backend and frontend webservers and an nginx proxy server that passes requests to these servers.
