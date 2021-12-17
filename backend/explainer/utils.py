@@ -19,9 +19,9 @@ class IndTab2Json:
     ) -> None:
         """
         Helper class to convert the input indication table into JSON.
-        
+
         Example of the indication table format:
-             
+
              Patient  Sample   Gene     Mutation Ind      Certainty
             |--------|--------|--------|--------|--------|--------|
           0 |   P1   | P1_s1  |   G1   |  p.1X  | Drug1  |   1    |
@@ -31,7 +31,7 @@ class IndTab2Json:
           4 |   P2   | P2_s2  |   G3   |  p.5X  | Drug1  |   1    |
           5 |   P3   | P3_s1  |   G2   |  p.6X  | Drug3  |   1    |
             |--------|--------|--------|--------|--------|--------|
-        
+
         Args:
         ---------
             path (Path, str):
@@ -88,7 +88,7 @@ class IndTab2Json:
             graphs = self._table2nodelinks()
 
         return json.dumps(graphs)
-    
+
     def _table2graphs(self) -> Dict[str, nx.DiGraph]:
         """
         Convert the indication table into networkx directed graphs
@@ -131,7 +131,7 @@ class IndTab2Json:
     def _table2nodelinks(self) -> Dict[str, TypedDict]:
         """
         Convert the input table into node link format that is
-        serializable to JSON and usable in Javascript documents. 
+        serializable to JSON and usable in Javascript documents.
         """
         graphs = self._table2graphs()
 

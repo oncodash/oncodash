@@ -8,11 +8,11 @@ from django.contrib.auth.models import (
 class UserManager(BaseUserManager):
 
     def create_user(
-            self,
-            email: str,
-            password: str = None,
-            **kwargs
-        ) -> AbstractBaseUser:
+        self,
+        email: str,
+        password: str = None,
+        **kwargs
+    ) -> AbstractBaseUser:
         """
         Creates and saves a new user
 
@@ -42,10 +42,10 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(
-            self,
-            email: str,
-            password: str = None
-        ) -> AbstractBaseUser:
+        self,
+        email: str,
+        password: str = None
+    ) -> AbstractBaseUser:
         """
         Creates and saves a new superuser
 
