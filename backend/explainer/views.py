@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from oncoviz.serializers import NetworkSerializer
-from oncoviz.models import NetworkSpec
+from explainer.serializers import NetworkSerializer
+from explainer.models import NetworkSpec
 
 
 class NetworkViewSet(viewsets.ModelViewSet):

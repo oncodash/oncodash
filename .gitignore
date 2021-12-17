@@ -27,3 +27,4 @@ __pycache__
 */db.sqlite3
 notebooks
 migrations
+nbs

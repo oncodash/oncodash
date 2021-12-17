@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from oncoviz.models import NetworkSpec
+from explainer.models import NetworkSpec
 
 
 class NetworkSerializer(serializers.ModelSerializer):
