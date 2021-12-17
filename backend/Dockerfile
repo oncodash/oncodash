@@ -44,5 +44,5 @@ EXPOSE 8888
 USER $UNAME
 
 # Run gunicorn web server
-CMD ["gunicorn", "core.wsgi", "--bind", "0.0.0.0:8888"]
+CMD ["gunicorn", "backend.wsgi", "--bind", "0.0.0.0:8888"]
 # CMD ["python", "manage.py", "runserver", "0.0.0.0:8888"]
