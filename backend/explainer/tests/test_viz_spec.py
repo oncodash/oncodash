@@ -3,10 +3,10 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 
-from core.models import NetworkSpec
+from explainer.models import NetworkSpec
 
 
-NETWORK_URL = reverse('oncoviz:network-list')
+NETWORK_URL = reverse('explainer:network-list')
 
 
 class NetworkAPiTests(TestCase):

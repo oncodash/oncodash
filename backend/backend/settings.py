@@ -37,10 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # own apps
     'core',
-    'oncoviz',
+    'explainer',
+    
+    # third-party
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +59,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-ROOT_URLCONF = 'core.urls'
+ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
     {
@@ -72,7 +77,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
+WSGI_APPLICATION = 'backend.wsgi.application'
 
 
 # Database
