@@ -370,7 +370,16 @@ class Oncoview extends LitElement {
     }
   `;
 
+  fetchNetworkData() {
+    console.log('Fetching...')
+    const apiUrl = 'http://127.0.0.1:8888/api/explainer/networks/'
+    fetch(apiUrl)
+      .then((response) => response.json())
+      .then((data) => console.log(data))
+  }
+
   render() {
+    this.fetchNetworkData()
     return draw();
   }
 }
