@@ -7,4 +7,4 @@
 Views
 ----------
 
-.. autofunction:: core.views.home
+.. autofunction:: core.views.FrontendRenderView
