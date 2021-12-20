@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from explainer.serializers import NetworkSerializer
-from explainer.models import NetworkSpec
+from .serializers import NetworkSerializer
+from ..models import NetworkSpec
 
 
 class NetworkViewSet(viewsets.ModelViewSet):

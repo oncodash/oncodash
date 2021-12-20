@@ -13,7 +13,7 @@ class IndTab2Json:
         separator: str = ",",
         index_key: str = "indicationindex",
         group_key: str = "Patient",
-        certainty_key="certainty",
+        certainty_key: str = "certainty",
         format: str = "nodelink",
         df_transform: Callable = None,
     ) -> None:
@@ -26,7 +26,7 @@ class IndTab2Json:
             |--------|--------|--------|--------|--------|--------|
           0 |   P1   | P1_s1  |   G1   |  p.1X  | Drug1  |   1    |
           1 |   P1   | P1_s2  |   G1   |  p.2X  | Drug1  |   1    |
-          2 |   P1   | P1_s1  |   G2   |  p.3X  | Drug2  |   2    |
+          2 |   P1   | P1_s3  |   G2   |  p.3X  | Drug2  |   2    |
           3 |   P2   | P2_s1  |   G1   |  p.4X  | Drug1  |   3    |
           4 |   P2   | P2_s2  |   G3   |  p.5X  | Drug1  |   1    |
           5 |   P3   | P3_s1  |   G2   |  p.6X  | Drug3  |   1    |
@@ -117,7 +117,7 @@ class IndTab2Json:
                 edge_attrs = {
                     e: {"certainty": 1./row[self.certainty_key],
                         "strength": row[self.certainty_key]}
-                    for i, e in enumerate(g.edges)
+                    for e in g.edges
                 }
                 nx.set_edge_attributes(g, edge_attrs)
 

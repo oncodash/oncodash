@@ -7,6 +7,6 @@ from core import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/explainer/', include('explainer.urls')),
+    path('api/explainer/', include('explainer.api.urls')),
     path('', views.home)
 ] + staticfiles_urlpatterns()
