@@ -27,5 +27,6 @@ __pycache__
 */db.sqlite3
 notebooks
 nbs
+.env
 
 **/build/
