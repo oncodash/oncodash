@@ -54,6 +54,7 @@ github_version = 'main'
 github_url = f'https://github.com/{github_user}/{github_repo}/'
 gh_page_url = f'https://{github_user}.github.io/{github_repo}/'
 
+
 html_context = {
     'display_github': True,
     'github_user': github_user,
@@ -61,13 +62,17 @@ html_context = {
     'github_version': github_version,
     "conf_py_path": "/backend/docs/sphinx/source/",  # Path in the checkout to the docs root
 }
+
+html_baseurl = github_url
 html_theme_options = {
     'github_url': github_url,
 
     'doc_items': {
-        'Back-end': 'oncodash/backend',
-        'Front-end': 'oncodash/frontend',
+        'Back-end': '/oncodash/backend',
+        'Front-end': '/oncodash/frontend',
     },
+
+    'home_url': 'https://oncodash.github.io/oncodash/',
 
     'logo': 'images/logo/logo.svg',
     'logo_dark': 'images/logo/oncodash-logo.svg',
