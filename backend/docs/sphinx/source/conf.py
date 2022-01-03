@@ -25,7 +25,7 @@ django.setup()
 # -- Project information -----------------------------------------------------
 
 project = 'oncodash-backend'
-copyright = '2021, DECIDER'
+copyright = '2022, DECIDER'
 author = 'DECIDER'
 
 
