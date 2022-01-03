@@ -3,22 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to oncodash-backend's documentation!
+oncodash documentation
 ============================================
+
+Oncodash is a clinical oncology tumor board decision support system developed within H2020 Decider project. 
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    views
-   
-.. changelog::
-	:changelog-url: https://your-project.readthedocs.io/en/stable/#changelog
-	:github: https://github.com/you/your-project/releases/
-	:pypi: https://pypi.org/project/your-project/
 
 
-Indices and tables
+indices and tables
 ==================
 
 * :ref:`genindex`

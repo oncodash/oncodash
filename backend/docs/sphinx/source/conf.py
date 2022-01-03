@@ -43,6 +43,30 @@ extensions = [
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
+needs_sphinx = '4.0.2'
+source_suffix = '.rst'  # ['.rst', '.md']
+root_doc = 'index'
+
+html_context = {
+    'display_github': True,
+    #'github_user': github_user,
+    'github_repo': 'https://github.com/oncodash',
+    #'github_version': github_version,
+    # "conf_py_path": "/docs/source/",  # Path in the checkout to the docs root
+}
+html_theme_options = {
+    'github_url': 'https://github.com/oncodash',
+
+    'doc_items': {
+        'Back-end': '/backend',
+        'Front-end': '/frontend',
+    },
+
+    'logo': 'images/logo/trojanzoo-logo.svg',
+    'logo_dark': 'images/logo/oncodash-logo.png',
+    'logo_icon': 'images/logo/trojanzoo-logo-icon.svg',
+}
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
@@ -54,9 +78,13 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+# html_theme = 'alabaster'
+html_theme = "trojanzoo_sphinx_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
+
+html_favicon = 'images/favicon.ico'
+# html_title = " ".join((project, version, "documentation"))
