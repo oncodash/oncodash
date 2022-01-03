@@ -34,9 +34,9 @@ jobs:
         touch build/html/.nojekyll
 
     - name: Deploy
-      uses: JamesIves/github-pages-deploy-action@releases/v3
+      uses: JamesIves/github-pages-deploy-action@4.1.7
       with:
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        BRANCH: gh-pages
-        FOLDER: backend/docs/sphinx/build/html/
+        token: ${{ secrets.ACCESS_TOKEN }}
+        branch: gh-pages
+        folder: backend/docs/sphinx/build/html/
         target-folder: backend/
