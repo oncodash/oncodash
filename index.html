@@ -1,42 +1,214 @@
 
+
+
 <!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
 
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Welcome to oncodash-backend’s documentation! &#8212; oncodash-backend  documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="core.views" href="views.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
-  </head><body>
+  <title>oncodash backend - docpage &mdash; oncodash-backend  documentation</title>
   
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
+  
+  
+  <link rel="shortcut icon" href="_static/favicon.ico" />
+  
+  
+  
+
+  
+
+  
+  
+  
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="index" title="Index" href="genindex.html" />
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="next" title="core.views" href="views.html" /> 
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"
+    integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<body class="sphinx-template-body">
+
+<div class="container-fluid header-holder docs-header" style="background-color: rgba(0, 0, 0, 0.165);">
+  <div class="container">
+<!--
+<div class="container-fluid header-holder docs-header" id="header-holder">
+  <div class="container">
+-->
+    <div class="header-container">
+      <!--<a class="header-logo" href="https://oncodash.github.io/oncodash/" aria-label="oncodash-backend"></a>-->
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://oncodash.github.io/oncodash/">Home</a>
+          </li>
+
+          <li class="docs">
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                  <a class="doc-dropdown-option nav-dropdown-item" href="/oncodash/backend">
+                  <span class="dropdown-title">Back-end</span>
+                  <p></p>
+                </a>
+                  <a class="doc-dropdown-option nav-dropdown-item" href="/oncodash/frontend">
+                  <span class="dropdown-title">Front-end</span>
+                  <p></p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/oncodash/oncodash/">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+   <div class="main-background home-page-background"></div>
+  
+
+  <div class="table-of-contents-link-wrapper">
+    <span>Table of Contents</span>
+    <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+  </div>
+
+<!--
+  <nav data-toggle="sphinx-template-nav-shift" class="sphinx-template-left-menu" id="sphinx-template-left-menu">
+    <div class="sphinx-template-side-scroll">
+      <div class="sphinx-template-menu sphinx-template-menu-vertical" data-spy="affix" role="navigation"
+        aria-label="main navigation">
+        <div class="sphinx-template-left-menu-search">
           
 
-          <div class="body" role="main">
+          
+          
+          
+          
+
+          
+
+
+<div role="search">
+  <form id="rtd-search-form" class="sphinx-template-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        
+        
+        
+        
+        
+        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="views.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">core.views</span></code></a></li>
+</ul>
+
+        
+        
+      </div>
+    </div>
+  </nav>
+  -->
+
+<br>
+<br>
+<br>
+<div class="container" >
+<h1>TODO - Main doc page here. Work in progress.</h1>
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<!--
+  <div class="sphinx-template-container">
+  
+    <div class="sphinx-template-page-level-bar" id="sphinx-template-page-level-bar">
+      <div class="sphinx-template-breadcrumbs-wrapper">
+        <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="sphinx-template-breadcrumbs">
+      <li><a href="#" class="fa fa-large fa-home">Docs</a> &gt;</li>
+      <li>oncodash backend - docpage</li>
+      <li class="sphinx-template-breadcrumbs-aside">
+              <a href="https://github.com/oncodash/oncodash/blob/main/backend/docs/sphinx/source/index.rst" class="fa fa-large fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+</div>
+      </div>
+
+      <div class="sphinx-template-shortcuts-wrapper" id="sphinx-template-shortcuts-wrapper">
+        Shortcuts
+      </div>
+    </div>
+
+    <section data-toggle="sphinx-template-nav-shift" id="sphinx-template-content-wrap" class="sphinx-template-content-wrap">
+      <div class="sphinx-template-content-left">
+        
+          <div class="rst-content">
             
-  <section id="welcome-to-oncodash-backend-s-documentation">
-<h1>Welcome to oncodash-backend’s documentation!<a class="headerlink" href="#welcome-to-oncodash-backend-s-documentation" title="Permalink to this headline">¶</a></h1>
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+              <article itemprop="articleBody" id="sphinx-template-article" class="sphinx-template-article">
+                
+  <section id="oncodash-backend-docpage">
+<h1>oncodash backend - docpage<a class="headerlink" href="#oncodash-backend-docpage" title="Permalink to this headline">¶</a></h1>
+<p>TODO - This is the backend architecture summary page. We have to write here all the general details about the backend.</p>
 <div class="toctree-wrapper compound">
-<p><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="views.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">core.views</span></code></a><ul>
 <li class="toctree-l2"><a class="reference internal" href="views.html#views">Views</a></li>
@@ -46,7 +218,7 @@
 </div>
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h1>indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
@@ -55,71 +227,172 @@
 </section>
 
 
+              </article>
+              
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="views.html" class="btn btn-neutral float-right" title="core.views" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+    </div>
+  
+  
+  <hr>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, DECIDER.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using <a href="https://github.com/ain-soph/trojanzoo_sphinx_theme">trojanzoo_sphinx_theme</a> (modified from  <a href="https://github.com/ain-soph/pytorch_sphinx_theme">pytorch_sphinx_theme</a>).
+      </div>
+     
+
+</footer>
+
           </div>
+        </div>
+
+        <div class="sphinx-template-content-right" id="sphinx-template-content-right">
+          <div class="sphinx-template-right-menu" id="sphinx-template-right-menu">
+            <div class="sphinx-template-side-scroll" id="sphinx-template-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">oncodash backend - docpage</a></li>
+<li><a class="reference internal" href="#indices-and-tables">indices and tables</a></li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+    </section>
+  </div>
+-->
+  
+
+  
+
+  
+  <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+  <script src="_static/jquery.js"></script>
+  <script src="_static/underscore.js"></script>
+  <script src="_static/doctools.js"></script>
+  
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+    jQuery(function () {
+      SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  <script type="text/javascript">
+    jQuery(function () {
+      $('.header-logo').css('background-image', 'url(_static/logo/logo.svg)');
+      $('.docs-header .header-logo').css('background-image', 'url(_static/logo/oncodash-logo.svg)');
+      $('.footer-logo').css('background-image', 'url(_static/logo/logo-icon.svg)');
+      });
+  </script>
+  <script script type="text/javascript">
+    var collapsedSections = [];
+  </script>
+  
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-resources" id="docs-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for oncodash-backend</p>
+          <a class="with-right-arrow" href="#">View Docs</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://oncodash.github.io/oncodash/" class="footer-logo"></a>
+      </div>
+    </div>
+  </footer>
+  -->
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://oncodash.github.io/oncodash/" aria-label="oncodash-backend"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+
+          <li>
+            <a href="https://oncodash.github.io/oncodash/">Home</a>
+          </li>
+
+          <li class="active resources-mobile-menu-title">
+            <a href="./">Docs</a>
+          </li>
+          <ul class="resources-mobile-menu-items">
+              <li>
+              <a href="/oncodash/backend">Back-end</a>
+            </li>
+              <li>
+              <a href="/oncodash/frontend">Front-end</a>
+            </li>
+          </ul>
           
-        </div>
+          <li>
+            <a href="https://github.com/oncodash/oncodash/">GitHub</a>
+          </li>
+        </ul>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="#">oncodash-backend</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="views.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">core.views</span></code></a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="views.html" title="next chapter"><code class="xref py py-mod docutils literal notranslate"><span class="pre">core.views</span></code></a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
     </div>
-</div>
-<script>$('#searchbox').show(0);</script>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="_static/js/vendor/anchor.min.js"></script>
 
 
+  <script type="text/javascript">
+    $(document).ready(function () {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      trojanzooAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
 
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.sphinx-template-article a span.pre").each(function (e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
 
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2021, DECIDER.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/index.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-
-    
-  </body>
 </html>
