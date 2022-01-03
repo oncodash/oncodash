@@ -18,12 +18,6 @@ jobs:
       with:
         python-version: '3.8'
 
-    - name: Install katex
-      run: |
-        apt update
-        apt install -y npm
-        npm install -g katex
-
     - name: Install Dependencies
       run: |
         pip install --upgrade pip
