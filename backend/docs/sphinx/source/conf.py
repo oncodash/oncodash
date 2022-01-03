@@ -62,9 +62,9 @@ html_theme_options = {
         'Front-end': '/frontend',
     },
 
-    'logo': 'images/logo/trojanzoo-logo.svg',
-    'logo_dark': 'images/logo/oncodash-logo.png',
-    'logo_icon': 'images/logo/trojanzoo-logo-icon.svg',
+    'logo': 'images/logo/logo.svg',
+    'logo_dark': 'images/logo/oncodash-logo.svg',
+    'logo_icon': 'images/logo/logo-icon.svg',
 }
 
 # List of patterns, relative to source directory, that match files and
