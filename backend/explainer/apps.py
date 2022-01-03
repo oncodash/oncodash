@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class OncovizConfig(AppConfig):
+class ExplainerConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'oncoviz'
+    name = 'explainer'

@@ -1,8 +1,5 @@
-import json
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-
-from core import models
 
 
 class ModelTests(TestCase):
@@ -54,26 +51,3 @@ class ModelTests(TestCase):
 
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
-
-    def test_valid_jsonspec_str(self) -> None:
-        """
-        Test the that json spec is valid json
-        """
-        net = {
-            "nodes": [
-                {"id": "A", "group": "samples", "order": 1},
-                {"id": "B", "group": "samples", "order": 1},
-                {"id": "C", "group": "cancers", "order": 2},
-                {"id": "D", "group": "cancers", "order": 2},
-            ],
-            "links": [
-                {"source": "A", "target": "C", "certainty": .5, "strength": .7},
-                {"source": "B", "target": "D", "certainty": .3, "strength": .9}
-            ]
-        }
-
-        spec = models.NetworkSpec.objects.create(
-            spec=json.dumps(net)
-        )
-
-        self.assertEqual(spec.spec, str(spec))

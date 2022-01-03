@@ -11,17 +11,38 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ARG UNAME=djangouser
 RUN adduser -D $UNAME
 
+# Update apk and install python3 headers for numpy
+RUN apk update
+RUN apk add python3-dev
+
+# install c++ compilers for pandas & numpy installations
+RUN apk add --no-cache --virtual .build-deps \
+    make \
+    automake \
+    gcc \
+    g++ \
+    subversion
+
 # Copy in source code and set up rights 
 RUN mkdir /opt/app/ && chown $UNAME:$UNAME /opt/app/
 WORKDIR /opt/app
 COPY --chown=$UNAME:$UNAME ./requirements.txt ./requirements.txt
 ENV PATH /home/$UNAME/.local/bin:$PATH
-RUN pip install -r requirements.txt
-COPY --chown=$UNAME:$UNAME . .
-EXPOSE 8888
 
+# install deps
+RUN pip install -U pip \
+    && pip install -U setuptools \
+    && pip install -r requirements.txt
+
+# remove build-deps
+RUN apk del .build-deps
+
+# copy in the source code
+COPY --chown=$UNAME:$UNAME . .
+
+EXPOSE 8888
 USER $UNAME
 
 # Run gunicorn web server
-CMD ["gunicorn", "core.wsgi", "--bind", "0.0.0.0:8888"]
+CMD ["gunicorn", "backend.wsgi", "--bind", "0.0.0.0:8888"]
 # CMD ["python", "manage.py", "runserver", "0.0.0.0:8888"]
