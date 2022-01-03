@@ -11,6 +11,11 @@ Welcome to oncodash-backend's documentation!
    :caption: Contents:
 
    views
+   
+.. changelog::
+	:changelog-url: https://your-project.readthedocs.io/en/stable/#changelog
+	:github: https://github.com/you/your-project/releases/
+	:pypi: https://pypi.org/project/your-project/
 
 
 Indices and tables
