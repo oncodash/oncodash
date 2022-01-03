@@ -6,7 +6,7 @@
 oncodash backend - docpage
 ============================================
 
-Oncodash is a clinical oncology tumor board decision support system developed within H2020 Decider project. 
+TODO - This is the backend architecture summary page. We have to write here all the general details about the backend.
 
 .. toctree::
    :maxdepth: 2
