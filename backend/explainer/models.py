@@ -9,7 +9,7 @@ class NetworkSpec(models.Model):
     spec = models.JSONField()
 
     def __str__(self):
-        return self.spec
+        return str(self.spec)
 
 
 # TODO: More abstracted network model
