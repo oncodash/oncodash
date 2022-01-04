@@ -226,7 +226,7 @@ function draw() {
   container.append('p').text('Oncoview');
   const svg = container.append("svg")
     .attr("id","oncoview")
-    .attr('viewBox', '0 0 ' + svgWidth.toString() + " " + svgHeight.toString());
+    .attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
 
   svg
     .append('rect')
