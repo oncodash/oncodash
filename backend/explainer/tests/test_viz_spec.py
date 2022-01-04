@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 
-from explainer.models import NetworkSpec
+# from explainer.models import NetworkSpec
 
 
 NETWORK_URL = reverse('explainer:network-list')
@@ -17,6 +17,7 @@ class NetworkAPiTests(TestCase):
     def setUp(self):
         self.valid_spec = {
             "id": 1,
+            "patient": "P1",
             "spec": {
                 "nodes": [
                     {"id": "Ascites", "group": "samples", "order": 1},
@@ -33,7 +34,7 @@ class NetworkAPiTests(TestCase):
             }
         }
 
-        self.network_spec = NetworkSpec(spec=self.valid_spec)
+        # self.network_spec = NetworkSpec(patient="P1", spec=self.valid_spec)
         self.client = APIClient()
 
     def test_create_network_successful(self) -> None:
