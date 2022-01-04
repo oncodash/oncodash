@@ -219,13 +219,14 @@ function draw() {
   const blurMax = 3;
 
   const div = document.createElement("div");
-  const container = d3.select(div);
+  const container = d3.select(div)
+    .attr("id","oncowidget");
 
   // Canvas
   container.append('p').text('Oncoview');
   const svg = container.append("svg")
-    .style('width', svgWidth)
-    .style('height', svgHeight);
+    .attr("id","oncoview")
+    .attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
 
   svg
     .append('rect')
