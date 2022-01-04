@@ -1,10 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from oncoviz import views
+from explainer import views
 
 
-app_name = 'oncoviz'
+app_name = 'explainer'
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()

@@ -1,0 +1,6 @@
+sphinxcontrib.katex
+sphinx-copybutton
+sphinx-autoapi
+# oncodash_sphinx_theme
+git+https://github.com/oncodash/oncodash_sphinx_theme.git#egg=trojanzoo_sphinx_theme
+

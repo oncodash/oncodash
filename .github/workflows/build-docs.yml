@@ -1,0 +1,40 @@
+name: build-docs
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+
+    - name: Python SetUp
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.8'
+
+    - name: Install Dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r ./backend/requirements.txt
+        pip install -r ./backend/docs/sphinx/requirements.txt
+
+    - name: Build (backend) Doc
+      run: |
+        cd backend/docs/sphinx
+        make clean
+        make html
+        touch build/html/.nojekyll
+
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@4.1.7
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        branch: gh-pages
+        folder: backend/docs/sphinx/build/html/
+        target-folder: backend/
