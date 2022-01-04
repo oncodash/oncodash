@@ -3,8 +3,9 @@ from django.db import models
 
 class NetworkSpec(models.Model):
     """
-    Django model for the json network graph spec
+    Django model for the json network graph spec for one patient
     """
+    patient = models.CharField(max_length=100, unique=True, null=True)
     spec = models.JSONField()
 
     def __str__(self):

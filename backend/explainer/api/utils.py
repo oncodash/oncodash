@@ -1,4 +1,3 @@
-import json
 import pandas as pd
 import networkx as nx
 from pathlib import Path
@@ -77,7 +76,7 @@ class IndTab2Json:
             self.indf = df_transform(self.indf)
 
     @property
-    def network_spec(self) -> str:
+    def network_spec(self) -> Dict[str, TypedDict]:
         """
         Get the JSON network specifications for all the groups in the
         indication table.
@@ -87,8 +86,8 @@ class IndTab2Json:
         elif self.format == "nodelink":
             graphs = self._table2nodelinks()
 
-        return json.dumps(graphs)
-
+        return graphs
+    
     def _table2graphs(self) -> Dict[str, nx.DiGraph]:
         """
         Convert the indication table into networkx directed graphs
