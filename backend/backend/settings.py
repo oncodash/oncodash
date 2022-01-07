@@ -63,10 +63,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'backend.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR.parent / 'oncodash-app'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -131,6 +132,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = Path(BASE_DIR / 'static')
+STATICFILES_DIRS = [
+    BASE_DIR.parent / 'oncodash-app/'
+]
 
 
 # Default primary key field type
@@ -146,4 +150,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-CORS_ALLOWED_ORIGINS = []
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8000'
+]
