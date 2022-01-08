@@ -6,9 +6,8 @@ from .views import NetworkViewSet
 
 app_name = 'explainer'
 
-# Create a router and register our viewsets with it.
 router = DefaultRouter()
-router.register(r'network', NetworkViewSet, 'network')
+router.register(r'networks', NetworkViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

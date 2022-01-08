@@ -6,8 +6,8 @@ from ..models import NetworkSpec
 
 class NetworkViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for the causal network. Provides `list`, `create`,
-    `retrieve`, `update` and `destroy` actions.
+    API endpoint for the causal networks of the patients. Provides
+    `list`, `create`, `retrieve`, `update` and `destroy` actions.
     """
     queryset = NetworkSpec.objects.all()
     serializer_class = NetworkSerializer
