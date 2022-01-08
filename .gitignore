@@ -11,6 +11,8 @@ node_modules/
 
 ## testing
 /coverage/
+.coverage
+.coveragerc
 
 ## temp folders
 /.tmp/
