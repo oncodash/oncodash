@@ -38,7 +38,11 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+    'sphinx.ext.autosummary',
 ]
+
+autosummary_generate = True  # Turn on sphinx.ext.autosummary
+autosummary_imported_members = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -96,7 +100,13 @@ html_theme = "trojanzoo_sphinx_theme"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ['_static']
+html_static_path = ['_static']
+
+def setup(app):
+    app.add_css_file('css/oncodash.css')  # may also be an URL
 
 html_favicon = 'images/favicon.ico'
 # html_title = " ".join((project, version, "documentation"))
+
+# Allow numbering of figures/references.
+numfig = True
