@@ -43,6 +43,6 @@ COPY --chown=$UNAME:$UNAME . .
 EXPOSE 8888
 USER $UNAME
 
-# Run gunicorn web server
-CMD ["gunicorn", "backend.wsgi", "--bind", "0.0.0.0:8888"]
-# CMD ["python", "manage.py", "runserver", "0.0.0.0:8888"]
+# Run gunicorn web server for production
+# CMD ["gunicorn", "backend.wsgi", "--bind", "0.0.0.0:8888"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8888"]
