@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  docs:
+  backend-doc:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -38,3 +38,43 @@ jobs:
         branch: gh-pages
         folder: backend/docs/sphinx/build/html/
         target-folder: backend/
+  frontend-doc:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+
+    - name: Python SetUp
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.8'
+
+    - uses: bahmutov/npm-install@v1
+      with:
+        working-directory: oncodash-app
+    - name: Install typedoc
+      run: |
+        npm install -g typedoc
+        npm install @open-wc/create
+
+    - name: Install Dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r ./oncodash-app/docs/sphinx-js/requirements.txt
+
+    - name: Build (frontend) Doc
+      run: |
+        cd oncodash-app/docs/sphinx-js
+        make clean
+        make html
+        touch build/html/.nojekyll
+
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@4.1.7
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        branch: gh-pages
+        folder: oncodash-app/docs/sphinx-js/build/html/
+        target-folder: frontend/
