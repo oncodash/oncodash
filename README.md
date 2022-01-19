@@ -28,7 +28,7 @@ docker-compose run --rm backend sh -c "python manage.py migrate"
 
 ## Development
 
-1. Run the images in a containers
+1. Run the images in containers
 ```sh
 docker-compose up
 ``` 
