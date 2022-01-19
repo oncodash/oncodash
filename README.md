@@ -38,7 +38,7 @@ docker-compose up
 ## 6. Develop
 
 - Open up the browser at `localhost` 
-- Browsable API at `localhost/api/explainer/network/`
+- Browsable API at `localhost/api/explainer/networks/`
 
 ## 7. Run tests and linting for the backend
 

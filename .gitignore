@@ -11,6 +11,8 @@ node_modules/
 
 ## testing
 /coverage/
+.coverage
+.coveragerc
 
 ## temp folders
 /.tmp/
@@ -27,6 +29,7 @@ __pycache__
 */db.sqlite3
 notebooks
 nbs
+.env
 
 **/build/
 **/env/

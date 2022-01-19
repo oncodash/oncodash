@@ -31,5 +31,5 @@ COPY --chown=node:node . .
 # app runs on port 8000
 EXPOSE 8000
 
-# start the server
+# start the dev server
 CMD ["npm", "start", "--prefix", "/opt/node_app/app"]
