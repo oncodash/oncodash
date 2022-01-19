@@ -16,9 +16,6 @@ interface Link {
     strength: number;
 }
 
-interface Nodes extends Array<Node>{}
-interface Links extends Array<Link>{}
-
 interface NodeLink {
     id: number;
     patient: string;    
@@ -26,8 +23,8 @@ interface NodeLink {
         directed: boolean;
         multigraph: boolean;
         graph: {};
-        nodes: Nodes;
-        links: Links; 
+        nodes: Node[];
+        links: Link[]; 
     } 
 }
 
@@ -46,15 +43,11 @@ interface BoxBounds {
     [index: string]: BoxBound;
 }
 
-// `drawGraph()` specific interfaces
-interface OrderedCols {
-    [order: number]: { vals: string[], colname: string };
-}
+// `drawGraph()` specific type
+type Column = { vals: string[], colname: string }[];
 
-// `drawLinks() specific interfaces`
-interface ColumnLinks {
-    [colname: string]: object & { links: Links, bound: BoxBounds };
-}
+// `drawLinks() specific type`
+type ColumnLinks = Record<string, object & { links: Link[], bound: BoxBounds }>
 
 /**
  * Draws one column from given input data.
@@ -94,7 +87,7 @@ function drawColumn(
         
         // draw the columns
         const bounds: BoxBounds = {};
-        for (let i = 0; i < labels.length; i++) {
+        for (let i = 0; i < labels.length; i += 1) {
             const s = svg.append('g').attr('id', `${id}-${i}`);
             const span = svgHeight / labels.length / 2;
             const boxY = 20 + span + (svgHeight / labels.length) * i;
@@ -186,11 +179,11 @@ function drawGraph(graphData: NodeLink): HTMLElement {
     
     // Canvas
     const svg = container.append('svg')
-    .attr('id', 'oncoview')
+    .attr('id', 'explainerview')
     .attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
     
     svg.append('rect')
-    .attr('class', 'oncoview-canvas')
+    .attr('class', 'explainerview-canvas')
     .attr('width', '100%')
     .attr('height', '100%')
     
@@ -209,11 +202,11 @@ function drawGraph(graphData: NodeLink): HTMLElement {
     const links = svg.append('g').attr('id', 'links');
     
     // wrangle the column nodes data-structure for `drawColumn()`
-    const colData: OrderedCols = {}
+    const colData: Column = [];
     for (const node of graphData.spec.nodes) {
         colData[node.order] = {vals: [], colname: node.group};
     }
-    
+
     for (const node of graphData.spec.nodes) {
         colData[node.order].vals.push(node.id)
     }
@@ -234,7 +227,7 @@ function drawGraph(graphData: NodeLink): HTMLElement {
             svgHeight
         )
       
-        const colLinks: Links = [];
+        const colLinks: Link[] = [];
         for (const k of Object.keys(colBounds)) {
             for (const link of graphData.spec.links) {
                 if (link.source === k) {
@@ -246,7 +239,7 @@ function drawGraph(graphData: NodeLink): HTMLElement {
     }
 
     // draw the links
-    for (let i = 1; i < Object.keys(colData).length; i++) {
+    for (let i = 1; i < Object.keys(colData).length; i += 1) {
         const colCurr = colData[i].colname
         const colNext = colData[i+1].colname
 
@@ -263,7 +256,11 @@ function drawGraph(graphData: NodeLink): HTMLElement {
 }
 
 
-class Oncoview extends LitElement {
+/**
+ * Lit Element, responsible for rendering the network visualization and
+ * fetching the node-link data from the API.
+ */
+class ExplainerView extends LitElement {
     private graph?: NodeLink;
 
     constructor() {
@@ -272,10 +269,10 @@ class Oncoview extends LitElement {
     }
 
     static styles = css`
-    .Oncoview {
+    .ExplainerView {
     }
 
-    .oncoview-canvas {
+    .explainerview-canvas {
         fill: white;
     }
 
@@ -325,7 +322,7 @@ class Oncoview extends LitElement {
 
   connectedCallback(): void {
       super.connectedCallback();
-      this.fetchNetworkData(2);
+      this.fetchNetworkData(4); // TODO: idx arg as user input
   }
 
   render() {
@@ -334,6 +331,5 @@ class Oncoview extends LitElement {
   }
 }
 
-export default Oncoview;
-
-customElements.define('onco-view', Oncoview);
+export default ExplainerView;
+customElements.define('explainer-view', ExplainerView);
