@@ -39,7 +39,7 @@ tsc -w
 npm test
 ```
 
-# Instructions to build a frontend docker-image with docker-compose (for development)
+# Instructions to build a frontend docker-image with docker-compose for development
 
 ### Requirements
 - [Docker desktop/CE](https://docs.docker.com/engine/install/) 
