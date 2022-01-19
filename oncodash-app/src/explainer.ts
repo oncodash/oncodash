@@ -22,7 +22,7 @@ interface NodeLink {
     spec: {
         directed: boolean;
         multigraph: boolean;
-        graph: {};
+        graph: Record<string, unknown>;
         nodes: Node[];
         links: Link[]; 
     } 
@@ -47,7 +47,7 @@ interface BoxBounds {
 type Column = { vals: string[], colname: string }[];
 
 // `drawLinks() specific type`
-type ColumnLinks = Record<string, object & { links: Link[], bound: BoxBounds }>
+type ColumnLinks = Record<string, { links: Link[], bound: BoxBounds }>
 
 /**
  * Draws one column from given input data.
@@ -87,7 +87,7 @@ function drawColumn(
         
         // draw the columns
         const bounds: BoxBounds = {};
-        for (let i = 0; i < labels.length; i += 1) {
+        for (let i = 0; i < labels.length; i++) {
             const s = svg.append('g').attr('id', `${id}-${i}`);
             const span = svgHeight / labels.length / 2;
             const boxY = 20 + span + (svgHeight / labels.length) * i;
@@ -239,7 +239,7 @@ function drawGraph(graphData: NodeLink): HTMLElement {
     }
 
     // draw the links
-    for (let i = 1; i < Object.keys(colData).length; i += 1) {
+    for (let i = 1; i < Object.keys(colData).length; i++) {
         const colCurr = colData[i].colname
         const colNext = colData[i+1].colname
 
@@ -325,7 +325,7 @@ class ExplainerView extends LitElement {
       this.fetchNetworkData(4); // TODO: idx arg as user input
   }
 
-  render() {
+  render(): HTMLElement {
     const data = this.graph as NodeLink;
     return drawGraph(data);
   }
