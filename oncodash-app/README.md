@@ -64,6 +64,7 @@ docker-compose up
 ```
 
 2. Develop
+  
 Open up the browser at `localhost:8000`
 
 ## Testing

@@ -3,7 +3,7 @@
 
 The oncodash back-end is used to serve API-endpoints for the front-end application
 
-# Instructions to build the backend locally for dvelopment
+# Instructions to build the backend locally for development
 
 ### Requirements
 - Python >= 3.7

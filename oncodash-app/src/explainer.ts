@@ -72,18 +72,18 @@ function drawColumn(
         
         // Column header
         svg.append('text')
-        .attr('class', 'column-label')
-        .attr('x', columnX + labelBoxWidth / 2)
-        .attr('y', 20)
-        .text(id);
+          .attr('class', 'column-label')
+          .attr('x', columnX + labelBoxWidth / 2)
+          .attr('y', 20)
+          .text(id);
         
         // strike-through line
         svg.append('line')
-        .attr('class', 'column-line')
-        .attr('x1', columnX + labelBoxWidth / 2)
-        .attr('x2', columnX + labelBoxWidth / 2)
-        .attr('y1', 20)
-        .attr('y2', svgHeight);
+          .attr('class', 'column-line')
+          .attr('x1', columnX + labelBoxWidth / 2)
+          .attr('x2', columnX + labelBoxWidth / 2)
+          .attr('y1', 20)
+          .attr('y2', svgHeight);
         
         // draw the columns
         const bounds: BoxBounds = {};
@@ -98,18 +98,18 @@ function drawColumn(
             };
             
             s.append('rect')
-            .attr('class', 'label-box')
-            .attr('width', labelBoxWidth)
-            .attr('height', labelBoxHeight)
-            .attr('x', columnX)
-            .attr('y', boxY)
-            .text(''); // FIXME only way to close the tag?
+              .attr('class', 'label-box')
+              .attr('width', labelBoxWidth)
+              .attr('height', labelBoxHeight)
+              .attr('x', columnX)
+              .attr('y', boxY)
+              .text(''); // FIXME only way to close the tag?
             
             s.append('text')
-            .attr('class', 'label-text')
-            .attr('x', columnX + labelBoxWidth / 2)
-            .attr('y', span + labelBoxHeight + (svgHeight / labels.length) * i + 15)
-            .text(labels[i]);
+              .attr('class', 'label-text')
+              .attr('x', columnX + labelBoxWidth / 2)
+              .attr('y', span + labelBoxHeight + (svgHeight / labels.length) * i + 15)
+              .text(labels[i]);
         }
         
         return bounds;
@@ -179,13 +179,13 @@ function drawGraph(graphData: NodeLink): HTMLElement {
     
     // Canvas
     const svg = container.append('svg')
-    .attr('id', 'explainerview')
-    .attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
+      .attr('id', 'explainerview')
+      .attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
     
     svg.append('rect')
-    .attr('class', 'explainerview-canvas')
-    .attr('width', '100%')
-    .attr('height', '100%')
+      .attr('class', 'explainerview-canvas')
+      .attr('width', '100%')
+      .attr('height', '100%')
     
     // Filters
     const defs = svg.append('defs');
@@ -193,9 +193,9 @@ function drawGraph(graphData: NodeLink): HTMLElement {
     for (let b = 0; b <= 1; b += 0.1) {
         const blur = Math.round(b*10) / 10;
         defs.append('filter')
-        .attr('id', `blur-${blur}`)
-        .append('feGaussianBlur')
-        .attr('stdDeviation', blurMax*blur)
+          .attr('id', `blur-${blur}`)
+          .append('feGaussianBlur')
+          .attr('stdDeviation', blurMax*blur)
     }
     
     const nodes = svg.append('g').attr('id', 'nodes');
@@ -322,7 +322,7 @@ class ExplainerView extends LitElement {
 
   connectedCallback(): void {
       super.connectedCallback();
-      this.fetchNetworkData(4); // TODO: idx arg as user input
+      this.fetchNetworkData(3); // TODO: idx arg as user input
   }
 
   render(): HTMLElement {

@@ -33,7 +33,7 @@ docker-compose run --rm backend sh -c "python manage.py migrate"
 docker-compose up
 ``` 
 2. Open up the browser at `localhost`
-3. Browsable API at `localhost/api/explainer/networks/`
+3. Browsable API endpoints at `localhost/api/explainer/networks/`
   
 ## Testing
   
