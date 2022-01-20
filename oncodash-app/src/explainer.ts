@@ -16,18 +16,15 @@ interface Link {
     strength: number;
 }
 
-interface Nodes extends Array<Node>{}
-interface Links extends Array<Link>{}
-
 interface NodeLink {
     id: number;
     patient: string;    
     spec: {
         directed: boolean;
         multigraph: boolean;
-        graph: {};
-        nodes: Nodes;
-        links: Links; 
+        graph: Record<string, unknown>;
+        nodes: Node[];
+        links: Link[]; 
     } 
 }
 
@@ -46,15 +43,11 @@ interface BoxBounds {
     [index: string]: BoxBound;
 }
 
-// `drawGraph()` specific interfaces
-interface OrderedCols {
-    [order: number]: { vals: string[], colname: string };
-}
+// `drawGraph()` specific type
+type Column = { vals: string[], colname: string }[];
 
-// `drawLinks() specific interfaces`
-interface ColumnLinks {
-    [colname: string]: object & { links: Links, bound: BoxBounds };
-}
+// `drawLinks() specific type`
+type ColumnLinks = Record<string, { links: Link[], bound: BoxBounds }>
 
 /**
  * Draws one column from given input data.
@@ -79,18 +72,18 @@ function drawColumn(
         
         // Column header
         svg.append('text')
-        .attr('class', 'column-label')
-        .attr('x', columnX + labelBoxWidth / 2)
-        .attr('y', 20)
-        .text(id);
+          .attr('class', 'column-label')
+          .attr('x', columnX + labelBoxWidth / 2)
+          .attr('y', 20)
+          .text(id);
         
         // strike-through line
         svg.append('line')
-        .attr('class', 'column-line')
-        .attr('x1', columnX + labelBoxWidth / 2)
-        .attr('x2', columnX + labelBoxWidth / 2)
-        .attr('y1', 20)
-        .attr('y2', svgHeight);
+          .attr('class', 'column-line')
+          .attr('x1', columnX + labelBoxWidth / 2)
+          .attr('x2', columnX + labelBoxWidth / 2)
+          .attr('y1', 20)
+          .attr('y2', svgHeight);
         
         // draw the columns
         const bounds: BoxBounds = {};
@@ -105,18 +98,18 @@ function drawColumn(
             };
             
             s.append('rect')
-            .attr('class', 'label-box')
-            .attr('width', labelBoxWidth)
-            .attr('height', labelBoxHeight)
-            .attr('x', columnX)
-            .attr('y', boxY)
-            .text(''); // FIXME only way to close the tag?
+              .attr('class', 'label-box')
+              .attr('width', labelBoxWidth)
+              .attr('height', labelBoxHeight)
+              .attr('x', columnX)
+              .attr('y', boxY)
+              .text(''); // FIXME only way to close the tag?
             
             s.append('text')
-            .attr('class', 'label-text')
-            .attr('x', columnX + labelBoxWidth / 2)
-            .attr('y', span + labelBoxHeight + (svgHeight / labels.length) * i + 15)
-            .text(labels[i]);
+              .attr('class', 'label-text')
+              .attr('x', columnX + labelBoxWidth / 2)
+              .attr('y', span + labelBoxHeight + (svgHeight / labels.length) * i + 15)
+              .text(labels[i]);
         }
         
         return bounds;
@@ -186,13 +179,13 @@ function drawGraph(graphData: NodeLink): HTMLElement {
     
     // Canvas
     const svg = container.append('svg')
-    .attr('id', 'oncoview')
-    .attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
+      .attr('id', 'explainerview')
+      .attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
     
     svg.append('rect')
-    .attr('class', 'oncoview-canvas')
-    .attr('width', '100%')
-    .attr('height', '100%')
+      .attr('class', 'explainerview-canvas')
+      .attr('width', '100%')
+      .attr('height', '100%')
     
     // Filters
     const defs = svg.append('defs');
@@ -200,20 +193,20 @@ function drawGraph(graphData: NodeLink): HTMLElement {
     for (let b = 0; b <= 1; b += 0.1) {
         const blur = Math.round(b*10) / 10;
         defs.append('filter')
-        .attr('id', `blur-${blur}`)
-        .append('feGaussianBlur')
-        .attr('stdDeviation', blurMax*blur)
+          .attr('id', `blur-${blur}`)
+          .append('feGaussianBlur')
+          .attr('stdDeviation', blurMax*blur)
     }
     
     const nodes = svg.append('g').attr('id', 'nodes');
     const links = svg.append('g').attr('id', 'links');
     
     // wrangle the column nodes data-structure for `drawColumn()`
-    const colData: OrderedCols = {}
+    const colData: Column = [];
     for (const node of graphData.spec.nodes) {
         colData[node.order] = {vals: [], colname: node.group};
     }
-    
+
     for (const node of graphData.spec.nodes) {
         colData[node.order].vals.push(node.id)
     }
@@ -234,7 +227,7 @@ function drawGraph(graphData: NodeLink): HTMLElement {
             svgHeight
         )
       
-        const colLinks: Links = [];
+        const colLinks: Link[] = [];
         for (const k of Object.keys(colBounds)) {
             for (const link of graphData.spec.links) {
                 if (link.source === k) {
@@ -263,7 +256,11 @@ function drawGraph(graphData: NodeLink): HTMLElement {
 }
 
 
-class Oncoview extends LitElement {
+/**
+ * Lit Element, responsible for rendering the network visualization and
+ * fetching the node-link data from the API.
+ */
+class ExplainerView extends LitElement {
     private graph?: NodeLink;
 
     constructor() {
@@ -272,10 +269,10 @@ class Oncoview extends LitElement {
     }
 
     static styles = css`
-    .Oncoview {
+    .ExplainerView {
     }
 
-    .oncoview-canvas {
+    .explainerview-canvas {
         fill: white;
     }
 
@@ -325,15 +322,14 @@ class Oncoview extends LitElement {
 
   connectedCallback(): void {
       super.connectedCallback();
-      this.fetchNetworkData(2);
+      this.fetchNetworkData(3); // TODO: idx arg as user input
   }
 
-  render() {
+  render(): HTMLElement {
     const data = this.graph as NodeLink;
     return drawGraph(data);
   }
 }
 
-export default Oncoview;
-
-customElements.define('onco-view', Oncoview);
+export default ExplainerView;
+customElements.define('explainer-view', ExplainerView);

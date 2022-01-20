@@ -32,4 +32,6 @@ nbs
 .env
 
 **/build/
+
+backenEnv
 **/env/

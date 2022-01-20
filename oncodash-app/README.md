@@ -1,56 +1,73 @@
-<p align="center">
-  <img width="200" src="https://open-wc.org/hero.png"></img>
-</p>
+# Oncodash Front-end
 
-## Open-wc Starter App
+The Oncodash front-end serves the static content of the application and
+interacts with the back-end API.
 
-[![Built with open-wc recommendations](https://img.shields.io/badge/built%20with-open--wc-blue.svg)](https://github.com/open-wc)
+# Instructions to build the frontend locally for development
 
-## Quickstart
+### Requirements
+- [nodejs](https://nodejs.org/en/download/)
+- typescript `npm install -g typescript`
 
-To get started:
-
+## Installation
+1. Clone the repository & move to `oncodash-app` dir
 ```sh
-npm init @open-wc
-# requires node 10 & npm 6 or higher
+git clone https://github.com/oncodash/oncodash.git
+cd oncodash/oncodash-app/
 ```
 
-## Scripts
+2.  Install packages
+```
+npm install
+```
 
-- `start` runs your app for development, reloading on file changes
-- `start:build` runs your app after it has been built using the build command
-- `build` builds your app and outputs it in your `dist` directory
-- `test` runs your test suite with Web Test Runner
-- `lint` runs the linter for your project
+## Development
+1. Run a development server
+```
+npm start
+```
 
-## Tooling configs
+2. Run the typescript compiler in watch mode
+```
+tsc -w
+```
 
-For most of the tools, the configuration is in the `package.json` to reduce the amount of files in your project.
+3. Open up the browser at `http://localhost:8000/`
 
-If you customize the configuration a lot, you can consider moving them to individual files.
+## Testing
+```sh
+npm test
+```
 
-# Instructions to build and run only the frontend with docker-compose
+# Instructions to build a frontend docker-image with docker-compose for development
 
+### Requirements
+- [Docker desktop/CE](https://docs.docker.com/engine/install/) 
+- [Docker-compose](https://docs.docker.com/compose/install/)
 
-## 1. Build the frontend image
+## Installation
+1. Clone the repository & move to `oncodash-app` dir
+```sh
+git clone https://github.com/oncodash/oncodash.git
+cd oncodash/oncodash-app/
+```
 
-Navigate to the `../oncodash-app/` folder
-
+2. Build the frontend docker-image
 ```sh
 docker-compose build
 ```
 
-## 2. Run the frontend image in a container
+## Development
+1. Run the frontend image in a container
 ```sh
 docker-compose up
 ```
 
-## 3. Develop
-
+2. Develop
+  
 Open up the browser at `localhost:8000`
 
-## 4. Run tests and linting for frontend
-
+## Testing
 ```sh
 docker-compose run --rm nodeserver sh -c "npm test"
 ```
