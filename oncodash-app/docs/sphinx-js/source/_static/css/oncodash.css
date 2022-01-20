@@ -1,0 +1,128 @@
+
+/***** Headings *****/
+/* Typography 101: space should come before. */
+h1 {
+    margin-bottom:0em!important;
+    margin-top:1em!important;
+    text-transform:none;
+    font-variant:small-caps;
+}
+h2 {
+    margin-bottom:0em!important;
+    margin-top:1em!important;
+}
+h3 {
+    margin-bottom:0em!important;
+    margin-top:0.75em!important;
+}
+p {
+    margin-bottom:0em!important;
+    margin-top: 0.8em!important;
+    text-align:justify;
+}
+
+/* Override weird reST rubric size (1em by default). */
+p.rubric {
+    font-size: 1.5em!important;
+}
+
+
+/***** Doc tables *****/
+/* Override weird docutils column width (10% by default). */
+table.docutils > colgroup {
+    display:grid;
+    /* FIXME stay at 50%, without regards for content. */
+    grid-template-columns:max-content auto;
+}
+table.docutils > colgroup > col:nth-child(1) {
+    grid-column-start: 1;
+}
+table.docutils > colgroup > col:nth-child(2) {
+    grid-column-start: 2;
+}
+
+
+/***** Footnotes *****/
+a.footnote-reference::before {
+    content: "[";
+}
+a.footnote-reference::after {
+    content: "]";
+}
+
+dl.footnote {
+    display:grid;
+    grid-template-columns: max-content auto;
+}
+dl.footnote > dt {
+    grid-column-start: 1;
+    margin:0!important;
+    margin-top:1em!important;
+}
+dl.footnote > dd {
+    grid-column-start: 2;
+    margin:0!important;
+    margin-top:1em!important;
+    margin-left:0.5em!important
+}
+dl.footnote > dt.label a.fn-backref:before {
+    content: "[";
+}
+dl.footnote > dt.label a.fn-backref:after {
+    content: "]";
+}
+dl.footnote > dd > p {
+    margin:0!important;
+}
+
+
+/**** Simple lists *****/
+dl.simple {
+    display:grid;
+    grid-template-columns: max-content auto;
+}
+dl.simple > dt {
+    font-weight:bold!important;
+    grid-column-start: 1;
+    text-align:right;
+    margin:0!important;
+    margin-top:0.5em!important;
+}
+dl.simple > dd {
+    grid-column-start: 2;
+    margin:0!important;
+    margin-left:0.5em!important;
+    margin-top:0.5em!important;
+}
+dl.simple > dd > p {
+    margin:0!important;
+}
+
+ol.simple {
+    margin-top:0.2rem!important;
+}
+ol.simple > li > p {
+    margin-top:0.1em!important;
+}
+
+
+/***** Figures *****/
+img:diagram {
+    width:90%;
+    margin:5%;
+}
+figure {
+    width:90%;
+    margin:5%;
+}
+figure > img {
+    width:100%;
+}
+figcaption {
+    font-style:italic;
+    font-size:0.95em;
+    text-align:center;
+    margin-left:10%;
+    margin-right:10%;
+    margin-top:0.8em;
+}

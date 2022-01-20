@@ -21,11 +21,11 @@ This diagram takes the form of a network, where the nodes are the object of inte
 and the directed edges figures the evidences that links one object to another.
 Those evidences are drawn as arrows, which displays both the *strength* of the evidence
 and its *uncertainty*.
-To that end, we use a visual grammar [#Bae]_ which have been proven to maximize
-the efficiency of interpretation for visual representation of causes and effects.
 
 The underlying data structure is thus a kind of Bayesian Network, able to manage uncertainties.
 To this end, the Explainer makes use of *Credal Network*, which models uncertainties as intervals.
+
+To read more about the visualization of this network, see the `frontend's documentation of the Explainer widget </frontend/explainer.html>`_.
 
 
 Credal Networks
@@ -81,7 +81,6 @@ See the full module documentation: :mod:`explainer`.
 
 .. rubric:: Notes and References
 
-.. [#Bae] Bae, J., Ventocilla, E., Riveiro, M., Helldin, T., & Falkman, G., `Evaluating Multi-Attributes on Cause and Effect Relationship Visualization <https://doi.org/10.5220/0006102300640074>`_. Proceedings of the 12th International Joint Conference on Computer Vision, Imaging and Computer Graphics Theory and Applications (VISIGRAPP 2017), Volumne 3: IVAPP, 64–74, 2017.
 .. [#Cozman] Fabio G. Cozman, Credal networks. Artificial Intelligence, 120(2):199–233, 2000.
 .. [#CPT] A **complete** *Conditional Probability Table* holds the probabilities that the considered node of the network is true, for all the cartesian products of its input edges.
 .. [#Antonucci] Alessandro Antonucci, The imprecise noisy-or gate. Fusion 2011 — 14th International Conference on Information Fusion, 01/2011.
