@@ -9,7 +9,7 @@
     <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>oncodash backend - docpage &mdash; oncodash-backend  documentation</title>
+    <title>Oncodash Documentation</title>
 
     <link rel="shortcut icon" href="_static/favicon.ico" />
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
@@ -144,12 +144,17 @@
 
     <p>
         The main approach of Oncodash is to have a so-called "<em>view</em>" for each specialty in the tumour board.
-        For <em>phase I</em> of the development, we plan to have two of them: the clinical view and the oncology view (see <a href="#Figure_M">Figure M</a>).
+        For <em>phase I</em> of the development, we plan to have two of them: the clinical view and the oncology view (see <a href="#Figure_C">Figure C</a> and <a href="#Figure_O">Figure O</a>).
     </p>
 
-    <figure id="Figure_M" class="subfigures twosubfigs">
-        <img src="images/mockup_clinical.svg" /> <img src="images/mockup_oncology.svg" />
-        <figcaption>Figure M: mocks-up of the clinical (left) and ontology (right) views.</figcaption>
+    <figure id="Figure_C">
+        <img src="images/mockup_clinical.svg" />
+        <figcaption>Figure C: mock-up of the clinical view.</figcaption>
+    </figure>
+
+    <figure id="Figure_O">
+        <img src="images/mockup_oncology.svg" />
+        <figcaption>Figure O: mock-up of the oncology view.</figcaption>
     </figure>
 
     <p>
@@ -208,7 +213,7 @@ docker-compose up </code>
         using <a href="https://www.json.org">JSON</a> payloads.
         Most of the service modules are written in <a href="https://www.python.org/">Python</a>, and use the <a href="">Django</a> framework.
         Those data are then visualized within the browser, in a web application written in <a href="https://www.typescriptlang.org/">Typescript</a> (a modern evolution of Javascript)
-        and using the <a href="https://www.webcomponents.org/">Web Components standard</a>, as implement by the <a href="https://open-wc.org/">OWC library</a>.
+        and using the <a href="https://www.webcomponents.org/">Web Components standard</a>, as implement by the <a href="https://lit.dev">Lit library</a>.
     </p>
 
     <h3 id="Layers">Layers</h3>
