@@ -1,0 +1,35 @@
+﻿explainer
+=========
+
+.. automodule:: explainer
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   explainer.api
+   explainer.apps
+   explainer.migrations
+   explainer.models
+   explainer.tests
+

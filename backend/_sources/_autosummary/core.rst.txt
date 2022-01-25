@@ -1,0 +1,36 @@
+﻿core
+====
+
+.. automodule:: core
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   core.admin
+   core.apps
+   core.migrations
+   core.models
+   core.tests
+   core.views
+

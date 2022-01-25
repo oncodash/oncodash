@@ -1,0 +1,30 @@
+core.models
+===========
+
+.. automodule:: core.models
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      User
+      UserManager
+   
+   
+
+   
+   
+   
+
+
+

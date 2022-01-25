@@ -1,0 +1,29 @@
+core.admin
+==========
+
+.. automodule:: core.admin
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      UserAdmin
+   
+   
+
+   
+   
+   
+
+
+

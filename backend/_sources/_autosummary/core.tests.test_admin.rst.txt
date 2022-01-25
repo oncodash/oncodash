@@ -1,0 +1,29 @@
+core.tests.test\_admin
+======================
+
+.. automodule:: core.tests.test_admin
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AdminSiteTests
+   
+   
+
+   
+   
+   
+
+
+

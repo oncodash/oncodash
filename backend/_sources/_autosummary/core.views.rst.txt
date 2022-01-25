@@ -1,0 +1,29 @@
+core.views
+==========
+
+.. automodule:: core.views
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      FrontendRenderView
+   
+   
+
+   
+   
+   
+
+
+

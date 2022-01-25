@@ -1,0 +1,29 @@
+explainer.api.serializers
+=========================
+
+.. automodule:: explainer.api.serializers
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      NetworkSerializer
+   
+   
+
+   
+   
+   
+
+
+

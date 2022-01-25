@@ -1,0 +1,32 @@
+explainer.tests
+===============
+
+.. automodule:: explainer.tests
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   explainer.tests.agrum_demo
+   explainer.tests.test_viz_spec
+

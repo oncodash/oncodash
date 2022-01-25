@@ -9,11 +9,10 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Oncodash backend documentation &mdash; oncodash-backend  documentation</title>
+  <title>Python Module Index &mdash; oncodash-backend  documentation</title>
   
 
   
@@ -38,7 +37,9 @@
   <link rel="stylesheet" href="_static/css/oncodash.css" type="text/css" />
   <link rel="index" title="Index" href="genindex.html" />
   <link rel="search" title="Search" href="search.html" />
-  <link rel="next" title="Clinical" href="clinical.html" /> 
+ 
+
+
 
   <!-- Preload the theme fonts -->
 
@@ -203,10 +204,9 @@
       <div class="sphinx-template-breadcrumbs-wrapper">
         <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="sphinx-template-breadcrumbs">
-      <li><a href="#" class="fa fa-large fa-home">Docs</a> &gt;</li>
-      <li>Oncodash backend documentation</li>
+      <li><a href="index.html" class="fa fa-large fa-home">Docs</a> &gt;</li>
+      <li>Python Module Index</li>
       <li class="sphinx-template-breadcrumbs-aside">
-              <a href="https://github.com/oncodash/oncodash/blob/main/backend/docs/sphinx/source/index.rst" class="fa fa-large fa-github"> Edit on GitHub</a>
       </li>
   </ul>
 </div>
@@ -225,125 +225,145 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
               <article itemprop="articleBody" id="sphinx-template-article" class="sphinx-template-article">
                 
-  <section id="oncodash-backend-documentation">
-<h1>Oncodash backend documentation<a class="headerlink" href="#oncodash-backend-documentation" title="Permalink to this headline">¶</a></h1>
-<section id="architecture">
-<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h2>
-<section id="django-s-model-view-template">
-<h3>Django’s Model-View-Template<a class="headerlink" href="#django-s-model-view-template" title="Permalink to this headline">¶</a></h3>
-<p>Oncodash’ backend is based on the <a class="reference external" href="https://www.djangoproject.com/">Django</a> framework.
-Django is a high-level Python framework for implementing server-side web application,
-which separates core features in several, loosely coupled, programming tools.</p>
-<p>A few concepts are key to understand how Oncodash is architectured with Django (see <a class="reference internal" href="#django-mvt"><span class="std std-numref">Figure 1</span></a>):</p>
-<dl class="simple">
-<dt>Models</dt><dd><p>encapsulate every aspects of an object of interest, for instance wrapping a row in a database,
-encapsulating the database access and adding some domain logic to the data.</p>
-</dd>
-<dt>Templates</dt><dd><p>are tools that control presentation of the Human-Machine Interface and the data (and the underlying logic).</p>
-</dd>
-<dt>Views</dt><dd><p>receive requests from the client, gather the related data from models and inject them into the templates.</p>
-</dd>
-<dt>API</dt><dd><p>the Application Programming Interface is a set of URL, which are all coupled to an underlying Python code.</p>
-</dd>
-</dl>
-<figure class="align-default" id="id1">
-<span id="django-mvt"></span><img alt="_images/django_MVT.svg" class="diagram" src="_images/django_MVT.svg" /><figcaption>
-<p><span class="caption-number">Fig. 1 </span><span class="caption-text">The <em>Model-View-Template</em> architecture used by Django to build web application.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
-<p>Note that in this view, the <em>client</em> can be the frontend application used by the operator or another kind of application.
-More precisely, the client may be a widget of the frontend application,
-requesting new data to display (e.g. a new set of patients)
-or an update of the data (e.g. a new patient).
-Depending on the API, the answer may be a JSON message or an HTML section.</p>
-<p>Every other data that goes through the internal application is a Python object.
-Note also that external data access may be done through the same kind of Web API
-(i.e. function calls on a URL, through HTTP, sending JSON and getting JSON back).</p>
-</section>
-</section>
-<section id="main-modules">
-<h2>Main modules<a class="headerlink" href="#main-modules" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Main modules:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="clinical.html">Clinical</a></li>
-<li class="toctree-l1"><a class="reference internal" href="explainer.html">Explainer</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="explainer.html#causal-network-visualization">Causal Network Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="explainer.html#credal-networks">Credal Networks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="explainer.html#main-datastructure">Main Datastructure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="explainer.html#explainer-s-views">Explainer’s <em>Views</em></a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="complete-reference">
-<h2>Complete Reference<a class="headerlink" href="#complete-reference" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Complete Reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="_autosummary/core.html">core</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="_autosummary/core.admin.html">core.admin</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_autosummary/core.apps.html">core.apps</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_autosummary/core.migrations.html">core.migrations</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/core.migrations.0001_initial.html">core.migrations.0001_initial</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="_autosummary/core.models.html">core.models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_autosummary/core.tests.html">core.tests</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/core.tests.test_admin.html">core.tests.test_admin</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/core.tests.test_models.html">core.tests.test_models</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="_autosummary/core.views.html">core.views</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="_autosummary/explainer.html">explainer</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="_autosummary/explainer.api.html">explainer.api</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/explainer.api.serializers.html">explainer.api.serializers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/explainer.api.urls.html">explainer.api.urls</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/explainer.api.utils.html">explainer.api.utils</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/explainer.api.views.html">explainer.api.views</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="_autosummary/explainer.apps.html">explainer.apps</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_autosummary/explainer.migrations.html">explainer.migrations</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/explainer.migrations.0001_initial.html">explainer.migrations.0001_initial</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/explainer.migrations.0002_networkspec_patient.html">explainer.migrations.0002_networkspec_patient</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="_autosummary/explainer.models.html">explainer.models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="_autosummary/explainer.tests.html">explainer.tests</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="_autosummary/explainer.tests.test_viz_spec.html">explainer.tests.test_viz_spec</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="index-and-tables">
-<h2>Index and Tables<a class="headerlink" href="#index-and-tables" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
-</section>
-</section>
+
+   <h1>Python Module Index</h1>
+
+   <div class="modindex-jumpbox">
+   <a href="#cap-c"><strong>c</strong></a> | 
+   <a href="#cap-e"><strong>e</strong></a>
+   </div>
+
+   <table class="indextable modindextable">
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-c"><td></td><td>
+       <strong>c</strong></td><td></td></tr>
+     <tr>
+       <td><img src="_static/minus.png" class="toggler"
+              id="toggle-1" style="display: none" alt="-" /></td>
+       <td>
+       <a href="_autosummary/core.html#module-core"><code class="xref">core</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/core.admin.html#module-core.admin"><code class="xref">core.admin</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/core.apps.html#module-core.apps"><code class="xref">core.apps</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/core.migrations.html#module-core.migrations"><code class="xref">core.migrations</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/core.migrations.0001_initial.html#module-core.migrations.0001_initial"><code class="xref">core.migrations.0001_initial</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/core.models.html#module-core.models"><code class="xref">core.models</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/core.tests.html#module-core.tests"><code class="xref">core.tests</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/core.tests.test_admin.html#module-core.tests.test_admin"><code class="xref">core.tests.test_admin</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/core.tests.test_models.html#module-core.tests.test_models"><code class="xref">core.tests.test_models</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/core.views.html#module-core.views"><code class="xref">core.views</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-e"><td></td><td>
+       <strong>e</strong></td><td></td></tr>
+     <tr>
+       <td><img src="_static/minus.png" class="toggler"
+              id="toggle-2" style="display: none" alt="-" /></td>
+       <td>
+       <a href="_autosummary/explainer.html#module-explainer"><code class="xref">explainer</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-2">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/explainer.api.html#module-explainer.api"><code class="xref">explainer.api</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-2">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/explainer.api.serializers.html#module-explainer.api.serializers"><code class="xref">explainer.api.serializers</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-2">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/explainer.api.urls.html#module-explainer.api.urls"><code class="xref">explainer.api.urls</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-2">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/explainer.api.utils.html#module-explainer.api.utils"><code class="xref">explainer.api.utils</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-2">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/explainer.api.views.html#module-explainer.api.views"><code class="xref">explainer.api.views</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-2">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/explainer.apps.html#module-explainer.apps"><code class="xref">explainer.apps</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-2">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/explainer.migrations.html#module-explainer.migrations"><code class="xref">explainer.migrations</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-2">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/explainer.migrations.0001_initial.html#module-explainer.migrations.0001_initial"><code class="xref">explainer.migrations.0001_initial</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-2">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/explainer.migrations.0002_networkspec_patient.html#module-explainer.migrations.0002_networkspec_patient"><code class="xref">explainer.migrations.0002_networkspec_patient</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-2">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/explainer.models.html#module-explainer.models"><code class="xref">explainer.models</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-2">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/explainer.tests.html#module-explainer.tests"><code class="xref">explainer.tests</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-2">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="_autosummary/explainer.tests.test_viz_spec.html#module-explainer.tests.test_viz_spec"><code class="xref">explainer.tests.test_viz_spec</code></a></td><td>
+       <em></em></td></tr>
+   </table>
 
 
               </article>
               
             </div>
             <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="clinical.html" class="btn btn-neutral float-right" title="Clinical" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
-      
-      
-    </div>
   
   
   <hr>
@@ -368,19 +388,7 @@ Note also that external data access may be done through the same kind of Web API
         <div class="sphinx-template-content-right" id="sphinx-template-content-right">
           <div class="sphinx-template-right-menu" id="sphinx-template-right-menu">
             <div class="sphinx-template-side-scroll" id="sphinx-template-side-scroll-right">
-              <ul>
-<li><a class="reference internal" href="#">Oncodash backend documentation</a><ul>
-<li><a class="reference internal" href="#architecture">Architecture</a><ul>
-<li><a class="reference internal" href="#django-s-model-view-template">Django’s Model-View-Template</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#main-modules">Main modules</a></li>
-<li><a class="reference internal" href="#complete-reference">Complete Reference</a></li>
-<li><a class="reference internal" href="#index-and-tables">Index and Tables</a></li>
-</ul>
-</li>
-</ul>
-
+              
             </div>
           </div>
         </div>
@@ -428,7 +436,7 @@ Note also that external data access may be done through the same kind of Web API
         <div class="col-md-4 text-center">
           <h2>Docs</h2>
           <p>Access comprehensive developer documentation for oncodash-backend</p>
-          <a class="with-right-arrow" href="#">View Docs</a>
+          <a class="with-right-arrow" href="index.html">View Docs</a>
         </div>
       </div>
     </div>

@@ -9,10 +9,11 @@
 
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview: module code &mdash; oncodash-backend  documentation</title>
+  <title>core.tests.test_models &mdash; oncodash-backend  documentation</title>
   
 
   
@@ -34,8 +35,11 @@
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/oncodash.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
-  <link rel="search" title="Search" href="../search.html" /> 
+  <link rel="search" title="Search" href="../search.html" />
+  <link rel="next" title="core.views" href="core.views.html" />
+  <link rel="prev" title="core.tests.test_admin" href="core.tests.test_admin.html" /> 
 
   <!-- Preload the theme fonts -->
 
@@ -143,9 +147,50 @@
         
         
         
-        <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+        <p class="caption" role="heading"><span class="caption-text">Main modules:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../views.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">core.views</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../clinical.html">Clinical</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../explainer.html">Explainer</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Complete Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="core.html">core</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="core.admin.html">core.admin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core.apps.html">core.apps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core.migrations.html">core.migrations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="core.migrations.0001_initial.html">core.migrations.0001_initial</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="core.models.html">core.models</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="core.tests.html">core.tests</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="core.tests.test_admin.html">core.tests.test_admin</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">core.tests.test_models</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="core.views.html">core.views</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="explainer.html">explainer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="explainer.api.html">explainer.api</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="explainer.api.serializers.html">explainer.api.serializers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="explainer.api.urls.html">explainer.api.urls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="explainer.api.utils.html">explainer.api.utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="explainer.api.views.html">explainer.api.views</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="explainer.apps.html">explainer.apps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explainer.migrations.html">explainer.migrations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="explainer.migrations.0001_initial.html">explainer.migrations.0001_initial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="explainer.migrations.0002_networkspec_patient.html">explainer.migrations.0002_networkspec_patient</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="explainer.models.html">explainer.models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explainer.tests.html">explainer.tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="explainer.tests.test_viz_spec.html">explainer.tests.test_viz_spec</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         
@@ -160,8 +205,12 @@
         <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="sphinx-template-breadcrumbs">
       <li><a href="../index.html" class="fa fa-large fa-home">Docs</a> &gt;</li>
-      <li>Overview: module code</li>
+          <li><a href="../reference.html">&lt;no title&gt;</a> &gt;</li>
+          <li><a href="core.html">core</a> &gt;</li>
+          <li><a href="core.tests.html">core.tests</a> &gt;</li>
+      <li>core.tests.test_models</li>
       <li class="sphinx-template-breadcrumbs-aside">
+              <a href="https://github.com/oncodash/oncodash/blob/main/backend/docs/sphinx/source/_autosummary/core.tests.test_models.rst" class="fa fa-large fa-github"> Edit on GitHub</a>
       </li>
   </ul>
 </div>
@@ -180,14 +229,36 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
               <article itemprop="articleBody" id="sphinx-template-article" class="sphinx-template-article">
                 
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="core/views.html">core.views</a></li>
-</ul>
+  <section id="module-core.tests.test_models">
+<span id="core-tests-test-models"></span><h1>core.tests.test_models<a class="headerlink" href="#module-core.tests.test_models" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Classes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ModelTests</span></code>([methodName])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
 
               </article>
               
             </div>
             <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="core.views.html" class="btn btn-neutral float-right" title="core.views" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="core.tests.test_admin.html" class="btn btn-neutral" title="core.tests.test_admin" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
   
   
   <hr>
@@ -212,7 +283,10 @@
         <div class="sphinx-template-content-right" id="sphinx-template-content-right">
           <div class="sphinx-template-right-menu" id="sphinx-template-right-menu">
             <div class="sphinx-template-side-scroll" id="sphinx-template-side-scroll-right">
-              
+              <ul>
+<li><a class="reference internal" href="#">core.tests.test_models</a></li>
+</ul>
+
             </div>
           </div>
         </div>

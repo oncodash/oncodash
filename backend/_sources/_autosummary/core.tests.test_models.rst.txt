@@ -1,0 +1,29 @@
+core.tests.test\_models
+=======================
+
+.. automodule:: core.tests.test_models
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ModelTests
+   
+   
+
+   
+   
+   
+
+
+
