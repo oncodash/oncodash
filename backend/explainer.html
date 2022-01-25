@@ -246,23 +246,22 @@ we designed a diagram that reads from left to right, showing at least:</p>
 <p>This diagram takes the form of a network, where the nodes are the object of interest,
 and the directed edges figures the evidences that links one object to another.
 Those evidences are drawn as arrows, which displays both the <em>strength</em> of the evidence
-and its <em>uncertainty</em>.
-To that end, we use a visual grammar <a class="footnote-reference brackets" href="#bae" id="id1">1</a> which have been proven to maximize
-the efficiency of interpretation for visual representation of causes and effects.</p>
+and its <em>uncertainty</em>.</p>
 <p>The underlying data structure is thus a kind of Bayesian Network, able to manage uncertainties.
 To this end, the Explainer makes use of <em>Credal Network</em>, which models uncertainties as intervals.</p>
+<p>To read more about the visualization of this network, see the <a class="reference external" href="/frontend/explainer.html">frontend’s documentation of the Explainer widget</a>.</p>
 </section>
 <section id="credal-networks">
 <h2>Credal Networks<a class="headerlink" href="#credal-networks" title="Permalink to this headline">¶</a></h2>
-<p>Credal networks <a class="footnote-reference brackets" href="#cozman" id="id2">2</a> are graph-based statistical models, sharing many properties with Bayesian networks
+<p>Credal networks <a class="footnote-reference brackets" href="#cozman" id="id1">1</a> are graph-based statistical models, sharing many properties with Bayesian networks
 but allowing more flexibility by dealing with imprecision and uncertainty.
 Instead of probability mass functions as parameters,
 credal networks parameters take values in closed convex sets (also called credal sets).
 In practical terms, while in a Bayesian network every variable is associated to a probability or
 a conditional probability, in a credal network variables may also be associated to probabilistic inequalities.</p>
 <p>One of the challenges we may have to deal with is the sparsity of the data that prevents us from
-learning the complete conditional probability tables (CPT <a class="footnote-reference brackets" href="#cpt" id="id3">3</a>).
-To tackle it, it is possible to use Noisy-OR gates <a class="footnote-reference brackets" href="#antonucci" id="id4">4</a> given an existing network structure.
+learning the complete conditional probability tables (CPT <a class="footnote-reference brackets" href="#cpt" id="id2">2</a>).
+To tackle it, it is possible to use Noisy-OR gates <a class="footnote-reference brackets" href="#antonucci" id="id3">3</a> given an existing network structure.
 They are usually used to describe the interactions between different causes of a common effect,
 where each cause is assumed to be sufficient to cause the effect and
 where the ability to cause the effect is assumed independent of the presence of the other causes.</p>
@@ -296,16 +295,13 @@ It serves the <code class="xref py py-class docutils literal notranslate"><span 
 <p>See the full module documentation: <a class="reference internal" href="_autosummary/explainer.html#module-explainer" title="explainer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">explainer</span></code></a>.</p>
 <p class="rubric">Notes and References</p>
 <dl class="footnote brackets">
-<dt class="label" id="bae"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Bae, J., Ventocilla, E., Riveiro, M., Helldin, T., &amp; Falkman, G., <a class="reference external" href="https://doi.org/10.5220/0006102300640074">Evaluating Multi-Attributes on Cause and Effect Relationship Visualization</a>. Proceedings of the 12th International Joint Conference on Computer Vision, Imaging and Computer Graphics Theory and Applications (VISIGRAPP 2017), Volumne 3: IVAPP, 64–74, 2017.</p>
-</dd>
-<dt class="label" id="cozman"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dt class="label" id="cozman"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>Fabio G. Cozman, Credal networks. Artificial Intelligence, 120(2):199–233, 2000.</p>
 </dd>
-<dt class="label" id="cpt"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dt class="label" id="cpt"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
 <dd><p>A <strong>complete</strong> <em>Conditional Probability Table</em> holds the probabilities that the considered node of the network is true, for all the cartesian products of its input edges.</p>
 </dd>
-<dt class="label" id="antonucci"><span class="brackets"><a class="fn-backref" href="#id4">4</a></span></dt>
+<dt class="label" id="antonucci"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
 <dd><p>Alessandro Antonucci, The imprecise noisy-or gate. Fusion 2011 — 14th International Conference on Information Fusion, 01/2011.</p>
 </dd>
 </dl>
