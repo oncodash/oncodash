@@ -9,10 +9,11 @@
 
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; oncodash-app  documentation</title>
+  <title>Explainer &mdash; oncodash-app  documentation</title>
   
 
   
@@ -36,7 +37,8 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/oncodash.css" type="text/css" />
   <link rel="index" title="Index" href="genindex.html" />
-  <link rel="search" title="Search" href="#" /> 
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="prev" title="Oncodash frontend documentation" href="index.html" /> 
 
   <!-- Preload the theme fonts -->
 
@@ -128,7 +130,7 @@
 
 
 <div role="search">
-  <form id="rtd-search-form" class="sphinx-template-form" action="#" method="get">
+  <form id="rtd-search-form" class="sphinx-template-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search Docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -144,8 +146,8 @@
         
         
         
-        <ul>
-<li class="toctree-l1"><a class="reference internal" href="explainer.html">Explainer</a></li>
+        <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Explainer</a></li>
 </ul>
 
         
@@ -160,9 +162,9 @@
         <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="sphinx-template-breadcrumbs">
       <li><a href="index.html" class="fa fa-large fa-home">Docs</a> &gt;</li>
-      <li>Search</li>
+      <li>Explainer</li>
       <li class="sphinx-template-breadcrumbs-aside">
-              <a href="https://github.com/oncodash/oncodash/blob/main/oncodash-app/docs/sphinx-js/source/search" class="fa fa-large fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/oncodash/oncodash/blob/main/oncodash-app/docs/sphinx-js/source/explainer.rst" class="fa fa-large fa-github"> Edit on GitHub</a>
       </li>
   </ul>
 </div>
@@ -181,24 +183,75 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
               <article itemprop="articleBody" id="sphinx-template-article" class="sphinx-template-article">
                 
-<noscript>
-<div id="fallback" class="admonition warning">
-  <p class="last">
-    Please activate JavaScript to enable the search
-    functionality.
-  </p>
-</div>
-</noscript>
+  <section id="explainer">
+<h1>Explainer<a class="headerlink" href="#explainer" title="Permalink to this headline">¶</a></h1>
+<section id="causal-network-visualization">
+<h2>Causal Network Visualization<a class="headerlink" href="#causal-network-visualization" title="Permalink to this headline">¶</a></h2>
+<p>The fundamental questions raised in a tumour board are:</p>
+<ol class="arabic simple">
+<li><p>what kind of treatment may improve the patient’s health, and</p></li>
+<li><p>what kind of treatment the patient can tolerate.</p></li>
+</ol>
+<p>To help oncologists to explore the data involved with these questions,
+we designed a diagram that reads from left to right, showing at least:</p>
+<ol class="arabic simple">
+<li><p>the existing samples,</p></li>
+<li><p>the detected alterations,</p></li>
+<li><p>the actionable drugs,</p></li>
+<li><p>the foreseen side-effects.</p></li>
+</ol>
+<p>This diagram takes the form of a network, where the nodes are the object of interest,
+and the directed edges figures the evidences that links one object to another.
+Those evidences are drawn as arrows, which displays both the <em>strength</em> of the evidence
+and its <em>uncertainty</em>.
+To that end, we use a visual grammar <a class="footnote-reference brackets" href="#bae" id="id1">1</a> which have been proven to maximize
+the efficiency of interpretation for visual representation of causes and effects:</p>
+<ul class="simple">
+<li><p>causal relationships are figured by arrows linking state nodes,</p></li>
+<li><p>the “strength” of the relationship is figured by the width of the arrow,</p></li>
+<li><p>the “certainty” of the relationship is fugured by the opacity and the fuzziness of the drawing (the more uncertain, the more transparent and blurred).</p></li>
+</ul>
+<p>Additionaly, the graph is shaped to be read from the left to the right,
+with nodes grouped on columns evenly spread, so as to ease the reading.</p>
+<p>To read more about the underlying concept of Bayesian networks, see the <a class="reference external" href="/backend/explainer.html">backend’s documentation of the Explainer widget</a>.</p>
+</section>
+<section id="widget-architecture">
+<h2>Widget architecture<a class="headerlink" href="#widget-architecture" title="Permalink to this headline">¶</a></h2>
+<p>The widget <code class="xref js js-class docutils literal notranslate"><span class="pre">Oncoview()</span></code> is a <a href="#id2"><span class="problematic" id="id3">:class:`LitElement`_</span></a> which fetch its data from the “explainer/networks” API entrypoint.
+The expected data is a JSON graph encoding a directed graph, as a list of nodes and a list of links.
+Each link holds a “strength” and a “certainty” data field.
+See the backend’s documentation for the detail of the graph data structure.</p>
+<p>The visualization is dnawn using a Scalable Vector Graphic (SVG) object right within the page.
+The <code class="xref js js-func docutils literal notranslate"><span class="pre">drawGraph()</span></code> is called when the widget is rendered and is in charge of adding
+the SVG objects figuring node labels and link arrows.
+Nodes and links are grouped within SVG groups.
+All SVG objects have CSS class, “link” for arrows, and “label-box” for nodes.</p>
+<p>Nodes are drown by the <code class="xref js js-func docutils literal notranslate"><span class="pre">drawColumn()</span></code> function,
+which proceed column by column, evenly spreading the labels on each vertical axis.</p>
+<p>Arrows are drawn by the <code class="xref js js-func docutils literal notranslate"><span class="pre">drawLinks()</span></code> function, as a rotated paths.
+Their colors is adjusted to the strength of the link through opacity and
+their certainty through the SVG blur filter.</p>
+<p class="rubric">Notes and References</p>
+<dl class="footnote brackets">
+<dt class="label" id="bae"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Bae, J., Ventocilla, E., Riveiro, M., Helldin, T., &amp; Falkman, G., <a class="reference external" href="https://doi.org/10.5220/0006102300640074">Evaluating Multi-Attributes on Cause and Effect Relationship Visualization</a>. Proceedings of the 12th International Joint Conference on Computer Vision, Imaging and Computer Graphics Theory and Applications (VISIGRAPP 2017), Volumne 3: IVAPP, 64–74, 2017.</p>
+</dd>
+</dl>
+</section>
+</section>
 
-
-<div id="search-results">
-
-</div>
 
               </article>
               
             </div>
             <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Oncodash frontend documentation" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
   
   
   <hr>
@@ -223,7 +276,14 @@
         <div class="sphinx-template-content-right" id="sphinx-template-content-right">
           <div class="sphinx-template-right-menu" id="sphinx-template-right-menu">
             <div class="sphinx-template-side-scroll" id="sphinx-template-side-scroll-right">
-              
+              <ul>
+<li><a class="reference internal" href="#">Explainer</a><ul>
+<li><a class="reference internal" href="#causal-network-visualization">Causal Network Visualization</a></li>
+<li><a class="reference internal" href="#widget-architecture">Widget architecture</a></li>
+</ul>
+</li>
+</ul>
+
             </div>
           </div>
         </div>
@@ -239,8 +299,6 @@
   <script src="_static/jquery.js"></script>
   <script src="_static/underscore.js"></script>
   <script src="_static/doctools.js"></script>
-  <script src="_static/searchtools.js"></script>
-  <script src="_static/language_data.js"></script>
   
 
   
@@ -260,13 +318,10 @@
       $('.footer-logo').css('background-image', 'url(_static/logo/logo-icon.svg)');
       });
   </script>
-<script type="text/javascript" src="searchindex.js" defer></script>
-
   <script script type="text/javascript">
     var collapsedSections = [];
   </script>
   
-
 
   <!-- Begin Footer -->
 

@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to oncodash-app’s documentation! &mdash; oncodash-app  documentation</title>
+  <title>Oncodash frontend documentation &mdash; oncodash-app  documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/oncodash.css" type="text/css" />
   <link rel="index" title="Index" href="genindex.html" />
-  <link rel="search" title="Search" href="search.html" /> 
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="next" title="Explainer" href="explainer.html" /> 
 
   <!-- Preload the theme fonts -->
 
@@ -144,12 +146,10 @@
         
         
         
-        <!-- Local TOC -->
-        <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Welcome to oncodash-app’s documentation!</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+        <ul>
+<li class="toctree-l1"><a class="reference internal" href="explainer.html">Explainer</a></li>
 </ul>
-</div>
+
         
         
       </div>
@@ -162,7 +162,7 @@
         <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="sphinx-template-breadcrumbs">
       <li><a href="#" class="fa fa-large fa-home">Docs</a> &gt;</li>
-      <li>Welcome to oncodash-app’s documentation!</li>
+      <li>Oncodash frontend documentation</li>
       <li class="sphinx-template-breadcrumbs-aside">
               <a href="https://github.com/oncodash/oncodash/blob/main/oncodash-app/docs/sphinx-js/source/index.rst" class="fa fa-large fa-github"> Edit on GitHub</a>
       </li>
@@ -183,34 +183,81 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
               <article itemprop="articleBody" id="sphinx-template-article" class="sphinx-template-article">
                 
-  <section id="welcome-to-oncodash-app-s-documentation">
-<h1>Welcome to oncodash-app’s documentation!<a class="headerlink" href="#welcome-to-oncodash-app-s-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-</div>
-<dl class="js function">
-<dt class="sig sig-object js" id="sayIt">
-<span class="sig-name descname"><span class="n"><span class="pre">sayIt</span></span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">person</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sayIt" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function says who I am and my age!</p>
-<dl class="field-list simple">
-<dt class="field-odd">Arguments</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>person</strong> (<span><code class="xref js js-func docutils literal notranslate"><span class="pre">Person()</span></code></span>) – TODO</p></li>
-</ul>
+  <section id="oncodash-frontend-documentation">
+<h1>Oncodash frontend documentation<a class="headerlink" href="#oncodash-frontend-documentation" title="Permalink to this headline">¶</a></h1>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h2>
+<section id="open-web-components">
+<h3>Open Web Components<a class="headerlink" href="#open-web-components" title="Permalink to this headline">¶</a></h3>
+<p>Oncodash makes a heavy use of reusable custom elements for its Graphical User Interface (GUI).
+Those “widgets” are implemented following an open standard,
+to allow for an easier composition of widgets within “views”,
+and better integration with third parties.</p>
+<p>Web components <a class="footnote-reference brackets" href="#wc" id="id1">1</a> uses three main concepts:</p>
+<dl class="simple">
+<dt>Custom elements</dt><dd><p>Javascript APIs allowing to define our own widgets.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>string</strong> – TODO.</p>
+<dt>Shadow DOM</dt><dd><p>Javascript APIs for inserting a part of the Document Ojbect Model (DOM)
+that is rendered separately from the main document,
+allowing to keep the implementation details hidden from the main templates.</p>
+</dd>
+<dt>HTML templates</dt><dd><p>A separate HTML DOM tree that is displayed at runtime, on demand.</p>
 </dd>
 </dl>
-</dd></dl>
-
+<p>Using this approach, one can design interactive graphical widgets
+that can be inserted in any view by just using a named HTML tag,
+allowing to share them across various frontends.</p>
 </section>
+<section id="lit-component">
+<h3>Lit Component<a class="headerlink" href="#lit-component" title="Permalink to this headline">¶</a></h3>
+<p>Oncodash use the <a class="reference external" href="https://lit.dev">Lit library</a> to implement its web components.
+Lit encapsulate most of the complexity of creating new widgets
+and allows to assemble self-contained widgets from smaller units.
+Lit can be programmed with Typescript, which brings decorator and types,
+for a better programming ergonomics.</p>
+<p>Lit comes as a layer on top of web components, and abstract its templates inside
+the <code class="xref js js-class docutils literal notranslate"><span class="pre">litElement()</span></code> class, from which all widgets should inherit.</p>
+<p><a class="reference internal" href="#lit-compo"><span class="std std-numref">Figure 1</span></a> shows widgets composition and data flows.</p>
+<figure class="align-default" id="id2">
+<span id="lit-compo"></span><img alt="_images/lit_composition.svg" class="diagram" src="_images/lit_composition.svg" /><figcaption>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">The application is built as a composition of Lit widgets.
+Any widget can make independent calls to the backend, through the API.
+Composed widgets can update the data held by sub-widgets,
+and should raise events every time they are updated
+(by new data from the backend or after an interaction with the user).</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The preferred composition architecture in Oncodash is to use composition of classes,
+using Lit’s <em>reactive controllers</em> instead of <em>mixins</em>, unless necessary.
+See <a class="reference external" href="https://lit.dev/docs/composition/component-composition/">Lit’s documentation</a> for more details.</p>
+</section>
+</section>
+<section id="main-modules">
+<h2>Main modules<a class="headerlink" href="#main-modules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="explainer.html">Explainer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="explainer.html#causal-network-visualization">Causal Network Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explainer.html#widget-architecture">Widget architecture</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p class="rubric">Notes and References</p>
+<dl class="footnote brackets">
+<dt class="label" id="wc"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>For more details, see the <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/Web_Components">Web Components</a> page on the MDN.</p>
+</dd>
+</dl>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h3>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
+</section>
+</section>
 </section>
 
 
@@ -218,6 +265,13 @@
               
             </div>
             <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="explainer.html" class="btn btn-neutral float-right" title="Explainer" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+    </div>
   
   
   <hr>
@@ -243,8 +297,18 @@
           <div class="sphinx-template-right-menu" id="sphinx-template-right-menu">
             <div class="sphinx-template-side-scroll" id="sphinx-template-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Welcome to oncodash-app’s documentation!</a></li>
+<li><a class="reference internal" href="#">Oncodash frontend documentation</a><ul>
+<li><a class="reference internal" href="#architecture">Architecture</a><ul>
+<li><a class="reference internal" href="#open-web-components">Open Web Components</a></li>
+<li><a class="reference internal" href="#lit-component">Lit Component</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#main-modules">Main modules</a><ul>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
             </div>
