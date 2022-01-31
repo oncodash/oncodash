@@ -21,15 +21,14 @@ class IndTab2Json:
 
         Example of the indication table format:
 
-             Patient  Sample   Gene     Mutation Ind      Certainty
-            |--------|--------|--------|--------|--------|--------|
-          0 |   P1   | P1_s1  |   G1   |  p.1X  | Drug1  |   1    |
-          1 |   P1   | P1_s2  |   G1   |  p.2X  | Drug1  |   1    |
-          2 |   P1   | P1_s3  |   G2   |  p.3X  | Drug2  |   2    |
-          3 |   P2   | P2_s1  |   G1   |  p.4X  | Drug1  |   3    |
-          4 |   P2   | P2_s2  |   G3   |  p.5X  | Drug1  |   1    |
-          5 |   P3   | P3_s1  |   G2   |  p.6X  | Drug3  |   1    |
-            |--------|--------|--------|--------|--------|--------|
+        | idx | Patient | Sample | Gene  | Mutation | Indication | Certainty |
+        |-----|---------|--------|-------|----------|------------|-----------|
+        | 0   | P1      | P1_s1  | BRCA1 | p.GGX    | Drug1      | 2         |
+        | 1   | P1      | P1_s2  | BRCA2 | p.TTX    | Drug2      | 1         |
+        | 2   | P2      | P2_s1  | RAD51 | p.FFX    | Drug1      | 1         |
+        | 3   | P2      | P2_s2  | BRCA1 | p.GGX    | Drug1      | 2         |
+        | 4   | P2      | P2_s3  | CHEK2 | p.DDX    | Drug3      | 3         |
+        | 5   | P3      | P3_s3  | BRCA1 | p.RRX    | Drug1      | 2         |
 
         Args:
         ---------
@@ -54,7 +53,8 @@ class IndTab2Json:
                 JSON.
         """
         if format not in ("nodelink", "cytoscape"):
-            raise ValueError(f"""
+            raise ValueError(
+                f"""
                 Invalid value for argument `format`. Got: {format}.
                 Allowed: {("nodelink", "cytoscape")}."""
             )
@@ -66,11 +66,7 @@ class IndTab2Json:
         self.certainty_key = certainty_key
         self.separator = separator
 
-        self.indf = pd.read_csv(
-            self.path,
-            sep=self.separator,
-            index_col=self.index_key
-        )
+        self.indf = pd.read_csv(self.path, sep=self.separator, index_col=self.index_key)
 
         if df_transform is not None:
             self.indf = df_transform(self.indf)
@@ -87,14 +83,15 @@ class IndTab2Json:
             graphs = self._table2nodelinks()
 
         return graphs
-    
+
     def _table2graphs(self) -> Dict[str, nx.DiGraph]:
         """
         Convert the indication table into networkx directed graphs
         """
         graphs = {}
         node_cols = [
-            col for col in self.indf.columns
+            col
+            for col in self.indf.columns
             if col not in (self.group_key, self.certainty_key)
         ]
 
@@ -102,8 +99,7 @@ class IndTab2Json:
 
             sub_graphs = []
             for _, row in p.iterrows():
-                g = nx.path_graph(row[node_cols].values,
-                                  create_using=nx.DiGraph)
+                g = nx.path_graph(row[node_cols].values, create_using=nx.DiGraph)
 
                 # set node attrs
                 node_attrs = {
@@ -114,8 +110,10 @@ class IndTab2Json:
 
                 # set edge attrs
                 edge_attrs = {
-                    e: {"certainty": 1./row[self.certainty_key],
-                        "strength": row[self.certainty_key]}
+                    e: {
+                        "certainty": 1.0 / row[self.certainty_key],
+                        "strength": row[self.certainty_key],
+                    }
                     for e in g.edges
                 }
                 nx.set_edge_attributes(g, edge_attrs)
@@ -157,7 +155,7 @@ def split_samplestr(df: pd.DataFrame) -> pd.DataFrame:
     Ad hoc split of the 'Sample' column into 'Tissue' and 'Timepoint'
     columns.
     """
-    df[["P", "Sample"]] = df["Sample"].str.split('_', n=1, expand=True)
+    df[["P", "Sample"]] = df["Sample"].str.split("_", n=1, expand=True)
     df = df.drop(columns=["P"])
 
     return df
