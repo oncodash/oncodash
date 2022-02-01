@@ -75,6 +75,10 @@ How to Submit Code
         Ref:#123
         BREAKING CHANGE: expects a key-value pair instead of single items.
         ```
+    - If you spread your changes across several atomic commits,
+      in order to ease the reviewer's job (thanks!),
+      please ensure that at least one commit message is correctly formatted with
+      all relevant information.
 4. Ensure that you did not introduce bugs by adding unit tests that run your new code.
 5. Ensure that you did not introduced a regression by running all the tests
    yourself, from within the project's containers.
@@ -82,6 +86,7 @@ How to Submit Code
 7. Push on your own repository and click on the "Create pull request" green
    button that should appear on your fork's page (or go to the original
    project page and click on "[Pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork)").
+   If you would like to get feedback but your code is not yet ready for merging, create a draft pull request instead.
 8. In the "base" dropdown menu, select the "dev" branch.
 
 
@@ -89,9 +94,9 @@ How to Merge code
 =================
 
 Our policiy for merging pull requests is to squash all commits into one.
-If your pull request consists in several commits, we will squash them manually,
-but the commit message may be cleaner if you rebase-and-squash your own branch before
-making the pull request.
+It is fine if your pull request consists in several commits,
+especially if you made them atomic, so as to ease the review.
+Note that we will squash your commits into a single one for the merge.
 
 In any case, enabling the checkbox
 "[allow maintainer edits](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/allowing-changes-to-a-pull-request-branch-created-from-a-fork)"
