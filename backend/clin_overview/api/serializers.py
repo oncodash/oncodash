@@ -7,6 +7,7 @@ class ClinicalDataSerializer(serializers.ModelSerializer):
     """
     Serializer for the oncodash causal network specification
     """
+
     class Meta:
         model = ClinicalData
-        fields = [] # fill me
+        fields = "__all__"

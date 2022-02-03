@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext as _
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models import F, Q
 
 
 # Enums for model
@@ -22,10 +23,10 @@ class CudStageFIGO2014(models.TextChoices):
 
 
 class CudTreatmentPhase(models.TextChoices):
-    PROGRESSION = "PROG", _("Progression")
+    PROGRESSION = "PROGRESSION", _("Progression")
     FOLLOWUP = "FOLLOWUP", _("Follow.-up")
-    PRIMARYCHEMO = "PCHEMO", _("Primary chemotherapy")
-    DRUGTRIAL = "DTRIAL", _("Drug trial")
+    PRIMARYCHEMO = "PRIMARYCHEMO", _("Primary chemotherapy")
+    DRUGTRIAL = "DRUGTRIAL", _("Drug trial")
     HORMONAL = "HORMONAL", _("Hormonal treatment")
 
 
@@ -60,19 +61,19 @@ class CudPrimaryTherapyOutcome(models.TextChoices):
     COMPLETE = "COMPLETE", _("Complete response")
     PROGRESSIVE = "PROGRESSIVE", _("Progressive disease")
     DEATH = "DEATH", _("Death during therapy")
-    UNKNOWN = "UNKNOWN", _("Unknown response")
     STOPPED = "STOPPED", _("Stopped")
     STOPPED_SIDEFFECTS = "SIDEEFFECTSTOP", _("Stopped due to side effects")
+    UNKNOWN = "UNKNOWN", _("Unknown response")
 
 
 class MainetenaceTherapy(models.TextChoices):
-    NOMAINTENANCE = "NOMAINTENCANCE", _("No maintenance therapy")
+    NOMAINTENANCE = "NOMAINTENANCE", _("No maintenance therapy")
     BEVACIZUMAB = "BEVACIZUMAB", _("Bevacizumab")
     PARPI = "PARPI", _("PARP inhibition therapy")
 
 
 class ClinicalData(models.Model):
-    patient = models.CharField(max_length=100, unique=True)
+    patient = models.CharField(max_length=20, unique=True)
     extra_patient_info = models.CharField(max_length=400, blank=True)
     other_diagnosis = models.CharField(max_length=100, blank=True)
     chronic_illnesses = models.CharField(max_length=100, blank=True)
@@ -80,36 +81,30 @@ class ClinicalData(models.Model):
     cancer_in_family = models.CharField(max_length=100, blank=True)
 
     # enums
-    cud_histology = models.CharField(
-        max_length=20, choices=CudHistology.choices, blank=False
-    )
+    cud_histology = models.CharField(max_length=20, choices=CudHistology.choices)
 
     disease_origin = models.CharField(
         max_length=20, choices=TissueType.choices, blank=True
     )
 
-    cud_stage = models.CharField(
-        max_length=7, choices=CudStageFIGO2014.choices, blank=True
-    )
+    cud_stage = models.CharField(max_length=7, choices=CudStageFIGO2014.choices)
 
     cud_primary_therapy_outcome = models.CharField(
         max_length=20, choices=CudPrimaryTherapyOutcome.choices, blank=True
     )
 
-    cud_survival = models.CharField(
-        max_length=15, choices=CudSurvival.choices, blank=False
-    )
+    cud_survival = models.CharField(max_length=15, choices=CudSurvival.choices)
 
     cud_treatment_strategy = models.CharField(
         max_length=4, choices=CudTreatmentStrategy.choices
     )
 
     cud_current_treatment_phase = models.CharField(
-        max_length=10, choices=CudTreatmentPhase.choices, blank=True
+        max_length=15, choices=CudTreatmentPhase.choices
     )
 
-    maintenace_therapy = models.CharField(
-        max_length=25, choices=MainetenaceTherapy.choices, blank=True
+    maintenance_therapy = models.CharField(
+        max_length=25, choices=MainetenaceTherapy.choices
     )
 
     # extra info related to the enums
@@ -122,24 +117,25 @@ class ClinicalData(models.Model):
     post_ids_cycles = models.PositiveIntegerField(null=True)
 
     # Dates
-    primary_laprascopy_date = models.DateTimeField(auto_now_add=False, blank=True)
-    primary_operation_date = models.DateTimeField(auto_now_add=False, blank=True)
-    secondary_operation_date = models.DateTimeField(auto_now_add=False, blank=True)
-    last_followup_visit = models.DateTimeField(auto_now_add=False, blank=True)
-    next_followup_visit = models.DateTimeField(auto_now_add=False, blank=True)
-    cud_time_of_diagnosis = models.DateTimeField(auto_now_add=False)
-    cud_progression_date = models.DateTimeField(auto_now_add=False, blank=True)
-    cud_last_primary_chemo = models.DateTimeField(auto_now_add=False, blank=True)
-    cud_date_of_outcome = models.DateTimeField(auto_now_add=False)
-    cud_date_of_death = models.DateTimeField(auto_now_add=False, blank=True)
-    maintenance_therapy_end = models.DateTimeField(auto_now_add=False, blank=True)
-    response_ct_date = models.DateTimeField(auto_now_add=False, blank=True)
+    cud_time_of_diagnosis = models.DateTimeField(blank=True, null=True)
+    primary_operation_date = models.DateTimeField(blank=True, null=True)
+    primary_laprascopy_date = models.DateTimeField(blank=True, null=True)
+    secondary_operation_date = models.DateTimeField(blank=True, null=True)
+    last_followup_visit = models.DateTimeField(blank=True, null=True)
+    next_followup_visit = models.DateTimeField(blank=True, null=True)
+    cud_progression_date = models.DateTimeField(blank=True, null=True)
+    cud_last_primary_chemo = models.DateTimeField(blank=True, null=True)
+    cud_date_of_outcome = models.DateTimeField(blank=True, null=True)
+    cud_date_of_death = models.DateTimeField(blank=True, null=True)
+    maintenance_therapy_end = models.DateTimeField(blank=True, null=True)
+    response_ct_date = models.DateTimeField(blank=True, null=True)
 
     # Basic patient info
     age = models.PositiveIntegerField(validators=[MaxValueValidator(150)])
     height = models.PositiveIntegerField(validators=[MaxValueValidator(250)])  # cm
-    weight = models.FloatField(validators=[MinValueValidator(0)])
-    bmi = models.FloatField(validators=[MinValueValidator(0)])
+    weight = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(300.0)]
+    )
 
     # aqcuired data from patient
     has_response_ct = models.BooleanField(default=False)
@@ -151,3 +147,58 @@ class ClinicalData(models.Model):
     has_paired_freshsample = models.BooleanField(default=False)
     has_brca_mutation = models.BooleanField(default=False)
     has_hrd = models.BooleanField(default=False)
+
+    @property
+    def bmi(self):
+        return self.weight / (self.height**2)
+
+    def __str__(self):
+        return self.patient
+
+    # timeline:
+    # 1.lapra, 2.diag, 3.oper1, 4.last-pchemo, 5. maintenance
+    #                           4.last-follow, 5. next-followup
+    #                                          5. oper2 6.prog, 7.out, 8.death
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=Q(primary_laprascopy_date__lt=F("cud_time_of_diagnosis")),
+                name="lapra-constraint1",
+            ),
+            models.CheckConstraint(
+                check=Q(cud_time_of_diagnosis__lt=F("primary_operation_date")),
+                name="diagnosis-constraint1",
+            ),
+            models.CheckConstraint(
+                check=Q(primary_operation_date__lt=F("cud_last_primary_chemo")),
+                name="operation-constraint1",
+            ),
+            models.CheckConstraint(
+                check=Q(primary_operation_date__lt=F("secondary_operation_date")),
+                name="operation-constraint2",
+            ),
+            models.CheckConstraint(
+                check=Q(primary_operation_date__lt=F("last_followup_visit")),
+                name="followup-constraint1",
+            ),
+            models.CheckConstraint(
+                check=Q(last_followup_visit__lt=F("next_followup_visit")),
+                name="followup-constraint2",
+            ),
+            models.CheckConstraint(
+                check=Q(cud_last_primary_chemo__lt=F("maintenance_therapy_end")),
+                name="maintenance-constraint1",
+            ),
+            models.CheckConstraint(
+                check=Q(maintenance_therapy_end__lt=F("cud_progression_date")),
+                name="progression-constraint1",
+            ),
+            models.CheckConstraint(
+                check=Q(cud_progression_date__lt=F("cud_date_of_death")),
+                name="outcome-constraint1",
+            ),
+            models.CheckConstraint(
+                check=Q(cud_date_of_outcome__lt=F("cud_date_of_death")),
+                name="outcome-constraint2",
+            ),
+        ]
