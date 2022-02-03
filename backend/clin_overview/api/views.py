@@ -6,8 +6,9 @@ from ..models import ClinicalData
 
 class ClinicalViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for the causal networks of the patients. Provides
+    API endpoint for the clinical data of the patients. Provides
     `list`, `create`, `retrieve`, `update` and `destroy` actions.
     """
+
     queryset = ClinicalData.objects.all()
     serializer_class = ClinicalDataSerializer

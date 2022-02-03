@@ -5,7 +5,7 @@ from clin_overview.models import ClinicalData
 
 class ClinicalDataSerializer(serializers.ModelSerializer):
     """
-    Serializer for the oncodash causal network specification
+    Serializer for the clinical data specification.
     """
 
     class Meta:
