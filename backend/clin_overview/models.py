@@ -73,7 +73,7 @@ class MainetenaceTherapy(models.TextChoices):
 
 
 class ClinicalData(models.Model):
-    patient = models.CharField(max_length=20, unique=True)
+    patient = models.CharField(max_length=100, unique=True)
     extra_patient_info = models.CharField(max_length=400, blank=True)
     other_diagnosis = models.CharField(max_length=100, blank=True)
     chronic_illnesses = models.CharField(max_length=100, blank=True)
@@ -87,20 +87,20 @@ class ClinicalData(models.Model):
         max_length=20, choices=TissueType.choices, blank=True
     )
 
-    cud_stage = models.CharField(max_length=7, choices=CudStageFIGO2014.choices)
+    cud_stage = models.CharField(max_length=20, choices=CudStageFIGO2014.choices)
 
     cud_primary_therapy_outcome = models.CharField(
         max_length=20, choices=CudPrimaryTherapyOutcome.choices, blank=True
     )
 
-    cud_survival = models.CharField(max_length=15, choices=CudSurvival.choices)
+    cud_survival = models.CharField(max_length=20, choices=CudSurvival.choices)
 
     cud_treatment_strategy = models.CharField(
-        max_length=4, choices=CudTreatmentStrategy.choices
+        max_length=20, choices=CudTreatmentStrategy.choices
     )
 
     cud_current_treatment_phase = models.CharField(
-        max_length=15, choices=CudTreatmentPhase.choices
+        max_length=20, choices=CudTreatmentPhase.choices
     )
 
     maintenance_therapy = models.CharField(

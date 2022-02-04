@@ -26,9 +26,6 @@ class Provider(BaseProvider):
     def get_cudstrategy(self) -> str:
         return self.random_element(CUDTREATSTRAT)
 
-    def get_cudstrategy(self) -> str:
-        return self.random_element(CUDTREATSTRAT)
-
     def get_tissuetype(self) -> str:
         return self.random_element(TISSUETYPE)
 
@@ -44,7 +41,7 @@ class Provider(BaseProvider):
     def get_maintenance(self) -> str:
         return self.random_element(MAINTENANCETHERAPY)
 
-    def get_cycles(self) -> str:
+    def get_cycles(self) -> int:
         return self.random_element(CYCLES)
 
 
