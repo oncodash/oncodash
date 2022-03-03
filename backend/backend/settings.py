@@ -155,3 +155,59 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:8000',
     'http://localhost'
 ]
+
+def skip_lib_python(record):
+    """Filter that removes "File seen" events on a *lib/python* file."""
+    msg = record.msg
+    if msg and msg.startswith("File") and len(record.args)>0:
+        path = str(record.args[0].resolve())
+        if "lib/python" in path:
+            return False
+    return True
+
+def skip_node_modules(record):
+    """Filter that removes "File seen" events on a *node_modules* file."""
+    msg = record.msg
+    if msg and msg.startswith("File") and len(record.args)>0:
+        path = str(record.args[0].resolve())
+        if "node_modules" in path:
+            return False
+    return True
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        # use Django's built in CallbackFilter to point to our filter 
+        'skip_lib_python': {
+            '()': 'django.utils.log.CallbackFilter',
+            'callback': skip_lib_python
+        },
+        'skip_node_modules': {
+            '()': 'django.utils.log.CallbackFilter',
+            'callback': skip_node_modules
+        }
+    },
+    'formatters': {
+        # django's default formatter
+        'django.server': {
+            '()': 'django.utils.log.ServerFormatter',
+            'format': '[%(server_time)s] %(message)s',
+        }
+    },
+    'handlers': {
+        'my_log_handler': {
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'filters': ['skip_lib_python','skip_node_modules'],
+            'class': 'logging.FileHandler',
+            'filename': Path(BASE_DIR, 'django.log'),
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['my_log_handler'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': True,
+        },
+    },
+}

@@ -3,6 +3,9 @@ from rest_framework.routers import DefaultRouter
 
 from .views import NetworkViewSet
 
+import logging
+logger = logging.getLogger(__name__)
+logger.debug("Register explainer")
 
 app_name = 'explainer'
 
@@ -12,3 +15,4 @@ router.register(r'networks', NetworkViewSet)
 urlpatterns = [
     path('', include(router.urls)),
 ]
+
