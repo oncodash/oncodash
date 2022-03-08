@@ -3,6 +3,7 @@ version: "3.2"
 services:
   # nodeserver
   nodeserver:
+    image: oncodash/nodeserver
     user: $UID:$GID
     build:
       context: ./oncodash-app
@@ -14,7 +15,7 @@ services:
         source: ./oncodash-app
         target: /opt/node_app/app
 
-        # this is a workaround to prevent host node_modules from accidently 
+        # this is a workaround to prevent host node_modules from accidently
         # getting mounted in container in case you want to use node/npm both
         # outside container for test/lint etc. and also inside container this
         # will overwrite the default node_modules dir in container so it won't
@@ -25,6 +26,7 @@ services:
 
   # django backend gunicorn server (communicates with nginx proxy)
   backend:
+    image: oncodash/backend
     user: $UID:$GID
     build:
       context: ./backend
@@ -38,6 +40,7 @@ services:
 
   # nginx proxy server
   nginx:
+    image: oncodash/nginx
     restart: always
     build:
       context: ./nginx
@@ -51,5 +54,5 @@ services:
 volumes:
   notused:
 
-    
+
 
