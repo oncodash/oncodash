@@ -10,3 +10,4 @@ class NetworkSerializer(serializers.ModelSerializer):
     class Meta:
         model = NetworkSpec
         fields = ['id', 'patient', 'spec']
+
