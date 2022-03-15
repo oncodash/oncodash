@@ -58,3 +58,4 @@ class NetworkSpec(models.Model):
 
 #     def serialize(self):
 #         return serializers.serialize("json", self.objects.all())
+

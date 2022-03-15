@@ -3,7 +3,7 @@ import networkx as nx
 from pathlib import Path
 from typing import Dict, Union, Callable
 from typing_extensions import TypedDict
-
+import logging
 
 class IndTab2Json:
     def __init__(
@@ -52,12 +52,16 @@ class IndTab2Json:
                 wrangling is needed for the table before converting to
                 JSON.
         """
+
+        self.logger = logging.getLogger(__name__)
+        self.logger.debug("Convert the input indication table into JSON")
+        
         if format not in ("nodelink", "cytoscape"):
-            raise ValueError(
-                f"""
+            msg = f"""
                 Invalid value for argument `format`. Got: {format}.
                 Allowed: {("nodelink", "cytoscape")}."""
-            )
+            logger.error(msg)    
+            raise ValueError(msg)
 
         self.path = Path(path)
         self.format = format
@@ -77,6 +81,7 @@ class IndTab2Json:
         Get the JSON network specifications for all the groups in the
         indication table.
         """
+        self.logger.debug("Get the JSON network specifications for all the groups in the indication table")
         if self.format == "cytoscape":
             graphs = self._table2cytoscape()
         elif self.format == "nodelink":
@@ -88,6 +93,8 @@ class IndTab2Json:
         """
         Convert the indication table into networkx directed graphs
         """
+        self.logger.debug("Convert the input indication table into networkx")
+
         graphs = {}
         node_cols = [
             col
@@ -130,6 +137,7 @@ class IndTab2Json:
         Convert the input table into node link format that is
         serializable to JSON and usable in Javascript documents.
         """
+        self.logger.debug("Convert the input indication table into node link")
         graphs = self._table2graphs()
 
         for n, g in graphs.items():
@@ -142,6 +150,7 @@ class IndTab2Json:
         Convert the input table into Cytoscape JSON format that is
         serializable to JSON and usable in Cytoscape.js applications.
         """
+        self.logger.debug("Convert the input indication table into Cytoscape")
         graphs = self._table2graphs()
 
         for n, g in graphs.items():
@@ -155,7 +164,9 @@ def split_samplestr(df: pd.DataFrame) -> pd.DataFrame:
     Ad hoc split of the 'Sample' column into 'Tissue' and 'Timepoint'
     columns.
     """
+    self.logger.debug("Split columns")
     df[["P", "Sample"]] = df["Sample"].str.split("_", n=1, expand=True)
     df = df.drop(columns=["P"])
 
     return df
+
