@@ -44,6 +44,8 @@ docker-compose run --rm backend sh -c "python manage.py migrate"
 ```sh
 docker-compose run --rm backend sh -c "python manage.py populate -p /opt/app/path/to/indf.csv"
 ```
+Note: `/opt/app/` points by default to wherever is `oncodash/backend/` on your
+system.
 
 ## Development
 
