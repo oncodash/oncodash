@@ -164,7 +164,8 @@ def split_samplestr(df: pd.DataFrame) -> pd.DataFrame:
     Ad hoc split of the 'Sample' column into 'Tissue' and 'Timepoint'
     columns.
     """
-    self.logger.debug("Split columns")
+    logger = logging.getLogger(__name__)
+    logger.debug("Split columns")
     df[["P", "Sample"]] = df["Sample"].str.split("_", n=1, expand=True)
     df = df.drop(columns=["P"])
 
