@@ -1,3 +1,12 @@
+## [0.2.1](https://github.com/oncodash/oncodash/compare/v0.2.0...v0.2.1) (2022-03-16)
+
+
+### Bug Fixes
+
+* **populate:** bad logger instance ([f871d6e](https://github.com/oncodash/oncodash/commit/f871d6e19450a5f87d25b6153d59f5291ac5833e))
+
+
+
 # [0.2.0](https://github.com/oncodash/oncodash/compare/v0.1.2-alpha...v0.2.0) (2022-03-15)
 
 
