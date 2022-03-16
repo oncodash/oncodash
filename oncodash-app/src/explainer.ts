@@ -142,12 +142,11 @@ function drawLinks(
         const l = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
         const h = labelBoxHeight * link.strength;
 
-        const a = l - h / 2;
-        const b = (-1 * h) / 2;
+        const b:number = h / 2;
+        const c:number = h / 4;
+        const a:number = l - b - c;
 
-        const shape = `M 0 0 v ${h} h ${a} l ${h / 2} ${b} l ${b} ${b} h ${
-            -1 * a
-        }`;
+        const shape = `M 0 0 v ${h} h ${a} v ${1*c} l ${c+b} ${-1*(c+b)} l ${-1*(b+c)} ${-1*(b+c)} v ${1*c} h ${-1*a}`;
 
         // draw the link
         svg.append("path")
@@ -161,7 +160,7 @@ function drawLinks(
             .attr("opacity", 0.2 + link.certainty * 0.4)
             .attr(
                 "filter",
-                `url(#blur)-${Math.round(((1 - link.certainty) * 10) / 10)})`
+                `url(#blur-${Math.round(((1 - link.certainty) * 10) / 10)})`
             );
     }
 }
@@ -176,7 +175,7 @@ function drawGraph(graphData: NodeLink): HTMLElement {
     const svgWidth = 1024;
     const svgHeight = 480;
     const labelBoxHeight = 16;
-    const blurMax = 3;
+    const blurMax = 4;
 
     // shadow-DOM container
     const div = document.createElement("div");
@@ -201,11 +200,13 @@ function drawGraph(graphData: NodeLink): HTMLElement {
         defs.append("filter")
             .attr("id", `blur-${blur}`)
             .append("feGaussianBlur")
-            .attr("stdDeviation", blurMax * blur);
+                .attr("in","SourceGraphic")
+                .attr("stdDeviation", blurMax * blur);
     }
 
-    const nodes = svg.append("g").attr("id", "nodes");
     const links = svg.append("g").attr("id", "links");
+    // Nodes on top of arrows, hence after in the z-order.
+    const nodes = svg.append("g").attr("id", "nodes");
 
     // wrangle the column nodes data-structure for `drawColumn()`
     const colData: Column = [];
