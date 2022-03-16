@@ -1,3 +1,16 @@
+# [0.2.0](https://github.com/oncodash/oncodash/compare/v0.1.2-alpha...v0.2.0) (2022-03-15)
+
+
+### Features
+
+* **backend:** more logging ([#30](https://github.com/oncodash/oncodash/issues/30)) ([1b19180](https://github.com/oncodash/oncodash/commit/1b1918070125440e9ff4a0798375b951163669b5))
+
+
+
+## [0.1.2-alpha](https://github.com/oncodash/oncodash/compare/v0.1.1...v0.1.2-alpha) (2022-01-25)
+
+
+
 ## [0.1.1](https://github.com/oncodash/oncodash/compare/v0.1.0...v0.1.1) (2021-12-17)
 
 
