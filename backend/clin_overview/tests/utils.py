@@ -160,7 +160,7 @@ def create_data(fake: Faker) -> Dict:
                 "tumor",
                 "biopsy",
                 "no",
-                "pleural fluis",
+                "pleural fluid",
                 "thorax norm",
                 "auxilliary",
             ],
@@ -170,7 +170,7 @@ def create_data(fake: Faker) -> Dict:
     if random.randint(0, 1):
         ret_dict["other_diagnosis"] = fake.word(
             ext_word_list=[
-                "brast cancer",
+                "breast cancer",
                 "renal cancer",
                 "lung cancer",
                 "leukemia",
