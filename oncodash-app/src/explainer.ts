@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { LitElement, css } from "lit";
+import {customElement} from 'lit/decorators.js';
 
 // Interfaces for the graph query data
 interface Node {
@@ -268,6 +269,7 @@ function drawGraph(graphData: NodeLink): HTMLElement {
  * Lit Element, responsible for rendering the network visualization and
  * fetching the node-link data from the API.
  */
+@customElement("oncodash-explainer")
 class ExplainerView extends LitElement {
     constructor(private graph?: NodeLink) {
         super();
@@ -335,6 +337,3 @@ class ExplainerView extends LitElement {
             });
     }
 }
-
-export default ExplainerView;
-customElements.define("explainer-view", ExplainerView);
