@@ -11,10 +11,22 @@
         <title>Oncodash</title>
     </head>
     <body>
+        <script type="module" src="./out-tsc/src/patient-broker.js"></script>
+        <script type="module" src="./out-tsc/src/patient-selector.js"></script>
+        <script type="module" src="./out-tsc/src/patient-card.js"></script>
+
+        <h1>Oncodash</h1>
+        <img src="assets/oncodash-logo.svg" />
+
+        <oncodash-patient-broker>
+            <oncodash-patient-selector slot="selector"></oncodash-patient-selector>
+            <oncodash-patient-card     slot="viewer"></oncodash-patient-card>
+        </oncodash-patient-broker>
+        
         <p>Views:</p>
         <ul>
-            <li><a href="explainer.html">ExplAIner</a></li>
             <li><a href="clinical.html">Clinical</a></li>
+            <li><a href="explainer.html">ExplAIner</a></li>
         </ul>
     </body>
 </html>
