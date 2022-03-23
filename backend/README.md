@@ -45,10 +45,16 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-5. Populate a test database with network data (Explainer-app)
+5. Populate a test database with network data (Explainer-app):
 
 ```sh
 python manage.py populate -p /path/to/indication_table.csv
+```
+
+6. Populate the database with clinical (fake) data:
+
+```sh
+python manage.py fake_data -n 10
 ```
 
 ## Development
@@ -97,10 +103,16 @@ docker-compose run --rm backend sh -c "python manage.py makemigrations"
 docker-compose run --rm backend sh -c "python manage.py migrate"
 ```
 
-4. Populate a test database with network data (Explainer-app)
+4. Populate a test database with network data (Explainer-app):
 
 ```sh
 docker-compose run --rm backend sh -c "python manage.py populate -p /opt/app/path/to/indf.csv"
+```
+
+5. Populate a test database with clinical data:
+
+```sh
+docker-compose run --rm backend sh -c "python manage.py fake_data -n 10"
 ```
 
 ## Development

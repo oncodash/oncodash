@@ -24,7 +24,7 @@ class CudStageFIGO2014(models.TextChoices):
 
 class CudTreatmentPhase(models.TextChoices):
     PROGRESSION = "PROGRESSION", _("Progression")
-    FOLLOWUP = "FOLLOWUP", _("Follow.-up")
+    FOLLOWUP = "FOLLOWUP", _("Follow-up")
     PRIMARYCHEMO = "PRIMARYCHEMO", _("Primary chemotherapy")
     DRUGTRIAL = "DRUGTRIAL", _("Drug trial")
     HORMONAL = "HORMONAL", _("Hormonal treatment")
