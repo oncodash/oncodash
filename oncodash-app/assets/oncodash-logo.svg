@@ -5,8 +5,8 @@
    viewBox="0 0 33.866666 33.866668"
    version="1.1"
    id="svg8"
-   inkscape:version="1.2-dev (9ee32be, 2021-06-19)"
-   sodipodi:docname="oncodash_logo.svg"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="oncodash-logo.svg"
    inkscape:export-filename="oncodash-favicon.png"
    inkscape:export-xdpi="12"
    inkscape:export-ydpi="12"
@@ -72,7 +72,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="2.0949461"
      inkscape:cx="194.75441"
-     inkscape:cy="179.24089"
+     inkscape:cy="179.47956"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -181,13 +181,13 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>Johann Dreo</dc:title>
-          </cc:Agent>
-        </dc:creator>
         <dc:date>2021-10-08</dc:date>
         <dc:title>Oncodash logo</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>nojhan</dc:title>
+          </cc:Agent>
+        </dc:creator>
       </cc:Work>
     </rdf:RDF>
   </metadata>

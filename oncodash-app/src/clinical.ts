@@ -8,6 +8,10 @@ class ClinicalView extends LitElement {
     }
 
     static styles = css`
+        img {
+            height:1.2em;
+        }
+    
         #patient-card {
             margin:2em;
             padding:1em;
@@ -20,6 +24,7 @@ class ClinicalView extends LitElement {
             font-size:large;
             font-weight:bold;
         }
+        
         .patient-main-item {
             background-color:grey;
             padding:3px 1.25rem;
@@ -28,12 +33,29 @@ class ClinicalView extends LitElement {
             clip-path: polygon(0% 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 100% 100%, 0% 100%, 14px 50%);
         }
 
-        #patient-name {background-color:#80B3FF;}
-        #patient-age  {background-color:#CCAAFF;}
-        #patient-cud_histology {background-color:#FFAACC;}
-        #patient-cud_stage {background-color:#FF8080;}
+        #patient-name {
+            background-color:#AACCFF;
+        }
+        
+        #patient-age {
+            background-color:#80B3FF;
+        }
+        
+        #patient-cud_histology {
+            background-color:#0066FF;
+            color:white;
+        }
+
+        #patient-cud_stage {
+            background-color:#0055D4;
+            color:white;
+        }
 
         #patient-survival {
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
         }
 
         #patient-info {
@@ -56,9 +78,14 @@ class ClinicalView extends LitElement {
         .patient-primary-item {
             margin:0.5em;
         }
+        
+        .patient-primary-item img {
+            vertical-align:text-top;
+        }
 
         .patient-primary-item span {
             margin-left:0.2em;
+            vertical-align:text-top;
         }
 
         #patient-secondary {
@@ -69,11 +96,16 @@ class ClinicalView extends LitElement {
         }
         #patient-secondary-grid {
             display: grid;
-            grid:repeat(3,2em) / auto-flow 25ex;
+            grid:repeat(3,2em) / auto-flow 30ex;
         }
 
         .patient-secondary-item {
-            vertical-align:middle;
+            text-align:right;
+        }
+
+        .patient-secondary-item img {
+            margin-left:0.5ex;
+            vertical-align:text-top;
         }
 
         .true {
@@ -128,8 +160,7 @@ class ClinicalView extends LitElement {
 
         const e = where.append("span")
             .attr("id",`patient-${name}`)
-            .attr("class","patient-secondary-item")
-            .attr("class",`${value}`)
+            .attr("class",`${value} patient-secondary-item`)
             .text(txt);
 
         const img = e.append("img")
@@ -155,9 +186,9 @@ class ClinicalView extends LitElement {
         /***** Header *****/
         const header = card.append("div").attr("id","patient-header");
         const main = header.append("div").attr("id","patient-main");
-        const survival = main.append("span");
+        const survival = main.append("span")
+            .attr("id","patient-survival");
         const img = survival.append("img")
-            .attr("id","patient-survival")
             .attr("alt",this.patient.cud_survival)
             .attr("title",this.patient.cud_survival);
         if( this.patient.cud_survival == "ALIVE" ) {
@@ -181,9 +212,9 @@ class ClinicalView extends LitElement {
         this.insert_icon_text(primgrid, "cud_current_treatment_phase", this.patient.cud_current_treatment_phase);
         this.insert_icon_text(primgrid, "cud_primary_therapy_outcome", this.patient.cud_primary_therapy_outcome);
         this.insert_icon_text(primgrid, "maintenance_therapy", this.patient.maintenance_therapy);
-        this.insert_icon_text(primgrid, "chronic_illness", this.patient.chronic_illness);
         this.insert_icon_text(primgrid, "other_diagnosis", this.patient.other_diagnosis);
         this.insert_icon_text(primgrid, "cancer_in_family", this.patient.cancer_in_family);
+        this.insert_icon_text(primgrid, "chronic_illness", this.patient.chronic_illness);
         this.insert_icon_text(primgrid, "other_medication", this.patient.other_medication);
         const bmi:number = Math.round(this.patient.weight/(this.patient.height/100)**2);
         this.insert_icon_text(primgrid, "bmi", `${bmi} kg/m̉²`);
