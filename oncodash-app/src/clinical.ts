@@ -1,9 +1,14 @@
 import * as d3 from "d3";
 import { LitElement, css } from "lit";
+import {customElement, property} from 'lit/decorators.js';
 
-class ClinicalView extends LitElement {
+@customElement("oncodash-clinical-card")
+class ClinicalCard extends LitElement {
 
-    constructor(private patient?: any) {
+    @property()
+    private patient: any;
+
+    constructor() {
         super();
     }
 
@@ -185,6 +190,7 @@ class ClinicalView extends LitElement {
 
         /***** Header *****/
         const header = card.append("div").attr("id","patient-header");
+        
         const main = header.append("div").attr("id","patient-main");
         const survival = main.append("span")
             .attr("id","patient-survival");
@@ -247,5 +253,5 @@ class ClinicalView extends LitElement {
     }
 }
 
-export default ClinicalView;
-customElements.define("clinical-view", ClinicalView);
+export default ClinicalCard;
+customElements.define("oncodash-clinical-card", ClinicalCard);
