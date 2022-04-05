@@ -6,7 +6,7 @@ The oncodash back-end is used to serve API-endpoints for the front-end applicati
 
 ### Requirements
 
-- Python >= 3.7
+- Python >= 3.7. **Be carefull** On windows you will need python 3.9 or higher in order to have the JSON1 extension enabled on SQLite.
 
 ## Installation
 
