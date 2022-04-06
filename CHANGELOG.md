@@ -1,3 +1,18 @@
+# [0.4.0](https://github.com/oncodash/oncodash/compare/v0.3.0...v0.4.0) (2022-04-06)
+
+
+### Bug Fixes
+
+* **linter:** warn on irregular space ([55e11d2](https://github.com/oncodash/oncodash/commit/55e11d23819c0924f145dadf1640ea969815d113))
+
+
+### Features
+
+* add an icon for Oncodash ([1fbe16c](https://github.com/oncodash/oncodash/commit/1fbe16cf2761f9cf73286155eab50c7b50118a93))
+* **front:** patient card and composable widgets ([e5371e4](https://github.com/oncodash/oncodash/commit/e5371e468380d1b2a25f43cfcd4041dfd31506b2))
+
+
+
 # [0.3.0](https://github.com/oncodash/oncodash/compare/v0.2.1...v0.3.0) (2022-03-22)
 
 
@@ -26,15 +41,6 @@
 
 
 ## [0.1.2-alpha](https://github.com/oncodash/oncodash/compare/v0.1.1...v0.1.2-alpha) (2022-01-25)
-
-
-
-## [0.1.1](https://github.com/oncodash/oncodash/compare/v0.1.0...v0.1.1) (2021-12-17)
-
-
-### Bug Fixes
-
-* update paths in files to new folder structure ([f788282](https://github.com/oncodash/oncodash/commit/f78828247e583db02e7c6534e364e0c33cd7b81f))
 
 
 
