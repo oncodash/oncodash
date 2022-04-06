@@ -21,5 +21,6 @@ module.exports = {
         "dot-notation": "off",
         "no-unused-vars": ["error", { args: "none" }],
         "require-await": "off",
+        "no-irregular-whitespace": "warn",
     },
 };
