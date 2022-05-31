@@ -69,65 +69,49 @@ export function nodeLinkToDAG(graphData: NodeLink): Map<string, DAGNode> {
 }
 
 /**
- * Depth first travesing of the explainer graph given a node.
- * Finds all the paths/links down or up stream of a node.
+ * Depth first travesing of the explainer graph given a DAGNode.
+ * Finds all the paths/links down or up stream of a node or a link.
  * @param {DAGNode} dagNode - Input DAG-node.
- * @param {string} [mode="forward"] - Direction to traverse the graph. One of "forward", "backward".
+ * @param {"link" | "node"} source - Flag, whether to start traversing the graph from a node or a link.
+ * @param {"children" | "parents"} [mode="forward"] - Direction to traverse the graph.
  * @returns {Map<Link, Node>} - Link-node pairs representing all the nodes/links in a path.
  */
 export function traverseNodes(
     dagNode: DAGNode,
-    mode = "forward"
+    mode = "forward",
+    source = "link",
+    sourceId?: string
 ): Map<Link, Node> {
     const nodelinks = new Map<Link, Node>();
     const key = mode === "forward" ? "children" : "parents";
 
-    // HACK: Add the current node to the map with a placeholder link.
-    // Otherwise the current node won't be added to the final map since it
-    // is not contained in the dagNode children or parents.
-    const placeholderLink = {
-        source: "",
-        target: "",
-        certainty: 0,
-        strength: 0,
-    };
-    nodelinks.set(placeholderLink, dagNode.node);
-
-    const traverse = (dagNode: DAGNode) => {
-        for (const nextNode of dagNode[key]) {
-            if (!nodelinks.has(nextNode.link)) {
-                nodelinks.set(nextNode.link, nextNode.dagnode.node);
-                traverse(nextNode.dagnode);
+    if (source === "link") {
+        // Only forward traversing when source === "link"
+        // store the first matching parent node to the map.
+        for (const parent of dagNode.parents) {
+            if (parent.link.source === sourceId) {
+                nodelinks.set(parent.link, parent.dagnode.node);
             }
         }
-    };
-
-    traverse(dagNode);
-    return nodelinks;
-}
-
-/**
- * Depth first travesing of the children links of the explainer graph.
- * Finds all the nodes/links down stream of a node and also the first parent.
- * @param {DAGNode} dagNode - Input DAG-node.
- * @param {string} source - The source node id of the currently active link.
- * @returns {Map<Link, Node>} - Link-node pairs representing all the nodes/links in a path.
- */
-export function traverseLinks(
-    dagNode: DAGNode,
-    source: string
-): Map<Link, Node> {
-    const nodelinks = new Map<Link, Node>();
-
-    // store the first matching parent node to the map.
-    for (const parent of dagNode.parents) {
-        if (parent.link.source === source) {
-            nodelinks.set(parent.link, parent.dagnode.node);
-        }
+    } else if (source === "node") {
+        // Add the current node to the map with a placeholder link.
+        // Otherwise the current node won't be added to the final map since it
+        // is not contained in the dagNode children or parents.
+        const placeholderLink = {
+            source: "",
+            target: "",
+            certainty: 0,
+            strength: 0,
+        };
+        nodelinks.set(placeholderLink, dagNode.node);
+    } else {
+        throw new Error(
+            `Illegal source argument. Got: ${source}. Allowed: "link", "node"`
+        );
     }
 
     const traverse = (dagNode: DAGNode) => {
-        for (const nextNode of dagNode["children"]) {
+        for (const nextNode of dagNode[key]) {
             if (!nodelinks.has(nextNode.link)) {
                 nodelinks.set(nextNode.link, nextNode.dagnode.node);
                 traverse(nextNode.dagnode);

@@ -15,7 +15,6 @@ import {
     DAGNode,
     nodeLinkToDAG,
     traverseNodes,
-    traverseLinks,
 } from "./graph_utils";
 import Tooltip from "../utils/tooltip";
 import { dataTooltipHandler } from "../utils/tooltip";
@@ -44,8 +43,8 @@ type ColumnLinks = Record<string, { links: Link[]; bound: BoxBounds }>;
 @customElement("oncodash-explainer")
 class ExplainerView extends LitElement {
     private dag: Map<string, DAGNode> = new Map();
-    private traversedNodes: Set<Node> = new Set();
-    private traversedLinks: Set<Link> = new Set();
+    private highlightedNodePaths: Set<Node> = new Set();
+    private highlightedLinks: Set<Link> = new Set();
     private tooltip: Tooltip = new Tooltip(document.body);
 
     /**
@@ -258,7 +257,7 @@ class ExplainerView extends LitElement {
                         <path id="${link.source}-${link.target}"
                             class="${classMap({
                                 link: true,
-                                active: this.traversedLinks.has(link),
+                                active: this.highlightedLinks.has(link),
                             })}"
                             d="${shape}"
                             transform="translate(${x1} ${y1 - h / 2})
@@ -305,14 +304,14 @@ class ExplainerView extends LitElement {
     private addNodePaths(target: string): void {
         // Stash all the children and parent nodes and links of `target`-node
         const paths = this.dag.get(target)!;
-        const fwd_links = traverseNodes(paths, "forward");
-        const bwd_links = traverseNodes(paths, "backward");
-        this.traversedLinks = new Set<Link>([
+        const fwd_links = traverseNodes(paths, "forward", "node");
+        const bwd_links = traverseNodes(paths, "backward", "node");
+        this.highlightedLinks = new Set<Link>([
             ...bwd_links.keys(),
             ...fwd_links.keys(),
         ]);
 
-        this.traversedNodes = new Set<Node>([
+        this.highlightedNodePaths = new Set<Node>([
             ...bwd_links.values(),
             ...fwd_links.values(),
         ]);
@@ -321,10 +320,10 @@ class ExplainerView extends LitElement {
     private addLinkPaths(source: string, target: string): void {
         // Stash all the children nodes and links of `target`-node
         const paths = this.dag.get(target)!;
-        const links = traverseLinks(paths, source);
+        const links = traverseNodes(paths, "forward", "link", source);
 
-        this.traversedNodes = new Set<Node>([...links.values()]);
-        this.traversedLinks = new Set<Link>([...links.keys()]);
+        this.highlightedNodePaths = new Set<Node>([...links.values()]);
+        this.highlightedLinks = new Set<Link>([...links.keys()]);
     }
 
     private mouseOverNode(e: MouseEvent): void {
@@ -361,8 +360,8 @@ class ExplainerView extends LitElement {
     }
 
     private mouseLeaveElem(e: MouseEvent): void {
-        this.traversedLinks.clear();
-        this.traversedNodes.clear();
+        this.highlightedLinks.clear();
+        this.highlightedNodePaths.clear();
         this.tooltip.clear();
         this.requestUpdate();
     }
