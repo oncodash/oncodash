@@ -6,7 +6,10 @@
             name="viewport"
             content="width=device-width, initial-scale=1.0, viewport-fit=cover"
         />
-        <meta name="Description" content="Oncology causal network visualisation" />
+        <meta
+            name="Description"
+            content="Oncology causal network visualisation"
+        />
         <base href="/" />
 
         <style>
@@ -18,11 +21,15 @@
                 background-color: #ededed;
             }
         </style>
+        <link rel="stylesheet" href="assets/css/tooltip.css" />
         <title>Ooncodash -- ExplAIner</title>
     </head>
     <body>
         <oncodash-explainer />
-        <script type="module" src="./out-tsc/src/explainer.js"></script>
+        <!-- <script type="module" src="./out-tsc/src/explainer.js"></script> -->
+        <script
+            type="module"
+            src="./out-tsc/src/explainer/explainer.js"
+        ></script>
     </body>
 </html>
-
