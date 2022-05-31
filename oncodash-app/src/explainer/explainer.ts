@@ -127,7 +127,7 @@ class ExplainerView extends LitElement {
      * @param {NodeLink} graphData - Input graph in node-link-format.
      * @returns {SVGTemplateResult[]} - An array containing <svg>-elems for nodes and links.
      */
-    addSvgNodesAndLinks(graphData: NodeLink): SVGTemplateResult[] {
+    private addSvgNodesAndLinks(graphData: NodeLink): SVGTemplateResult[] {
         // Compute widths for the node columns
         const colData = _getColNodeData(graphData);
         const colWidth = this.svgWidth / Object.keys(colData).length;
@@ -284,7 +284,7 @@ class ExplainerView extends LitElement {
      * @param {NodeLink} graphData - Input graph in node-link-format.
      * @returns {TemplateResult} - An array containing <svg>-elems for nodes and links.
      */
-    drawSvgGraph(graphData: NodeLink): TemplateResult {
+    private drawSvgGraph(graphData: NodeLink): TemplateResult {
         const canvas = html`<div class="oncowidget">
             <svg
                 id="explainerview"
@@ -302,7 +302,7 @@ class ExplainerView extends LitElement {
         return canvas;
     }
 
-    addNodePaths(target: string): void {
+    private addNodePaths(target: string): void {
         // Stash all the children and parent nodes and links of `target`-node
         const paths = this.dag.get(target)!;
         const fwd_links = traverseNodes(paths, "forward");
@@ -318,7 +318,7 @@ class ExplainerView extends LitElement {
         ]);
     }
 
-    addLinkPaths(source: string, target: string): void {
+    private addLinkPaths(source: string, target: string): void {
         // Stash all the children nodes and links of `target`-node
         const paths = this.dag.get(target)!;
         const links = traverseLinks(paths, source);
@@ -327,7 +327,7 @@ class ExplainerView extends LitElement {
         this.traversedLinks = new Set<Link>([...links.keys()]);
     }
 
-    mouseOverNode(e: MouseEvent): void {
+    private mouseOverNode(e: MouseEvent): void {
         const target = e.target as HTMLElement;
         this.addNodePaths(target.id);
 
@@ -339,7 +339,7 @@ class ExplainerView extends LitElement {
         this.requestUpdate();
     }
 
-    mouseOverLink(e: MouseEvent): void {
+    private mouseOverLink(e: MouseEvent): void {
         const target = e.target as HTMLElement;
         const nodes = target.id.split("-");
         this.addLinkPaths(nodes[0], nodes[1]);
@@ -360,10 +360,19 @@ class ExplainerView extends LitElement {
         this.requestUpdate();
     }
 
-    mouseLeaveElem(e: MouseEvent): void {
+    private mouseLeaveElem(e: MouseEvent): void {
         this.traversedLinks.clear();
         this.traversedNodes.clear();
         this.tooltip.clear();
+        this.requestUpdate();
+    }
+
+    private async fetchNetworkData(id: number) {
+        const apiUrl = `http://127.0.0.1:8888/api/explainer/networks/${id}/`;
+        const response = await fetch(apiUrl);
+        const jsonData = await (response.json() as Promise<NodeLink>);
+        this.graph = jsonData;
+        this.dag = nodeLinkToDAG(this.graph);
         this.requestUpdate();
     }
 
@@ -377,15 +386,6 @@ class ExplainerView extends LitElement {
         return this.graph
             ? this.drawSvgGraph(nodeLink)
             : html`<p>Loading...</p>`;
-    }
-
-    private async fetchNetworkData(id: number) {
-        const apiUrl = `http://127.0.0.1:8888/api/explainer/networks/${id}/`;
-        const response = await fetch(apiUrl);
-        const jsonData = await (response.json() as Promise<NodeLink>);
-        this.graph = jsonData;
-        this.dag = nodeLinkToDAG(this.graph);
-        this.requestUpdate();
     }
 }
 

@@ -96,7 +96,6 @@ export function traverseNodes(
     const traverse = (dagNode: DAGNode) => {
         for (const nextNode of dagNode[key]) {
             if (!nodelinks.has(nextNode.link)) {
-                nextNode.link.source;
                 nodelinks.set(nextNode.link, nextNode.dagnode.node);
                 traverse(nextNode.dagnode);
             }
