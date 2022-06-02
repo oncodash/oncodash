@@ -9,7 +9,7 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -227,9 +227,9 @@
               <article itemprop="articleBody" id="sphinx-template-article" class="sphinx-template-article">
                 
   <section id="explainer">
-<h1>Explainer<a class="headerlink" href="#explainer" title="Permalink to this headline">¶</a></h1>
+<h1>Explainer<a class="headerlink" href="#explainer" title="Permalink to this heading">¶</a></h1>
 <section id="causal-network-visualization">
-<h2>Causal Network Visualization<a class="headerlink" href="#causal-network-visualization" title="Permalink to this headline">¶</a></h2>
+<h2>Causal Network Visualization<a class="headerlink" href="#causal-network-visualization" title="Permalink to this heading">¶</a></h2>
 <p>The fundamental questions raised in a tumour board are:</p>
 <ol class="arabic simple">
 <li><p>what kind of treatment may improve the patient’s health, and</p></li>
@@ -252,16 +252,16 @@ To this end, the Explainer makes use of <em>Credal Network</em>, which models un
 <p>To read more about the visualization of this network, see the <a class="reference external" href="/frontend/explainer.html">frontend’s documentation of the Explainer widget</a>.</p>
 </section>
 <section id="credal-networks">
-<h2>Credal Networks<a class="headerlink" href="#credal-networks" title="Permalink to this headline">¶</a></h2>
-<p>Credal networks <a class="footnote-reference brackets" href="#cozman" id="id1">1</a> are graph-based statistical models, sharing many properties with Bayesian networks
+<h2>Credal Networks<a class="headerlink" href="#credal-networks" title="Permalink to this heading">¶</a></h2>
+<p>Credal networks <a class="footnote-reference brackets" href="#cozman" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> are graph-based statistical models, sharing many properties with Bayesian networks
 but allowing more flexibility by dealing with imprecision and uncertainty.
 Instead of probability mass functions as parameters,
 credal networks parameters take values in closed convex sets (also called credal sets).
 In practical terms, while in a Bayesian network every variable is associated to a probability or
 a conditional probability, in a credal network variables may also be associated to probabilistic inequalities.</p>
 <p>One of the challenges we may have to deal with is the sparsity of the data that prevents us from
-learning the complete conditional probability tables (CPT <a class="footnote-reference brackets" href="#cpt" id="id2">2</a>).
-To tackle it, it is possible to use Noisy-OR gates <a class="footnote-reference brackets" href="#antonucci" id="id3">3</a> given an existing network structure.
+learning the complete conditional probability tables (CPT <a class="footnote-reference brackets" href="#cpt" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>).
+To tackle it, it is possible to use Noisy-OR gates <a class="footnote-reference brackets" href="#antonucci" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> given an existing network structure.
 They are usually used to describe the interactions between different causes of a common effect,
 where each cause is assumed to be sufficient to cause the effect and
 where the ability to cause the effect is assumed independent of the presence of the other causes.</p>
@@ -277,34 +277,31 @@ The use of Noisy-OR can reduce these difficulties but is based on the assumption
 Python library, which is dedicated to Bayesian networks and other graphical models.</p>
 </section>
 <section id="main-datastructure">
-<h2>Main Datastructure<a class="headerlink" href="#main-datastructure" title="Permalink to this headline">¶</a></h2>
+<h2>Main Datastructure<a class="headerlink" href="#main-datastructure" title="Permalink to this heading">¶</a></h2>
 <p>TODO</p>
 </section>
 <section id="explainer-s-views">
-<h2>Explainer’s <em>Views</em><a class="headerlink" href="#explainer-s-views" title="Permalink to this headline">¶</a></h2>
+<h2>Explainer’s <em>Views</em><a class="headerlink" href="#explainer-s-views" title="Permalink to this heading">¶</a></h2>
 <p>The main entry point to Explainer is the <code class="xref py py-mod docutils literal notranslate"><span class="pre">network</span></code> URL.
 It serves the <code class="xref py py-class docutils literal notranslate"><span class="pre">NetworkViewSet</span></code> functor:</p>
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 </tbody>
 </table>
 <p>See the full module documentation: <a class="reference internal" href="_autosummary/explainer.html#module-explainer" title="explainer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">explainer</span></code></a>.</p>
 <p class="rubric">Notes and References</p>
-<dl class="footnote brackets">
-<dt class="label" id="cozman"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Fabio G. Cozman, Credal networks. Artificial Intelligence, 120(2):199–233, 2000.</p>
-</dd>
-<dt class="label" id="cpt"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p>A <strong>complete</strong> <em>Conditional Probability Table</em> holds the probabilities that the considered node of the network is true, for all the cartesian products of its input edges.</p>
-</dd>
-<dt class="label" id="antonucci"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
-<dd><p>Alessandro Antonucci, The imprecise noisy-or gate. Fusion 2011 — 14th International Conference on Information Fusion, 01/2011.</p>
-</dd>
-</dl>
+<aside class="footnote brackets" id="cozman" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Fabio G. Cozman, Credal networks. Artificial Intelligence, 120(2):199–233, 2000.</p>
+</aside>
+<aside class="footnote brackets" id="cpt" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>A <strong>complete</strong> <em>Conditional Probability Table</em> holds the probabilities that the considered node of the network is true, for all the cartesian products of its input edges.</p>
+</aside>
+<aside class="footnote brackets" id="antonucci" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Alessandro Antonucci, The imprecise noisy-or gate. Fusion 2011 — 14th International Conference on Information Fusion, 01/2011.</p>
+</aside>
 </section>
 </section>
 
@@ -370,6 +367,7 @@ It serves the <code class="xref py py-class docutils literal notranslate"><span 
   <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
   <script src="_static/jquery.js"></script>
   <script src="_static/underscore.js"></script>
+  <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
   <script src="_static/doctools.js"></script>
   
 
