@@ -1,0 +1,50 @@
+.tooltip > :last-child {
+    margin-bottom: 0;
+}
+.tooltip > .title {
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+    border-bottom: 1px dashed #b6b6b6;
+}
+.tooltip .summary {
+    font-size: 12px;
+}
+.tooltip table {
+    border-collapse: collapse;
+}
+.tooltip table:first-child {
+    margin-top: 0;
+}
+.tooltip table th,
+.tooltip table td {
+    padding: 2px 0.4em;
+    vertical-align: top;
+}
+.tooltip table th:first-child,
+.tooltip table td:first-child {
+    padding-left: 0;
+}
+.tooltip table th {
+    text-align: left;
+    font-weight: 700;
+}
+.tooltip .color-legend {
+    display: inline-block;
+    width: 0.8em;
+    height: 0.8em;
+    margin-left: 0.4em;
+    box-shadow: 0 0 3px 1px #fff;
+}
+.tooltip .attributes .hovered {
+    background-color: #e0e0e0;
+}
+.tooltip .na {
+    color: #aaa;
+    font-style: italic;
+    font-size: 80%;
+}
+.tooltip {
+    background-color: #f8f8f8;
+    padding: 0.7em;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}

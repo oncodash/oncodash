@@ -9,6 +9,7 @@
         <meta name="Description" content="Oncodash" />
         <base href="/" />
         <title>Oncodash</title>
+        <link rel="stylesheet" href="assets/css/tooltip.css" />
     </head>
     <body>
         <script type="module" src="./out-tsc/src/patient-broker.js"></script>
@@ -19,10 +20,12 @@
         <img src="assets/oncodash-logo.svg" />
 
         <oncodash-patient-broker>
-            <oncodash-patient-selector slot="selector"></oncodash-patient-selector>
-            <oncodash-patient-card     slot="viewer"></oncodash-patient-card>
+            <oncodash-patient-selector
+                slot="selector"
+            ></oncodash-patient-selector>
+            <oncodash-patient-card slot="viewer"></oncodash-patient-card>
         </oncodash-patient-broker>
-        
+
         <p>Views:</p>
         <ul>
             <li><a href="clinical.html">Clinical</a></li>
