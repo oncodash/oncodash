@@ -1,3 +1,20 @@
+# [0.5.0](https://github.com/oncodash/oncodash/compare/v0.4.0...v0.5.0) (2022-06-02)
+
+
+### Bug Fixes
+
+* **explainer:** fix according to suggestions ([2ce2e9a](https://github.com/oncodash/oncodash/commit/2ce2e9aace284d95c1f5a1a28971729b87dead9a))
+* **explainer:** update html files and clean up ([8187dfc](https://github.com/oncodash/oncodash/commit/8187dfc2d5c3bb7576e94499383b57ee59c5ffd6))
+
+
+### Features
+
+* **explainer:** Add graph traversal utils ([2e37f6f](https://github.com/oncodash/oncodash/commit/2e37f6f3113f7ae5839eb406cdf44fcd61bfff93))
+* **explainer:** Rewrite with lit + interactivity ([80744c0](https://github.com/oncodash/oncodash/commit/80744c091bb41a7d44d22e20a43509abd32d4dd4))
+* **oncodash:** Add generic (genomespy) tooltip ([b7487fd](https://github.com/oncodash/oncodash/commit/b7487fd1a7c50d6c0b345c7c544ce4e04694c06b))
+
+
+
 # [0.4.0](https://github.com/oncodash/oncodash/compare/v0.3.0...v0.4.0) (2022-04-06)
 
 
@@ -37,10 +54,6 @@
 ### Features
 
 * **backend:** more logging ([#30](https://github.com/oncodash/oncodash/issues/30)) ([1b19180](https://github.com/oncodash/oncodash/commit/1b1918070125440e9ff4a0798375b951163669b5))
-
-
-
-## [0.1.2-alpha](https://github.com/oncodash/oncodash/compare/v0.1.1...v0.1.2-alpha) (2022-01-25)
 
 
 
