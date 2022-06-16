@@ -1,3 +1,12 @@
+## [0.5.1](https://github.com/oncodash/oncodash/compare/v0.5.0...v0.5.1) (2022-06-16)
+
+
+### Bug Fixes
+
+* **deps:** use es2022 and update deps ([#51](https://github.com/oncodash/oncodash/issues/51)) ([ae5c202](https://github.com/oncodash/oncodash/commit/ae5c202f000f815bb38253eb99709b5a45f0d697)), closes [#48](https://github.com/oncodash/oncodash/issues/48)
+
+
+
 # [0.5.0](https://github.com/oncodash/oncodash/compare/v0.4.0...v0.5.0) (2022-06-02)
 
 
@@ -45,15 +54,6 @@
 ### Bug Fixes
 
 * **populate:** bad logger instance ([f871d6e](https://github.com/oncodash/oncodash/commit/f871d6e19450a5f87d25b6153d59f5291ac5833e))
-
-
-
-# [0.2.0](https://github.com/oncodash/oncodash/compare/v0.1.2-alpha...v0.2.0) (2022-03-15)
-
-
-### Features
-
-* **backend:** more logging ([#30](https://github.com/oncodash/oncodash/issues/30)) ([1b19180](https://github.com/oncodash/oncodash/commit/1b1918070125440e9ff4a0798375b951163669b5))
 
 
 
