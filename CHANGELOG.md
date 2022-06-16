@@ -1,3 +1,12 @@
+## [0.5.2](https://github.com/oncodash/oncodash/compare/v0.5.1...v0.5.2) (2022-06-16)
+
+
+### Bug Fixes
+
+* **doc:** add flush step to build docs ([#50](https://github.com/oncodash/oncodash/issues/50)) ([78f9a79](https://github.com/oncodash/oncodash/commit/78f9a79f74b9e22eb18e4949f0fd9da98a379fdf)), closes [#49](https://github.com/oncodash/oncodash/issues/49)
+
+
+
 ## [0.5.1](https://github.com/oncodash/oncodash/compare/v0.5.0...v0.5.1) (2022-06-16)
 
 
@@ -45,15 +54,6 @@
 ### Features
 
 * **clinicalview:** add clinical view lit-skeleton ([69b0375](https://github.com/oncodash/oncodash/commit/69b03750f0bbadb2bc4347af16f32dcb2c1168de))
-
-
-
-## [0.2.1](https://github.com/oncodash/oncodash/compare/v0.2.0...v0.2.1) (2022-03-16)
-
-
-### Bug Fixes
-
-* **populate:** bad logger instance ([f871d6e](https://github.com/oncodash/oncodash/commit/f871d6e19450a5f87d25b6153d59f5291ac5833e))
 
 
 
