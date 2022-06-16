@@ -42,6 +42,7 @@ docker-compose run --rm backend sh -c "python manage.py migrate"
 3. Populate a test database with network data (Explainer-app)
 
 ```sh
+docker-compose run --rm backend sh -c "python manage.py flush --no-input"
 docker-compose run --rm backend sh -c "python manage.py populate -p /opt/app/path/to/indf.csv"
 ```
 Note: `/opt/app/` points by default to wherever is `oncodash/backend/` on your
@@ -109,6 +110,7 @@ python manage.py migrate
 ```
 5. Populate a test database with network data (Explainer-app)
 ```sh
+python manage.py flush --no-input
 python manage.py populate -p /path/to/indication_table.csv
 ```
 
