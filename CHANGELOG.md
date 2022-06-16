@@ -1,3 +1,12 @@
+## [0.5.3](https://github.com/oncodash/oncodash/compare/v0.5.2...v0.5.3) (2022-06-16)
+
+
+### Bug Fixes
+
+* **doc:** single place for installation instructions ([#52](https://github.com/oncodash/oncodash/issues/52)) ([daee49d](https://github.com/oncodash/oncodash/commit/daee49dd3d63c425e70a899f05fd972295762576))
+
+
+
 ## [0.5.2](https://github.com/oncodash/oncodash/compare/v0.5.1...v0.5.2) (2022-06-16)
 
 
@@ -45,15 +54,6 @@
 
 * add an icon for Oncodash ([1fbe16c](https://github.com/oncodash/oncodash/commit/1fbe16cf2761f9cf73286155eab50c7b50118a93))
 * **front:** patient card and composable widgets ([e5371e4](https://github.com/oncodash/oncodash/commit/e5371e468380d1b2a25f43cfcd4041dfd31506b2))
-
-
-
-# [0.3.0](https://github.com/oncodash/oncodash/compare/v0.2.1...v0.3.0) (2022-03-22)
-
-
-### Features
-
-* **clinicalview:** add clinical view lit-skeleton ([69b0375](https://github.com/oncodash/oncodash/commit/69b03750f0bbadb2bc4347af16f32dcb2c1168de))
 
 
 
