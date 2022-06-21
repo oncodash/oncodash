@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "core",
     "explainer",
     "clin_overview",
+    "side_effects",
     # third-party
     "rest_framework",
     "corsheaders",
