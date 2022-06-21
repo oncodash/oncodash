@@ -4,16 +4,15 @@ import json
 import django
 import argparse
 
-# Replace this with the your project's local path. Should this utility file became a view? How many time the import functions will be called?
-sys.path.append('C:/Progetti/oncodash/backend')
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
-
-django.setup()
-
-from django.contrib.auth.models import User
-from side_effects.models import Drug, Effect, Interaction
+'''
+This is a command line script to import data from BIOSNAP dataset (http://snap.stanford.edu/biodata/) into the 
+side-effects app. Documentation is intrinsic to the argparse arguments. 
+'''
 
 def get_or_create_drug_by_cid(cid):
+    # The following import directive must be left here
+    from side_effects.models import Drug, Effect, Interaction
+
     property_list = ["Title", "MolecularFormula"]  # To change this effectively we need to change the model
     request_url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/" + \
                   cid + "/property/" + ','.join(property_list) + "/JSON"
@@ -68,7 +67,9 @@ def get_or_create_drug_by_cid(cid):
 
 
 def handle_ds_files(inputfile):
-    # "C:/Users/Federico/PycharmProjects/djangoProject/oncodashsideeffects/database.csv"
+    # The following import directive must be left here
+    from side_effects.models import Drug, Effect, Interaction
+
     with open(inputfile, "r") as file:
         for line in file:
             words = line.split(",")
@@ -90,7 +91,9 @@ def handle_ds_files(inputfile):
 
 
 def handle_dds_files(inputfile):
-    # "C:/Users/Federico/PycharmProjects/djangoProject/oncodashsideeffects/ChChSe-Decagon_polypharmacy.csv"
+    # The following import directive must be left here
+    from side_effects.models import Drug, Effect, Interaction
+
     with open(inputfile, "r") as file:
         for line in file:
             words = line.split(",")
@@ -114,17 +117,22 @@ def handle_dds_files(inputfile):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Popolate DB with Drug side-effects')
-    parser.add_argument('--debug_cid', type=str, help="CID to call the API in 'debug' mode on a specific CID")
-    # If the input is not specified the program will search for "ChSe-Decagon_monopharmacy.csv" (drug, side-effect) and
-    # "ChChSe-Decagon_polypharmacy.csv" (drug, drug, side-effect) files in the running folder and import data from those files
+    parser = argparse.ArgumentParser(description='Populates DB with drug side-effects. Data are taken from CVS files such as the ones available in the BIOSNAP databases at http://snap.stanford.edu/biodata/index.html')
+    parser.add_argument('--debug_cid', type=str, help="CID to execute the script in 'debug' mode on a specific CID")
     parser.add_argument('--input', type=str, default="",
-                        help='path to the .csv SNAP file with "drug, side-effect" data or "drug, drug, side-effect"')
+                        help='Path to the .csv SNAP file with "drug, side-effect" data or "drug, drug, side-effect". If the input is not specified the program will search for "ChSe-Decagon_monopharmacy.csv" (drug, side-effect) and "ChChSe-Decagon_polypharmacy.csv" (drug, drug, side-effect) files in the running folder and will import data from those files')
     parser.add_argument('--type', type=str,
-                        help='can be either ds (drug, side-effect) or dds (drug, drug, side-effect)')
+                        help='Can be either ds (drug, side-effect) or dds (drug, drug, side-effect)')
+    parser.add_argument('--django_project_path', type=str,
+                        help='This is the django project local path. It is required to connect to the django database and populate it.')
 
     args = parser.parse_args()
     # print(args.accumulate(args.integers))
+
+    sys.path.append(args.django_project_path)
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
+
+    django.setup()
 
     # dir_path = os.path.dirname(os.path.realpath(__file__))
     # print(dir_path)
