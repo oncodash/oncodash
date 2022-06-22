@@ -80,8 +80,15 @@ The communication process follows this chain of events:
 7. it fetches the corresponding data in its ``item`` state,
 8. which triggers a rendering of the Viewer widget.
 
+.. figure:: _static/mediator.svg
+    :class: diagram
+
+    Summary of the process by which a change in one managed widget (here the Selector)
+    leads to an update in another managed widget (here the Viewer)
+    by passing through a Mediator widget.
+
 The following sections show the code for this example,
-read the comment for explanations.
+read the comments for explanations.
 
 
 Selector Widget
