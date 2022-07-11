@@ -151,6 +151,10 @@ python manage.py flush --no-input
 python manage.py populate -p /path/to/indication_table.csv
 ```
 
+6. Populate a test database with clinical data (clin_overview-app)
+```sh
+python manage.py fake_data -n <num samples>
+```
 
 #### Front-end
 
