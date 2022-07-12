@@ -9,27 +9,30 @@
         <meta name="Description" content="Oncodash" />
         <base href="/" />
         <title>Oncodash</title>
+        <link rel="stylesheet" href="assets/css/oncodash.css" />
         <link rel="stylesheet" href="assets/css/tooltip.css" />
     </head>
     <body>
         <script type="module" src="./out-tsc/src/patient-broker.js"></script>
-        <script type="module" src="./out-tsc/src/patient-selector.js"></script>
+        <script type="module" src="./out-tsc/src/patient-list.js"></script>
         <script type="module" src="./out-tsc/src/patient-card.js"></script>
 
-        <h1>Oncodash</h1>
-        <img src="assets/oncodash-logo.svg" />
+        <div id="header">
+            <h1><img id="header-logo" src="assets/oncodash-logo.svg" />Oncodash</h1>
+        </div> <!-- header -->
 
-        <oncodash-patient-broker>
-            <oncodash-patient-selector
-                slot="selector"
-            ></oncodash-patient-selector>
-            <oncodash-patient-card slot="viewer"></oncodash-patient-card>
-        </oncodash-patient-broker>
+        <div id="main">
+            <oncodash-patient-broker>
+                <oncodash-patient-list slot="selector"></oncodash-patient-list>
+                <oncodash-patient-card slot="viewer"  ></oncodash-patient-card>
+            </oncodash-patient-broker>
+        </div> <!-- main -->
 
-        <p>Views:</p>
-        <ul>
-            <li><a href="clinical.html">Clinical</a></li>
-            <li><a href="explainer.html">ExplAIner</a></li>
-        </ul>
+        <div id="footer">
+            <h2>Other Views:</h2>
+                <ul>
+                    <li><a href="explainer.html">ExplAIner</a></li>
+                </ul>
+        </div> <!-- footer -->
     </body>
 </html>

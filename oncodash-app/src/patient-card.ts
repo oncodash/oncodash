@@ -1,274 +1,483 @@
-import * as d3 from "d3";
-import { LitElement, css /*, html*/ } from "lit";
+import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { styleMap } from "lit/directives/style-map.js";
 
+/** A widget that displays basic clinical information about a patient.
+ *
+ * Updates from the parent mediator comes through the `patient_id` property.
+ * Changing the `patient_id` value will trigger a new fetch for data.
+ *
+ * May dispatch a `selected_patient` event when clicked.
+ *
+ * Sections can be hidden to produce smaller patient cards.
+ */
 @customElement("oncodash-patient-card")
-class ODPatientCard extends LitElement {
+export class ODPatientCard extends LitElement {
+    /** Constructor.
+     *
+     * The only required info is the patient's ID.
+     * Other parameters change the appearance of the widget.
+     *
+     * @note as `styles` expects an object, Lit will transliterate CSS' property names
+     *       from/to camelCase to/from kebab-case.
+     *       For instance, pass `fontStyle` to reach CSS' `font-style`.
+     *       Properties' values should be strings.
+     *
+     * @param patient_id the patient to fetch and display
+     * @param styles additional CSS to apply on this instance (see Lit's `styleMap`)
+     * @param hideHeader if true, do not display the header section of the patient card
+     * @param hideMain if true, do not display the main section of the patient card
+     * @param hidePrimary if true, do not display the primary section of the patient card
+     * @param hideSecondary if true, do not display the secondary section of the patient card
+     * @param hideFooter if true, do not display the footer section of the patient card
+     * @param eventOnClick if true, dispatch an event when clicked
+     */
+    constructor(
+        patient_id: number,
+        styles: object = { fontStyle: "xx-large" },
+        hideHeader = false,
+        hideMain = false,
+        hidePrimary = false,
+        hideSecondary = false,
+        hideFooter = false,
+        eventOnClick = false
+    ) {
+        super();
+        this.styles = styles;
+        this.hideHeader = hideHeader;
+        this.hideMain = hideMain;
+        this.hidePrimary = hidePrimary;
+        this.hideSecondary = hideSecondary;
+        this.hideFooter = hideFooter;
+        this.eventOnClick = eventOnClick;
+        // Triggers the fetch/update, so called last.
+        this.patient_id = patient_id;
+    }
+
+    // We overload the setter for the `patient_id` attribute
+    // because we want to trigger an update of the corresponding data.
+    // Hence, every time the Mediator widget does change this attribute,
+    // we will fetch new data.
     @property({ type: Number })
-    patient_id = Number.NaN;
+    set patient_id(patient_id: number) {
+        // The "true" attribute is private and prefixed by convention.
+        this._patient_id = patient_id;
+        this.fetchItem(patient_id);
+        this.requestUpdate("patient_id", patient_id);
+    }
+    // The corresponding getter.
+    get patient_id() {
+        return this._patient_id;
+    }
+    // The "true" attribute.
+    private _patient_id: number = Number.NaN;
 
+    /** Additional CSS styles to apply on this instance.
+     *
+     * See Lit's `styleMap`.
+     *
+     * Note: as `styles` expects an object, Lit will transliterate CSS' property names
+     *       from/to camelCase to/from kebab-case.
+     *       For instance, pass `fontStyle` to reach CSS' `font-style`.
+     *       Properties' values should be strings.
+     */
+    @property()
+    styles = {};
+
+    /** This attribute holds the data that this widget is actually displaying.
+     * As a `state`, every time it is changed, it will automatically
+     * trigger an update sequence.
+     */
     @state()
-    private patient: any;
+    patient: any = {};
 
-    // private async getPatient(): Promise<any> {
-    private getPatient(): any {
-        // return this.fetchClinicalData(this.patient_id);
-        this.fetchClinicalData(this.patient_id);
-        return this.patient;
-        // this.patient = this.fetchClinicalData(this.patient_id);
-        // return this.patient;
-        // const patient:any = await this.fetchClinicalData(this.patient_id);
-        // .then(data => {
-        //     console.log("Promised data?",data);
-        //     return data;
-        // })
-        // .catch(error => console.warn(error));
-        // const patient = this.fetchClinicalData(this.patient_id);
-        // return patient;
+    /** If true, hide the "header" section.
+     */
+    @property({ type: Boolean })
+    hideHeader = false;
+
+    /** If true, hide the "main" section.
+     */
+    @property({ type: Boolean })
+    hideMain = false;
+
+    /** If true, hide the "primary" section.
+     */
+    @property({ type: Boolean })
+    hidePrimary = false;
+
+    /** If true, hide the "secondary" section.
+     */
+    @property({ type: Boolean })
+    hideSecondary = false;
+
+    /** If true, hide the "footer" section.
+     */
+    @property({ type: Boolean })
+    hideFooter = false;
+
+    /** If true, allow the widget to dispatch a `selected_patient` event when clicked.
+     */
+    @property({ type: Boolean })
+    eventOnClick = false;
+
+    /** The function called when the `patient_id` is changed.
+     *
+     * It downloads the corresponding data that this widget is displaying.
+     */
+    private async fetchItem(id: number): Promise<any> {
+        const apiUrl = `http://localhost:8888/api/clinical-overview/data/${id}/`;
+        let response: any;
+        try {
+            // Wait for the asynchronous `fetch` function to terminate.
+            // Either it ends on a result or raise an exeption.
+            response = await fetch(apiUrl);
+        } catch (error) {
+            console.error("[ODPatientCard]", error);
+        }
+        if (!response.ok) {
+            console.error("[ODPatientCard] failed fetched patient", id);
+            throw new Error(response.statusText);
+        } else {
+            // Convert the payload to JSON.
+            const patient = await response.json();
+            // Set the fetched data as the new ones
+            // to display in the Viewer widget.
+            this.patient = patient;
+        }
     }
 
-    private async fetchClinicalData(id: number): Promise<any> {
-        const apiUrl = `http://127.0.0.1:8888/api/clinical-overview/data/${id}/`;
-        // const response = await fetch(apiUrl);
-        // return response.json();
-        return await fetch(apiUrl)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(response.statusText);
-                } else {
-                    return response.json() as Promise<any>;
-                }
-            })
-            .then((jsonData) => {
-                this.patient = jsonData;
-                // console.log("Fetched patient data for patient_id ",id, this.patient);
-                console.log("Fetched patient data for patient_id ", id);
-                // return jsonData;
-            })
-            .catch((error) => console.warn(error));
-    }
-
+    /** Render the widget. */
     override render() {
         // render = (): HTMLElement => { // FIXME does not fix the false undefined patient error
-        console.log("Render card for patient_id ", this.patient_id);
-
         const div = document.createElement("div");
 
         if (Number.isNaN(this.patient_id)) {
-            console.log("Cannot render, no patient_id");
+            console.error("[ODPatientCard] Cannot render, no patient_id");
             return div;
         }
 
-        // console.log("getPatient:",this.getPatient());
-        const patient = this.getPatient();
-        // let getpatient = async() => {return await this.fetchClinicalData(this.patient_id)};
-        // const patient = getpatient();
-        // const patient = this.fetchClinicalData(this.patient_id)
-        //     .then(data => {
-        //         console.log("Promised data?",data);
-        //         return data;
-        //     })
-        //     .catch(error => {
-        //         console.warn(error);
-        //     });
-
-        if (patient === undefined) {
-            console.log("No patient data");
+        if (this.patient === undefined) {
+            console.error("[ODPatientCard] No patient data");
             return div;
         }
-        console.log("Render patient data: ", patient);
 
-        const card = d3
-            .select(div)
-            .attr("id", "clinicalwidget")
-            .append("div")
-            .attr("id", "patient-card");
+        return html`
+            <h2 class="widget-title">Selected Patient</h2>
+            <div
+                id="patient-card"
+                style=${styleMap(this.styles)}
+                @click=${this.eventOnClick ? this.onClick : ""}
+            >
+                ${this.hideHeader ? "" : this.tHeader()}
+                <div id="patient-main">
+                    ${this.hideMain ? "" : this.tMain()}
+                    ${this.hidePrimary ? "" : this.tPrimary()}
+                    <!-- <form> -->
+                    ${this.hideSecondary ? "" : this.tSecondary()}
+                    <!-- </form> -->
+                </div>
+                <!-- patient-main -->
+                ${this.hideFooter ? "" : this.tFooter()}
+            </div>
+            <!-- patient-card -->
+        `;
+    }
 
-        /***** Header *****/
-        const header = card.append("div").attr("id", "patient-header");
-
-        const main = header.append("div").attr("id", "patient-main");
-        const survival = main.append("span").attr("id", "patient-survival");
-        const img = survival
-            .append("img")
-            .attr("alt", patient.cud_survival)
-            .attr("title", patient.cud_survival);
-        if (patient.cud_survival == "ALIVE") {
-            img.attr("class", "patient-alive").attr("src", "assets/alive.svg");
+    /** Dispatch a `patient_selected` event up.
+     */
+    private onClick(e: Event) {
+        const id = this.patient_id;
+        if (!Number.isNaN(id)) {
+            const options = {
+                detail: { id },
+                bubbles: true, // can bubble up through the DOM
+                composed: true, // can bubble across the boundary between the shadow DOM and the regular DOM
+            };
+            this.dispatchEvent(new CustomEvent("patient_selected", options));
         } else {
-            img.attr("class", "patient-not-alive").attr(
-                "src",
-                "assets/not-alive.svg"
+            // Error management.
+            console.error(
+                "[ODPatientSelector] User selected patient, but patient_id is",
+                id
             );
-            survival.text(`(${patient.cud_date_of_death})`);
         }
+    }
 
-        main.append("span")
-            .attr("class", "patient-main-item")
-            .attr("id", "patient-name")
-            .text(patient.patient);
-        main.append("span")
-            .attr("class", "patient-main-item")
-            .attr("id", "patient-age")
-            .text(`${patient.age}y`);
-        main.append("span")
-            .attr("class", "patient-main-item")
-            .attr("id", "patient-cud_histology")
-            .text(patient.cud_histology);
-        main.append("span")
-            .attr("class", "patient-main-item")
-            .attr("id", "patient-cud_stage")
-            .text(patient.cud_stage);
+    /** Template of the header section.
+     *
+     * Displays:
+     * - cud_survival,
+     * - patient's ID.
+     */
+    private tHeader() {
+        const is_alive: boolean = this.patient.cud_survival == "ALIVE";
+        return html`
+            <div id="patient-header">
+                <h3 class="patient-main-item">
+                    <span id="patient-survival">
+                        <img
+                            alt="${this.patient.cud_survival}"
+                            title="${this.patient.cud_survival}"
+                            class=${is_alive
+                                ? "patient-alive"
+                                : "patient-not-alive"}
+                            src=${is_alive
+                                ? "assets/alive.svg"
+                                : "assets/not-alive.svg"}
+                        />
+                    </span>
+                    <!-- patient-survival -->
+                    <span id="patient-name">${this.patient.patient}</span>
+                </h3>
+            </div>
+            <!-- patient-header -->
+        `;
+    }
 
-        header
-            .append("div")
-            .attr("id", "patient-info")
-            .text(patient.extra_patient_info);
+    /** Template of the main section.
+     *
+     * Displays:
+     * - age,
+     * - cud_histology,
+     * - cud_stage.
+     */
+    private tMain() {
+        return html`
+            <p class="patient-main-item">
+                <span id="patient-age">${this.patient.age}y</span>
+                <span id="patient-cud_histology"
+                    >${this.patient.cud_histology}</span
+                >
+                <span id="patient-cud_stage">${this.patient.cud_stage}</span>
+            </p>
+            <!-- patient-main-item -->
+        `;
+    }
 
-        /***** Primary section *****/
-        const primary = card.append("div").attr("id", "patient-primary");
-        const primgrid = primary
-            .append("div")
-            .attr("id", "patient-primary-grid");
-        this.insert_icon_text(
-            primgrid,
-            "cud_treatment_strategy",
-            patient.cud_treatment_strategy
-        );
-        this.insert_icon_text(
-            primgrid,
-            "cud_current_treatment_phase",
-            patient.cud_current_treatment_phase
-        );
-        this.insert_icon_text(
-            primgrid,
-            "cud_primary_therapy_outcome",
-            patient.cud_primary_therapy_outcome
-        );
-        this.insert_icon_text(
-            primgrid,
-            "maintenance_therapy",
-            patient.maintenance_therapy
-        );
-        this.insert_icon_text(
-            primgrid,
-            "other_diagnosis",
-            patient.other_diagnosis
-        );
-        this.insert_icon_text(
-            primgrid,
-            "cancer_in_family",
-            patient.cancer_in_family
-        );
-        this.insert_icon_text(
-            primgrid,
-            "chronic_illness",
-            patient.chronic_illness
-        );
-        this.insert_icon_text(
-            primgrid,
-            "other_medication",
-            patient.other_medication
-        );
+    /** Template of the primary section.
+     *
+     * Displays:
+     * - cud_treatment_strategy,
+     * - cud_primary_therapy_outcome,
+     * - cud_current_treatment_phase,
+     * - maintenance_therapy,
+     * - cud_stage_info,
+     * - progression_detection_method,
+     * - extra_patient_info,
+     * - other_diagnosis,
+     * - cancer_in_family,
+     * - chronic_illness,
+     * - other_medication,
+     * - BMI
+     */
+    private tPrimary() {
+        const stage: string = this.patient.cud_stage_info;
+        const progm: string = this.patient.progression_detection_method;
+        const has_stage: boolean = stage ? true : false;
+        const has_progm: boolean = progm ? true : false;
+
         const bmi: number = Math.round(
-            patient.weight / (patient.height / 100) ** 2
+            this.patient.weight / (this.patient.height / 100) ** 2
         );
-        this.insert_icon_text(primgrid, "bmi", `${bmi} kg/m̉²`);
 
-        const stage: string = patient.cud_stage_info;
-        const progm: string = patient.progression_detection_method;
-        if (stage || progm) {
-            primary
-                .append("div")
-                .attr("id", "patient-cud_stage_info")
-                .text(`${stage} (${progm}).`);
-        }
-
-        /***** Secondary section *****/
-        const secondary = card.append("div").attr("id", "patient-secondary");
-        const secgrid = secondary
-            .append("div")
-            .attr("id", "patient-secondary-grid");
-        this.insert_bool_icon(
-            secgrid,
-            "has_response_ct",
-            patient.has_response_ct
-        );
-        this.insert_bool_icon(secgrid, "has_ctdna", patient.has_ctdna);
-        this.insert_bool_icon(secgrid, "has_petct", patient.has_petct);
-        this.insert_bool_icon(secgrid, "has_wgs", patient.has_wgs);
-        this.insert_bool_icon(
-            secgrid,
-            "has_singlecell",
-            patient.has_singlecell
-        );
-        this.insert_bool_icon(
-            secgrid,
-            "has_germline_control",
-            patient.has_germline_control
-        );
-        this.insert_bool_icon(
-            secgrid,
-            "has_paired_freshsample",
-            patient.has_paired_freshsample
-        );
-        this.insert_bool_icon(
-            secgrid,
-            "has_brca_mutation",
-            patient.has_brca_mutation
-        );
-        this.insert_bool_icon(secgrid, "has_hrd", patient.has_hrd);
-
-        /***** Footer *****/
-        // const footer = card.append("div").attr("id","patient-footer");
-
-        return div;
+        return html`
+                    <div id="patient-primary">
+                        <p id="patient-primary-therapy">
+                            <span id="cud_treatment_strategy">${
+                                this.patient.cud_treatment_strategy
+                            }</span>
+                            <span id="cud_primary_therapy_outcome">${
+                                this.patient.cud_primary_therapy_outcome
+                            }</span>
+                            <span id="cud_current_treatment_phase">${
+                                this.patient.cud_current_treatment_phase
+                            }</span>
+                            <span id="maintenance_therapy">${
+                                this.patient.maintenance_therapy
+                            }</span>
+                        </p>
+                        <p id="patient-primary-stage">
+                            ${
+                                has_stage
+                                    ? html`<span id="patient-cud_stage_info"
+                                          >${stage}</span
+                                      >`
+                                    : ""
+                            }
+                            ${
+                                has_progm
+                                    ? html`<span id="patient-cud_progm_info"
+                                          >${progm}</span
+                                      >`
+                                    : ""
+                            }
+                        </p>
+                        <p id="patient-primary-info">${
+                            this.patient.extra_patient_info
+                        }</p>
+                        <p id="patient-primary-other">
+                            <span id="other_diagnosis">${
+                                this.patient.other_diagnosis
+                            }</span>
+                            <span id="cancer_in_family">${
+                                this.patient.cancer_in_family
+                            }</span>
+                            <span id="chronic_illness">${
+                                this.patient.chronic_illness
+                            }</span>
+                            <span id="other_medication">${
+                                this.patient.other_medication
+                            }</span>
+                        </p>
+                        <p id="patient-primary-more"></p>
+                            BMI: <span id="bmi">${bmi}</span><span class="unit"> kg/m²</span>
+                        </p>
+                    </div> <!-- patient-primary -->
+        `;
     }
 
-    private insert_icon_text(where: any, name: string, text: string): void {
-        const e = where
-            .append("span")
-            .attr("id", `patient-${name}`)
-            .attr("class", "patient-primary-item");
-        if (text) {
-            e.append("img")
-                .attr("id", `icon-${name}`)
-                .attr("src", `assets/${name}.svg`)
-                .attr("title", name);
-            e.append("span").text(text);
-        } else {
-            e.append("img")
-                .attr("id", `icon-${name}`)
-                .attr("src", `assets/${name}_NONE.svg`)
-                .attr("title", name)
-                .attr("alt", `${name}: `);
-        }
+    /** Template of the secondary section.
+     *
+     * Display boolean variables:
+     * - has_response_ct,
+     * - has_ctdna,
+     * - has_petct,
+     * - has_wgs,
+     * - has_singlecell,
+     * - has_germline_control,
+     * - has_paired_freshsample,
+     * - has_brca_mutation,
+     * - has_hrd.
+     */
+    private tSecondary() {
+        return html`
+                    <div id="patient-secondary">
+                        <ul>
+                            <li class=${
+                                this.patient.has_response_ct ? "true" : "false"
+                            }>
+                                <input type="checkbox" disabled="disabled"
+                                    ?checked=${this.patient.has_response_ct}
+                                    >has ${
+                                        this.patient.has_response_ct
+                                            ? ""
+                                            : html`<em>not</em>`
+                                    } response CT</input></li>
+                            <li class=${
+                                this.patient.has_ctdna ? "true" : "false"
+                            }>
+                                <input type="checkbox" disabled="disabled"
+                                    ?checked=${this.patient.has_ctdna}
+                                    >has ${
+                                        this.patient.has_ctdna
+                                            ? ""
+                                            : html`<em>not</em>`
+                                    } CTDNA</input></li>
+                            <li class=${
+                                this.patient.has_petct ? "true" : "false"
+                            }>
+                                <input type="checkbox" disabled="disabled"
+                                    ?checked=${this.patient.has_petct}
+                                    >has ${
+                                        this.patient.has_petct
+                                            ? ""
+                                            : html`<em>not</em>`
+                                    } PETCT</input></li>
+                            <li class=${
+                                this.patient.has_wgs ? "true" : "false"
+                            }>
+                                <input type="checkbox" disabled="disabled"
+                                    ?checked=${this.patient.has_wgs}
+                                    >has ${
+                                        this.patient.has_wgs
+                                            ? ""
+                                            : html`<em>not</em>`
+                                    } WGS</input></li>
+                            <li class=${
+                                this.patient.has_singlecell ? "true" : "false"
+                            }>
+                                <input type="checkbox" disabled="disabled"
+                                    ?checked=${this.patient.has_singlecell}
+                                    >has ${
+                                        this.patient.has_singlecell
+                                            ? ""
+                                            : html`<em>not</em>`
+                                    } single-cell</input></li>
+                            <li class=${
+                                this.patient.has_germline_control
+                                    ? "true"
+                                    : "false"
+                            }>
+                                <input type="checkbox" disabled="disabled"
+                                    ?checked=${
+                                        this.patient.has_germline_control
+                                    }
+                                    >has ${
+                                        this.patient.has_germline_control
+                                            ? ""
+                                            : html`<em>not</em>`
+                                    } germline control</input></li>
+                            <li class=${
+                                this.patient.has_paired_freshsample
+                                    ? "true"
+                                    : "false"
+                            }>
+                                <input type="checkbox" disabled="disabled"
+                                    ?checked=${
+                                        this.patient.has_paired_freshsample
+                                    }
+                                    >has ${
+                                        this.patient.has_paired_freshsample
+                                            ? ""
+                                            : html`<em>not</em>`
+                                    } paired freshsample</input></li>
+                            <li class=${
+                                this.patient.has_brca_mutation
+                                    ? "true"
+                                    : "false"
+                            }>
+                                <input type="checkbox" disabled="disabled"
+                                    ?checked=${this.patient.has_brca_mutation}
+                                    >has ${
+                                        this.patient.has_brca_mutation
+                                            ? ""
+                                            : html`<em>not</em>`
+                                    } BRCA mutation</input></li>
+                            <li class=${
+                                this.patient.has_hrd ? "true" : "false"
+                            }>
+                                <input type="checkbox" disabled="disabled"
+                                    ?checked=${this.patient.has_hrd}
+                                    >has ${
+                                        this.patient.has_hrd
+                                            ? ""
+                                            : html`<em>not</em>`
+                                    } HRD</input></li>
+                        </ul>
+                    </div> <!-- patient-secondary -->
+            `;
     }
 
-    private insert_bool_icon(where: any, name: string, value: boolean): void {
-        const re = /has_/;
-        const txt = name.replace(re, "");
-
-        const e = where
-            .append("span")
-            .attr("id", `patient-${name}`)
-            .attr("class", `${value} patient-secondary-item`)
-            .text(txt);
-
-        const img = e.append("img").attr("id", `icon-${name}`);
-
-        if (value) {
-            img.attr("title", `${txt}: YES`).attr("alt", `: YES`);
-            img.attr("src", `assets/${name}.svg`);
-        } else {
-            img.attr("title", `${txt}: NO`).attr("alt", `: NO`);
-            img.attr("src", `assets/${name}_NONE.svg`);
-        }
+    /** Template for the footer section.
+     *
+     * (Empty for now).
+     */
+    private tFooter() {
+        return html`
+            <div id="patient-footer"></div>
+            <!-- patient-footer -->
+        `;
     }
 
+    /** Encapsulated CSS style. */
     static styles = css`
+        .widget-title {
+            display: none;
+        }
+
         img {
-            height: 1.2em;
+            height: 2ex;
         }
 
         #patient-card {
@@ -276,77 +485,63 @@ class ODPatientCard extends LitElement {
             padding: 1em;
             border: thin solid grey;
             box-shadow: 3px 3px 8px grey;
+            min-width: fit-content;
+            background-color: white;
         }
+
+        #patient-header {
+        }
+
         #patient-main {
-            display: flex;
-            font-size: large;
-            font-weight: bold;
+            font-size: 90%;
         }
 
         .patient-main-item {
-            background-color: grey;
-            padding: 3px 1.25rem;
-            position: relative;
-            margin-right: -14px;
-            clip-path: polygon(
-                0% 0%,
-                calc(100% - 14px) 0%,
-                100% 50%,
-                calc(100% - 14px) 100%,
-                100% 100%,
-                0% 100%,
-                14px 50%
-            );
+            margin-left: 0.5em;
+            font-weight: bold;
         }
 
         #patient-name {
-            background-color: #aaccff;
+            font-size: 100%;
         }
 
         #patient-age {
-            background-color: #80b3ff;
+        }
+
+        #patient-age::after {
+            content: " — ";
+        }
+
+        #patient-primary-therapy {
+            font-weight: bold;
         }
 
         #patient-cud_histology {
-            background-color: #0066ff;
-            color: white;
         }
 
         #patient-cud_stage {
-            background-color: #0055d4;
-            color: white;
         }
-
-        #patient-survival {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+        #patient-cud_stage::before {
+            content: " (";
+        }
+        #patient-cud_stage::after {
+            content: ")";
         }
 
         #patient-info {
-            font-size: large;
+            font-size: 85%;
             margin: 0.5em 0.5em 0.5em 1em;
         }
 
         #patient-primary {
-            font-size: medium;
-            border: thin solid grey;
+            font-size: 80%;
+            border: thin solid #ddd;
             padding: 1em;
             margin: 1em;
         }
 
-        #patient-primary-grid {
-            display: grid;
-            grid: repeat(4, 2em) / auto-flow 25ex;
-        }
-
         .patient-primary-item {
             margin: 0.5em;
-        }
-
-        .patient-primary-item img {
-            vertical-align: text-top;
         }
 
         .patient-primary-item span {
@@ -355,32 +550,30 @@ class ODPatientCard extends LitElement {
         }
 
         #patient-secondary {
-            font-size: small;
-            border: thin solid grey;
+            font-size: 75%;
+            border: thin solid #ddd;
             padding: 1em;
             margin: 1em;
         }
-        #patient-secondary-grid {
-            display: grid;
-            grid: repeat(3, 2em) / auto-flow 30ex;
+
+        #patient-secondary ul {
+            list-style-type: none;
+        }
+
+        #patient-secondary ul li {
         }
 
         .patient-secondary-item {
             text-align: right;
         }
 
-        .patient-secondary-item img {
-            margin-left: 0.5ex;
-            vertical-align: text-top;
-        }
-
-        .true {
-            font-weight: bold;
-            color: black;
-        }
         .false {
             font-weight: normal;
             color: grey;
+        }
+        .true {
+            font-weight: bold;
+            color: black;
         }
     `;
 }
