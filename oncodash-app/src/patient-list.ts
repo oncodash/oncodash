@@ -1,12 +1,15 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+// import { ODPatientCard } from "patient-card.js";
+// import ODPatientCard = require("out-tsc/src/patient-card.js");
+import { ODPatientCard } from "./patient-card";
 
 /** A widget that lets the user select a patient and send the correpsponding ID up.
  *
  * Should be put in the slot of a Patient Broker.
  */
-@customElement("oncodash-patient-selector")
-export class ODPatientSelector extends LitElement {
+@customElement("oncodash-patient-list")
+export class ODPatientList extends LitElement {
     /** Main managed attribute.
      *
      * This is not strictly speaking necessary for the sub-widgets management,
@@ -62,25 +65,33 @@ export class ODPatientSelector extends LitElement {
         return html`
             <h2 class="widget-title">Available Patients</h2>
             <div id="patients-query">
-                <select @change=${this.onChange} tabindex="0">
+                <ul id="patients-list">
                     ${this.patients.map(
                         (item) => html`
-                            <option
-                                value="${item.id}"
-                                ${this.patient_id == item.id ? "selected" : ""}
-                            >
-                                ${item.patient}
-                            </option>
+                            <li>
+                                <div class="patient-card">
+                                    ${new ODPatientCard(
+                                        item.id,
+                                        { fontSize: "70%", cursor: "pointer" },
+                                        false /* hideHeader    */,
+                                        false /* hideMain      */,
+                                        true /* hidePrimary   */,
+                                        true /* hideSecondary */,
+                                        true /* hideFooter    */,
+                                        true /* eventOnClick  */
+                                    )}
+                                </div>
+                            </li>
                         `
                     )}
-                </select>
+                </ul>
             </div>
         `;
-        // FIXME the "selected" attribute does not appear.
+        // FIXME use anchor links?.
     }
 
     /** Called when the user selects something. */
-    private onChange(e: Event) {
+    private onClick(e: Event) {
         const id = Number((e.target as HTMLInputElement).value);
         this.onSelectedPatient(id);
     }
@@ -108,11 +119,16 @@ export class ODPatientSelector extends LitElement {
         .widget-title {
             display: none;
         }
+
+        #patients-list {
+            list-style: none;
+            padding: 0.5em;
+        }
     `;
 }
 
 declare global {
     interface HTMLElementTagNameMap {
-        "oncodash-patient-selector": ODPatientSelector;
+        "oncodash-patient-list": ODPatientList;
     }
 }
