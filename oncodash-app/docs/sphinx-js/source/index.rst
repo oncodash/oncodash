@@ -73,7 +73,9 @@ the :class:`litElement` class, from which all widgets should inherit.
 
 The preferred composition architecture in Oncodash is to use composition of classes,
 using Lit's *reactive controllers* instead of *mixins*, unless necessary.
-See `Lit's documentation <https://lit.dev/docs/composition/component-composition/>`_ for more details.
+
+See :ref:`widgets_composition` for an example and more explanations.
+
 
 
 ************
@@ -85,6 +87,7 @@ Main modules
 
 .. toctree::
 
+    composition
     explainer
 
 
