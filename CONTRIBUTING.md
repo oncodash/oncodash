@@ -54,13 +54,14 @@ How to Submit Code
 ==================
 
 1. Create your own fork of the project.
-2. Checkout a branch named after the following convention:
+2. Checkout the `develop` branch.
+3. Checkout a branch named after the following convention:
     - `<type>[#:ID]_[scope/]<three-keywords-max>`
     - `type` may be: `feat`, `fix`, `doc`, `refactor`, `build`, `ci`, etc.
     - `ID` (optional) refers to the issue number.
     - `scope` is a generic category, like "frontend", "backend" or "widget".
     - Examples: `feat_widget/timeline` or `fix#12_backend/import-clinical`
-3. Commit your changes using the [Conventional Commits](https://www.conventionalcommits.org/) convention:
+4. Commit your changes using the [Conventional Commits](https://www.conventionalcommits.org/) convention:
     - First line: `<type>[(scope)][!]: <short description>`,
       the exclamation mark indicating a breaking change (usually in an API).
     - Empty line, followed by a multi-line long description.
@@ -79,15 +80,15 @@ How to Submit Code
       in order to ease the reviewer's job (thanks!),
       please ensure that at least one commit message is correctly formatted with
       all relevant information.
-4. Ensure that you did not introduce bugs by adding unit tests that run your new code.
-5. Ensure that you did not introduced a regression by running all the tests
+5. Ensure that you did not introduce bugs by adding unit tests that run your new code.
+6. Ensure that you did not introduced a regression by running all the tests
    yourself, from within the project's containers.
-6. Add explanations about your new feature in the documentation.
-7. Push on your own repository and click on the "Create pull request" green
+7. Add explanations about your new feature in the documentation.
+8. Push on your own repository and click on the "Create pull request" green
    button that should appear on your fork's page (or go to the original
    project page and click on "[Pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork)").
-   If you would like to get feedback but your code is not yet ready for merging, create a draft pull request instead.
-8. In the "base" dropdown menu, select the "dev" branch.
+   If you would like to get feedback but your code is not yet ready for merging, create a draft pull request instead. Please ensure you are doing so against the `develop` branch.
+9. In the "base" dropdown menu, select the "dev" branch.
 
 
 How to Merge code
