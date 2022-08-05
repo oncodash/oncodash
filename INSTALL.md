@@ -82,6 +82,10 @@ docker-compose run --rm backend sh -c "python manage.py populate -p /opt/app/pat
 Note: `/opt/app/` points by default to wherever is `oncodash/backend/` on your
 system.
 
+4. Populate a test database with clinical data (clin_overview-app)
+```sh
+python manage.py fake_data -n <num samples>
+```
 
 ## Development
 
