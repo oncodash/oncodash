@@ -77,6 +77,7 @@ export class ODPatientList extends LitElement {
                                         false /* hideMain      */,
                                         true /* hidePrimary   */,
                                         true /* hideSecondary */,
+                                        true /* hideTertiary */,
                                         true /* hideFooter    */,
                                         true /* eventOnClick  */
                                     )}

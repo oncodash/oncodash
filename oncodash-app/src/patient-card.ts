@@ -29,6 +29,7 @@ export class ODPatientCard extends LitElement {
      * @param hideMain if true, do not display the main section of the patient card
      * @param hidePrimary if true, do not display the primary section of the patient card
      * @param hideSecondary if true, do not display the secondary section of the patient card
+     * @param hideTertiary if true, do not display the tertiary section of the patient card
      * @param hideFooter if true, do not display the footer section of the patient card
      * @param eventOnClick if true, dispatch an event when clicked
      */
@@ -39,6 +40,7 @@ export class ODPatientCard extends LitElement {
         hideMain = false,
         hidePrimary = false,
         hideSecondary = false,
+        hideTertiary = false,
         hideFooter = false,
         eventOnClick = false
     ) {
@@ -48,6 +50,7 @@ export class ODPatientCard extends LitElement {
         this.hideMain = hideMain;
         this.hidePrimary = hidePrimary;
         this.hideSecondary = hideSecondary;
+        this.hideTertiary = hideTertiary;
         this.hideFooter = hideFooter;
         this.eventOnClick = eventOnClick;
         // Triggers the fetch/update, so called last.
@@ -89,7 +92,16 @@ export class ODPatientCard extends LitElement {
      * trigger an update sequence.
      */
     @state()
-    patient: any = {};
+    patient: any = {
+        time_series: {
+            nothing: {
+                x: [0],
+                y: [0],
+                colors: ["rgba(0,0,0,0)", "rgba(0,0,0,0)", "rgba(0,0,0,0)"],
+                thresholds: [0, 1],
+            },
+        },
+    };
 
     /** If true, hide the "header" section.
      */
@@ -110,6 +122,11 @@ export class ODPatientCard extends LitElement {
      */
     @property({ type: Boolean })
     hideSecondary = false;
+
+    /** If true, hide the "tertiary" section.
+     */
+    @property({ type: Boolean })
+    hideTertiary = false;
 
     /** If true, hide the "footer" section.
      */
@@ -141,10 +158,111 @@ export class ODPatientCard extends LitElement {
         } else {
             // Convert the payload to JSON.
             const patient = await response.json();
+            const time_series = this.fetchTimeSeries();
             // Set the fetched data as the new ones
             // to display in the Viewer widget.
             this.patient = patient;
+            this.patient.time_series = time_series;
         }
+    }
+
+    /** Create random vector of length n
+     *
+     * @param n length
+     * @param a amplitude
+     * @param b offset
+     * @returns
+     */
+    private randomVector(n: number, a = 10, b = 0): number[] {
+        const vec: number[] = [];
+        for (let i = 0; i < n; i++) {
+            let rand = Math.random() * a + b - a / 2;
+            rand = Math.round(rand);
+            if (rand < 0) rand = 0;
+            vec.push(rand);
+        }
+        return vec;
+    }
+
+    /** Create a vector of incremental integers of length n
+     *
+     * @param n length
+     * @returns vector
+     */
+    private getXOfLength(n: number): number[] {
+        //
+        const foo = new Array(n);
+        for (let i = 0; i < foo.length; i++) {
+            foo[i] = i + 1;
+        }
+        return foo;
+    }
+
+    /** Create fake time series
+     *
+     * @returns Object{'name': [...]}
+     */
+    private fetchTimeSeries(): Record<string, any> {
+        //
+        const n = 100;
+        const time_series: Record<string, any> = {
+            "Temperature_[°C]": {
+                x: this.getXOfLength(n),
+                y: this.randomVector(n, 6, 36),
+                colors: [
+                    "rgba(198, 198, 45, 1)",
+                    //  "rgba(184, 249, 152, 1)",
+                    "rgba(255, 255, 255, 1)",
+                    "rgba(250, 255, 0, 1)",
+                ],
+                thresholds: [35, 37],
+            },
+            "Blood_Pressure_[mmHg]": {
+                x: this.getXOfLength(n),
+                y: this.randomVector(n, 50, 100),
+                colors: [
+                    "rgba(165, 128, 54, 1)",
+                    //  "rgba(184, 249, 152, 1)",
+                    "rgba(255, 255, 255, 1)",
+                    "rgba(255, 131, 0, 1)",
+                ],
+                thresholds: [80, 120],
+            },
+            "CA12-5_[units/mL]": {
+                x: this.getXOfLength(n),
+                y: this.randomVector(n, 16000, 7500),
+                colors: [
+                    "rgba(54, 150, 165, 1)",
+                    //  "rgba(184, 249, 152, 1)",
+                    "rgba(255, 255, 255, 1)",
+                    "rgba(0, 242, 255, 1)",
+                ],
+                thresholds: [35, 15000],
+            },
+            "Hemoglobin_[g/L]": {
+                x: this.getXOfLength(n),
+                y: this.randomVector(n, 90, 155),
+                colors: [
+                    "rgba(165, 54, 134, 1)",
+                    //  "rgba(184, 249, 152, 1)",
+                    "rgba(255, 255, 255, 1)",
+                    "rgba(255, 0, 106, 1)",
+                ],
+                thresholds: [117, 155],
+            },
+            Platelets: {
+                x: this.getXOfLength(n),
+                y: this.randomVector(n, 300, 225),
+                colors: [
+                    "rgba(165, 121, 54, 1)",
+                    //  "rgba(184, 249, 152, 1)",
+                    "rgba(255, 255, 255, 1)",
+                    "rgba(255, 123, 0,1)",
+                ],
+                thresholds: [150, 350],
+            },
+        };
+        return time_series;
     }
 
     /** Render the widget. */
@@ -175,6 +293,7 @@ export class ODPatientCard extends LitElement {
                     ${this.hidePrimary ? "" : this.tPrimary()}
                     <!-- <form> -->
                     ${this.hideSecondary ? "" : this.tSecondary()}
+                    ${this.hideTertiary ? "" : this.tTertiary()}
                     <!-- </form> -->
                 </div>
                 <!-- patient-main -->
@@ -459,6 +578,21 @@ export class ODPatientCard extends LitElement {
             `;
     }
 
+    /** Template of the tertiary section.
+     *
+     * Display:
+     * - timeseries
+     */
+    private tTertiary() {
+        return html`
+            <div id="patient-tertiary">
+                <!-- <div>Time series:</div> -->
+                <plot-manager
+                    time-series=${JSON.stringify(this.patient.time_series)}
+                ></plot-manager>
+            </div>
+        `;
+    }
     /** Template for the footer section.
      *
      * (Empty for now).
@@ -550,6 +684,13 @@ export class ODPatientCard extends LitElement {
         }
 
         #patient-secondary {
+            font-size: 75%;
+            border: thin solid #ddd;
+            padding: 1em;
+            margin: 1em;
+        }
+
+        #patient-tertiary {
             font-size: 75%;
             border: thin solid #ddd;
             padding: 1em;

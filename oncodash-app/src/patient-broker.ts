@@ -70,7 +70,7 @@ export class ODPatientBroker extends LitElement {
         #oncodash-patient-broker {
             display: flex;
             flex-direction: row;
-            height: 90vh;
+            /* height: 90vh; */
         }
 
         #oncodash-patient-broker-selector {
