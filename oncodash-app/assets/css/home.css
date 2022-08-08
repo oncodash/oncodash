@@ -1,0 +1,5 @@
+oncodash-patient-list {
+    --oncodash-patient-list-li-display: inline-block;
+    --oncodash-patient-list-li-width: 33%;
+    --oncodash-patient-card-font-size: 100%;
+}

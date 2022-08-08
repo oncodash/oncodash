@@ -1,7 +1,7 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-// import { ODPatientCard } from "patient-card.js";
-// import ODPatientCard = require("out-tsc/src/patient-card.js");
+import { styleMap } from "lit/directives/style-map.js";
+
 import { ODPatientCard } from "./patient-card";
 
 /** A widget that lets the user select a patient and send the correpsponding ID up.
@@ -18,6 +18,27 @@ export class ODPatientList extends LitElement {
      */
     @property({ type: Number })
     patient_id = Number.NaN;
+
+    @property({ type: Boolean })
+    hideHeader = false;
+
+    @property({ type: Boolean })
+    hideMain = false;
+
+    @property({ type: Boolean })
+    hidePrimary = false;
+
+    @property({ type: Boolean })
+    hideSecondary = false;
+
+    @property({ type: Boolean })
+    hideFooter = false;
+
+    @property({ type: Boolean })
+    eventOnClick = true;
+
+    @property({ type: styleMap })
+    cardStyles = {};
 
     /** The actual list of patients.
      *
@@ -64,21 +85,21 @@ export class ODPatientList extends LitElement {
     override render() {
         return html`
             <h2 class="widget-title">Available Patients</h2>
-            <div id="patients-query">
-                <ul id="patients-list">
+            <div id="patient-query">
+                <ul id="patient-list">
                     ${this.patients.map(
                         (item) => html`
                             <li>
                                 <div class="patient-card">
                                     ${new ODPatientCard(
                                         item.id,
-                                        { fontSize: "70%", cursor: "pointer" },
-                                        false /* hideHeader    */,
-                                        false /* hideMain      */,
-                                        true /* hidePrimary   */,
-                                        true /* hideSecondary */,
-                                        true /* hideFooter    */,
-                                        true /* eventOnClick  */
+                                        { cursor: "pointer" },
+                                        this.hideHeader,
+                                        this.hideMain,
+                                        this.hidePrimary,
+                                        this.hideSecondary,
+                                        this.hideFooter,
+                                        this.eventOnClick
                                     )}
                                 </div>
                             </li>
@@ -117,12 +138,18 @@ export class ODPatientList extends LitElement {
 
     static styles = css`
         .widget-title {
-            display: none;
+            display: var(--oncodash-patient-list-title-display, block);
         }
 
-        #patients-list {
+        #patient-list {
             list-style: none;
             padding: 0.5em;
+        }
+
+        #patient-list li {
+            vertical-align: top;
+            display: var(--oncodash-patient-list-li-display, block);
+            width: var(--oncodash-patient-list-li-width, 100%);
         }
     `;
 }

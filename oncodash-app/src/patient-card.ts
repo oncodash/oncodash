@@ -473,7 +473,7 @@ export class ODPatientCard extends LitElement {
     /** Encapsulated CSS style. */
     static styles = css`
         .widget-title {
-            display: none;
+            display: var(--oncodash-patient-card-title-display, none);
         }
 
         img {
@@ -481,6 +481,7 @@ export class ODPatientCard extends LitElement {
         }
 
         #patient-card {
+            font-size: var(--oncodash-patient-card-font-size, 100%);
             margin: 2em;
             padding: 1em;
             border: thin solid grey;

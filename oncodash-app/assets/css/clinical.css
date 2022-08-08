@@ -1,0 +1,11 @@
+oncodash-patient-list {
+    --oncodash-patient-list-title-display: none;
+
+    /* Variables for patient cards within a patient list widget. */
+    --oncodash-patient-card-font-size: 70%;
+}
+
+/* Selected card */
+oncodash-patient-card {
+    --oncodash-patient-card-font-size: 100%;
+}
