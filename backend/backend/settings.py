@@ -154,37 +154,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost",
 ]
 
-def skip_lib_python(record):
-    """Filter that removes "File seen" events on a *lib/python* file."""
-    msg = record.msg
-    if msg and msg.startswith("File") and len(record.args)>0:
-        path = str(record.args[0].resolve())
-        if "lib/python" in path:
-            return False
-    return True
-
-def skip_node_modules(record):
-    """Filter that removes "File seen" events on a *node_modules* file."""
-    msg = record.msg
-    if msg and msg.startswith("File") and len(record.args)>0:
-        path = str(record.args[0].resolve())
-        if "node_modules" in path:
-            return False
-    return True
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'filters': {
-        # use Django's built in CallbackFilter to point to our filter 
-        'skip_lib_python': {
-            '()': 'django.utils.log.CallbackFilter',
-            'callback': skip_lib_python
-        },
-        'skip_node_modules': {
-            '()': 'django.utils.log.CallbackFilter',
-            'callback': skip_node_modules
-        }
+        # Will be filled up below.
     },
     'formatters': {
         # django's default formatter
@@ -194,18 +168,52 @@ LOGGING = {
         }
     },
     'handlers': {
-        'my_log_handler': {
+        'oncodash_log_handler': {
             'level': 'DEBUG' if DEBUG else 'INFO',
-            'filters': ['skip_lib_python','skip_node_modules'],
+            'filters': [], # Will be filled up below.
             'class': 'logging.FileHandler',
             'filename': Path(BASE_DIR, 'django.log'),
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['my_log_handler'],
+            'handlers': ['oncodash_log_handler'],
             'level': 'DEBUG' if DEBUG else 'INFO',
             'propagate': True,
         },
     },
 }
+
+
+#
+# Machinery to filter out useless and annoying log messages.
+#
+
+def make_skip_files(substring):
+    """Make a filter function that removes "File seen" events on a *substring* file."""
+    def f(record):
+        msg = record.msg
+        if msg and msg.startswith("File") and len(record.args)>0:
+            path = str(record.args[0].resolve())
+            if substring in path:
+                return False
+        return True
+    # Returns the built anonymous function.
+    return f
+
+
+# Populate the LOGGING configuration with filters that remove the files matching the listed keywords.
+# If you want to filter out some files from the "autoreload" logs,
+# just add the matching substring in the list below.
+for p in [ "lib/python", "node_modules", "sphinx-js", "out-tsc"]:
+    name = "skip_"+p
+    f = make_skip_files(p)
+    # Register the callback to the anonymous function.
+    LOGGING["filters"][name] = {
+        # use Django's built in CallbackFilter to point to our filter 
+        '()': 'django.utils.log.CallbackFilter',
+        'callback': f
+    }
+    # Actually use the filter in our logger.
+    LOGGING["handlers"]["oncodash_log_handler"]["filters"].append(name)
+
