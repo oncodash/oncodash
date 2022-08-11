@@ -4,10 +4,10 @@ from rest_framework.routers import DefaultRouter
 from .views import NetworkViewSet
 
 import logging
-logger = logging.getLogger(__name__)
-logger.debug("Register explainer")
+logger = logging.getLogger("django.oncodash.explainer")
+logger.debug("Register explainer URLs")
 
-app_name = 'explainer'
+app_name = 'explainer-api'
 
 router = DefaultRouter()
 router.register(r'networks', NetworkViewSet)

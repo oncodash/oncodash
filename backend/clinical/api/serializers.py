@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from clin_overview.models import ClinicalData
+from clinical.models import ClinicalData
 
 
 class ClinicalDataSerializer(serializers.ModelSerializer):

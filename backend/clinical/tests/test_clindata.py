@@ -6,7 +6,7 @@ from faker import Faker
 from .utils import Provider, create_data
 
 
-CLINDATA_URL = reverse("clin_overview:clinicaldata-list")
+CLINDATA_URL = reverse("clinical:clinicaldata-list")
 
 
 class ClinDataAPiTests(APITestCase):

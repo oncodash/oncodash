@@ -1,8 +1,8 @@
 from django.core.management.base import BaseCommand
 from faker import Faker
 
-from clin_overview.models import ClinicalData
-from clin_overview.tests.utils import Provider, create_data
+from clinical.models import ClinicalData
+from clinical.tests.utils import Provider, create_data
 
 
 class Command(BaseCommand):

@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     # own apps
     "core",
     "explainer",
-    "clin_overview",
+    "clinical",
     "side_effects",
     # third-party
     "rest_framework",

@@ -60,7 +60,7 @@ export class ODPatientList extends LitElement {
 
     /** Download the data for all the patients. */
     private async fetchPatients(): Promise<any> {
-        const apiUrl = `http://localhost:8888/api/clinical-overview/data/`;
+        const apiUrl = `http://localhost:8888/api/clinical/data/`;
         let response: any;
         try {
             // Wait for the asynchronous `fetch` function to terminate.

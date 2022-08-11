@@ -126,7 +126,7 @@ export class ODPatientCard extends LitElement {
      * It downloads the corresponding data that this widget is displaying.
      */
     private async fetchItem(id: number): Promise<any> {
-        const apiUrl = `http://localhost:8888/api/clinical-overview/data/${id}/`;
+        const apiUrl = `http://localhost:8888/api/clinical/data/${id}/`;
         let response: any;
         try {
             // Wait for the asynchronous `fetch` function to terminate.

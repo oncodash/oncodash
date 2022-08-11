@@ -7,9 +7,10 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="index.html")),
+    path("clinical/", include("clinical.urls")),
     path("admin/", admin.site.urls),
     path("api/explainer/", include("explainer.api.urls")),
-    path("api/clinical-overview/", include("clin_overview.api.urls")),
+    path("api/clinical/", include("clinical.api.urls")),
 ] + staticfiles_urlpatterns()
 
 
