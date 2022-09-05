@@ -2,7 +2,8 @@ from django.db import models
 from django.utils.translation import gettext as _
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import F, Q
-
+import random
+import json
 
 # Enums for model
 class CudStageFIGO2014(models.TextChoices):
@@ -71,6 +72,91 @@ class MainetenaceTherapy(models.TextChoices):
     BEVACIZUMAB = "BEVACIZUMAB", _("Bevacizumab")
     PARPI = "PARPI", _("PARP inhibition therapy")
 
+def randomVector(n, a = 10, b = 0):
+    vec = []
+    for i in range(n):
+        rand = random.random() * a + b - a / 2
+        rand = round(rand)
+        if (rand < 0):
+            rand = 0
+        vec.append(rand)
+    
+    return vec
+
+
+    # /** Create a vector of incremental integers of length n
+    #  *
+    #  * @param n length
+    #  * @returns vector
+    #  */
+def getXOfLength(n):
+    return [i for i in range(n)]
+
+    # /** Create fake time series
+    #  *
+    #  * @returns Object{'name': [...]}
+    #  */
+def fetchTimeSeries(): 
+    n = 100
+    time_series = {
+        "Temperature_[°C]": {
+            'x': getXOfLength(n),
+            'y': randomVector(n, 6, 36),
+            'colors': [
+                "rgba(198, 198, 45, 1)",
+                
+                "rgba(255, 255, 255, 1)",
+                "rgba(250, 255, 0, 1)",
+            ],
+            'thresholds': [35, 37],
+        },
+        "Blood_Pressure_[mmHg]": {
+            'x': getXOfLength(n),
+            'y': randomVector(n, 50, 100),
+            'colors': [
+                "rgba(165, 128, 54, 1)",
+                
+                "rgba(255, 255, 255, 1)",
+                "rgba(255, 131, 0, 1)",
+            ],
+            'thresholds': [80, 120],
+        },
+        "CA12-5_[units/mL]": {
+            'x': getXOfLength(n),
+            'y': randomVector(n, 16000, 7500),
+            'colors': [
+                "rgba(54, 150, 165, 1)",
+                
+                "rgba(255, 255, 255, 1)",
+                "rgba(0, 242, 255, 1)",
+            ],
+            'thresholds': [35, 15000],
+        },
+        "Hemoglobin_[g/L]": {
+            'x': getXOfLength(n),
+            'y': randomVector(n, 90, 155),
+            'colors': [
+                "rgba(165, 54, 134, 1)",
+                
+                "rgba(255, 255, 255, 1)",
+                "rgba(255, 0, 106, 1)",
+            ],
+            'thresholds': [117, 155],
+        },
+        'Platelets': {
+            'x': getXOfLength(n),
+            'y': randomVector(n, 300, 225),
+            'colors': [
+                "rgba(165, 121, 54, 1)",
+                
+                "rgba(255, 255, 255, 1)",
+                "rgba(255, 123, 0,1)",
+            ],
+            'thresholds': [150, 350],
+        }
+    }    
+    return json.dumps(time_series)
+
 
 class ClinicalData(models.Model):
     patient = models.CharField(max_length=100, unique=True)
@@ -79,6 +165,7 @@ class ClinicalData(models.Model):
     chronic_illnesses = models.CharField(max_length=100, blank=True)
     other_medication = models.CharField(max_length=100, blank=True)
     cancer_in_family = models.CharField(max_length=100, blank=True)
+    time_series = models.TextField(default=fetchTimeSeries)
 
     # enums
     cud_histology = models.CharField(max_length=20, choices=CudHistology.choices)
