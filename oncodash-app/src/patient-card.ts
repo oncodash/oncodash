@@ -158,7 +158,7 @@ export class ODPatientCard extends LitElement {
         } else {
             // Convert the payload to JSON.
             const patient = await response.json();
-            console.log("patient: ", patient);
+            // console.log("patient: ", patient);
             // const time_series = this.fetchTimeSeries();
             // Set the fetched data as the new ones
             // to display in the Viewer widget.

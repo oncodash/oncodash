@@ -63,12 +63,12 @@ function basePlot2(label, x, y, colors, thresholds, hoverIndex){
   // let barY = getMaxVec(y.length, max(y));
   let barY = new Array(y.length);
   barY.fill(Math.max(...y))
-  console.log("barY: ", barY);
+  // console.log("barY: ", barY);
   let backColors = barY.map(x=>'rgba(255, 255, 255, 0)');
   let hoverColors = barY.map(x=>'rgba(0, 0, 0, 0.5)');
   backColors[hoverIndex] = 'rgba(0, 0, 255, 0.5)';
 
-  console.log(backColors[hoverIndex]);
+  // console.log(backColors[hoverIndex]);
 
   let template = 
                   {
