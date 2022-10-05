@@ -1,21 +1,26 @@
 {
   "compilerOptions": {
-    "target": "es2022",
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
     "module": "esnext",
     "moduleResolution": "node",
-    "noEmitOnError": true,
-    "lib": ["es2022", "dom"],
-    "strict": true,
-    "esModuleInterop": false,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "useDefineForClassFields": false,
-    "importHelpers": true,
-    "outDir": "out-tsc",
-    "sourceMap": true,
-    "inlineSources": true,
-    "rootDir": "./",
-    "incremental": true
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
   },
-  "include": ["**/*.ts"]
+  "include": [
+    "src"
+  ]
 }
