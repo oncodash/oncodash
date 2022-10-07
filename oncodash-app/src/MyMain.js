@@ -56,6 +56,10 @@ function MyMain(props) {
                 patientsPerPage={patientsPerPage}
                 setPatientsPerPage_callback={setPatientsPerPageWrapper}
                 page={page}
+                setFilterCallback={props.setFilterCallback} 
+                filter={props.filter}
+                statusFilter={props.statusFilter}
+                setStatusFilterCallback={props.setStatusFilterCallback}
             ></Navigator>
             {viewMode === "GRID"? 
                 <GridView patients={viewPatients()}></GridView>

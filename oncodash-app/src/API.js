@@ -30,10 +30,15 @@ import {Patient} from './Clinical/Patient.js';
     });
   }
 
-  async function getPatients() {
+  async function getPatients(token) {
     // call: GET /api/surveys
     return getJson(
-      fetch(BASEURL + CLIN_OVERVIEW)
+      fetch(BASEURL + CLIN_OVERVIEW, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Token '+token,
+        },
+      })
     ).then(patients => {
       return patients.map((s)=> new Patient(  s.id, 
                                               s.age, 
@@ -55,10 +60,15 @@ import {Patient} from './Clinical/Patient.js';
   
   }
 
-  async function getSelectedPatient(patient_id) {
+  async function getSelectedPatient(token, patient_id) {
     // call: GET /api/surveys
     return getJson(
-      fetch(BASEURL + CLIN_OVERVIEW + patient_id + `/`)
+      fetch(BASEURL + CLIN_OVERVIEW + patient_id + `/`, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Token '+token,
+        },
+      })
     ).then(patient => {
       return new Patient(                     
                           patient.id, 
@@ -84,5 +94,48 @@ import {Patient} from './Clinical/Patient.js';
   
   }  
 
-const API = {getPatients, getSelectedPatient};
+  async function logIn(username, password) {
+    let response = await fetch('http://127.0.0.1:8888/api-token-auth/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({username, password}),
+    });
+    if(response.ok) {
+      
+      const res = await response.json();
+      return res;
+    }
+    else {
+      try {
+        const errDetail = await response.json();
+        throw errDetail.message;
+      }
+      catch(err) {
+        throw err;
+      }
+    }
+  }
+  
+  async function logOut(token) {
+    await fetch('http://127.0.0.1:8888/logout/', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Token '+token,
+      },
+    });
+  }
+  
+  async function getUserInfo() {
+    const response = await fetch(BASEURL + '/sessions/current');
+    const userInfo = await response.json();
+    if (response.ok) {
+      return userInfo;
+    } else {
+      throw userInfo;  // an object with the error coming from the server
+    }
+  }  
+
+const API = {getPatients, getSelectedPatient, logIn, logOut, getUserInfo};
 export default API;

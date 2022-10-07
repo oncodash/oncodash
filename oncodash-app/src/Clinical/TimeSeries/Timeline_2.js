@@ -24,11 +24,19 @@ function create_chart(dayzero, time_series, name){
         thresholds = [-10, 35];
     }
     if(name === "hb"){
-        thresholds = [100, 110];
+        thresholds = [117, 155];
     }
     if(name === "leuk"){
-        thresholds = [5, 10];
+        thresholds = [3.4, 8.2];
     }
+    if(name === "neut"){
+        thresholds = [1.5, 6.7];
+    }
+    if(name === "platelets"){
+        thresholds = [150, 360];
+    }
+    // let min_x_value = Math.min(...time_series.x);
+    // time_series.x = time_series.x.map(x=>x-min_x_value+1);
     for(let i=0; i<time_series.x.length; i++){
         let date = new Date(dayzero);
         // console.log("date: ", date)
@@ -107,7 +115,7 @@ function create_chart(dayzero, time_series, name){
 
 function Timeline2(props) {
     const displayOrder = ['ca125', 'neut', 'hb', 'leuk', 'platelets'];
-    const dayzero = new Date("2018-01-01");
+    const dayzero = new Date("2000-01-01");
     const charts = displayOrder.filter((d)=>!props.time_series[d].y.every(e=>e===null)).map((d)=> {
         return create_chart(dayzero, props.time_series[d], d);
     });

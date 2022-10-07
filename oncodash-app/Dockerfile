@@ -22,7 +22,7 @@ USER node
 
 # copy package.json, install deps and set $PATH-var for node_modules
 COPY --chown=node:node package.json package-lock.json* ./
-RUN npm install --no-optional && npm cache clean --force
+RUN npm install --no-optional --legacy-peer-deps && npm cache clean --force
 ENV PATH /opt/node_app/node_modules/.bin:$PATH
 
 # copy in our source code last, as it changes the most

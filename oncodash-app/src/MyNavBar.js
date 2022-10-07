@@ -4,8 +4,12 @@ import Navbar from 'react-bootstrap/Navbar';
 import { Row, Col} from 'react-bootstrap';
 import logo from './assets/oncodash-logo.svg';
 import {Link} from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import LoginModal from './LoginModal';
 
 function MyNavBar(props) {
+    const [modalShow, setModalShow] = useState(false);
+
     return(
             
             <Navbar className="bg-secondary py-3 bg-opacity-25" expand="lg">
@@ -22,12 +26,15 @@ function MyNavBar(props) {
                             </Link>
                         </Col>
                         <Col className="col-1 d-flex justify-content-center align-items-center">
-                            <Button className="bg-secondary bg-opacity-75 border-secondary text-light border rounded py-2 px-4 fs-6">
-                                Login
-                            </Button>
+                            {props.logged ?  <Button variant="dark" onClick={()=>props.logoutCallback()} >Logout</Button>  :  <Button variant="primary" onClick={() => setModalShow(true)} type="button">LOGIN</Button> }
                         </Col>
                     </Row>
                 </Container>
+                <LoginModal
+                    show={modalShow}
+                    onHide={() => setModalShow(false)}
+                    loginCallback={props.loginCallback}
+                />
             </Navbar>
 
       );

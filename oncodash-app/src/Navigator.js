@@ -8,6 +8,12 @@ import { Row, Col} from 'react-bootstrap';
 import { Calendar, Tag, Table, Sliders2Vertical, Microsoft} from 'react-bootstrap-icons';
 
 function Navigator(props) {
+
+    const resetFields = ()=>{
+        props.setStatusFilterCallback("");
+        props.setFilterCallback("");
+    };
+
     return(
             <>
             <Navbar  expand="lg">
@@ -17,40 +23,28 @@ function Navigator(props) {
                             <Form className="w-100">
                                 <Form.Control
                                     type="search"
-                                    placeholder="Search by project id, member, etc"
+                                    placeholder="Search by patient_ID, STAGE"
                                     className="p-2 border border-secondary rounded"
                                     aria-label="Search"
+                                    onChange={(event)=>props.setFilterCallback(event.target.value)}
+                                    value={props.filter}
                                 />
-                                {/* <Button variant="outline-success">Search</Button> */}
+                                
                             </Form>
                         </Col>
                         <Col className="col-4 d-flex justify-content-center align-items-center">
                             <Navbar.Collapse id="navbarScroll">
                                 <Nav navbarScroll className="d-flex justify-content-end w-100" >
-                                    <NavDropdown id="daterange" className="mx-1 border border-secondary rounded" title={<div style={{float: 'left'}}><div className="d-flex align-items-center float"><Calendar className="mr-1 fa-lg"/><div className="px-1  fs-6">Date range</div></div></div>}>
-                                        <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
-                                        <NavDropdown.Item href="#action4">Action</NavDropdown.Item>
-                                        <NavDropdown.Divider />
-                                        <NavDropdown.Item href="#action5">
-                                            Something else here
-                                        </NavDropdown.Item>
-                                    </NavDropdown>
+
                                     <NavDropdown id="status" className="mx-1 border border-secondary rounded" title={<div style={{float: 'left'}}><div className="d-flex align-items-center float"><Tag className="mr-1 fa-lg"/><div className="px-1  fs-6">Status</div></div></div>}>
-                                        <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
-                                        <NavDropdown.Item href="#action4">Action</NavDropdown.Item>
+                                        <NavDropdown.Item onClick={()=>props.setStatusFilterCallback("ALIVE")}>Alive</NavDropdown.Item>
+                                        <NavDropdown.Item onClick={()=>props.setStatusFilterCallback("DEAD")}>Dead</NavDropdown.Item>
                                         <NavDropdown.Divider />
-                                        <NavDropdown.Item href="#action5">
-                                            Something else here
+                                        <NavDropdown.Item onClick={()=>props.setStatusFilterCallback("")}>
+                                            Remove
                                         </NavDropdown.Item>
                                     </NavDropdown>
-                                    <NavDropdown id="morefilters" className="mx-1 border border-secondary rounded" title={<div style={{float: 'left'}}><div className="d-flex align-items-center float"><Sliders2Vertical className="mr-1 fa-lg"/><div className="px-1  fs-6">More filters</div></div></div>}>
-                                        <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
-                                        <NavDropdown.Item href="#action4">Action</NavDropdown.Item>
-                                        <NavDropdown.Divider />
-                                        <NavDropdown.Item href="#action5">
-                                            Something else here
-                                        </NavDropdown.Item>
-                                    </NavDropdown>
+                                    <Button className='bg-danger text-light' onClick={()=>resetFields()}>Reset</Button>
                                 </Nav>
                             </Navbar.Collapse>
                         </Col> 
@@ -63,7 +57,7 @@ function Navigator(props) {
                 <Container>
                     <Row className="w-100">
                         <Col className="col-4 d-flex align-items-center p-4">
-                            Selected {(props.page-1)*props.patientsPerPage+1}-{Math.min(((props.page)*props.patientsPerPage), Math.ceil(props.patients.length))} of {props.patients.length} patients
+                            Selected {props.patients.length===0?0:(props.page-1)*props.patientsPerPage+1}-{Math.min(((props.page)*props.patientsPerPage), Math.ceil(props.patients.length))} of {props.patients.length} patients
                         </Col>
                         <Col className="col-6 d-flex align-items-center justify-content-end">
                             <div className='p-2'>Patients per page: </div>

@@ -2,7 +2,7 @@ import { Row, Container, Col    } from 'react-bootstrap';
 import Clinical from './Clinical/Clinical';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-import {useLocation} from 'react-router-dom';
+import {useLocation, Navigate} from 'react-router-dom';
 import API from "./API.js";
 import { useEffect, useState } from 'react';
 import alive from './assets/alive.svg';
@@ -24,10 +24,10 @@ function PatientView(props) {
     const [waitingSelected, setWaitingSelected] = useState(true);
     // const [selectedTab, setSelectedTab] = useState("clinical");
 
-    const getSelectedPatient = async(patient_id)=>{
+    const getSelectedPatient = async(token, patient_id)=>{
         try{
             setWaitingSelected(true);
-            const patient = await API.getSelectedPatient(patient_id);
+            const patient = await API.getSelectedPatient(token, patient_id);
             setSelectedPatient(patient);
             setWaitingSelected(false);
         }catch(err){
@@ -37,18 +37,20 @@ function PatientView(props) {
 
     useEffect(()=>{
         const getPatients = async()=>{
-            try{
-                getSelectedPatient(state.patient_id);
-            }catch(err){
-                throw err;
+            if(props.token!=="" && props.token!==undefined && props.token!=="undefined"){
+                try{
+                    getSelectedPatient(props.token, state.patient_id);
+                }catch(err){
+                    throw err;
+                }
             }
         };
             getPatients();
-        }, [state.patient_id]   
+        }, []   
     );
 
     return(
-             
+            state === null ? <Navigate to="/" relative={-1}/> : state.patient_id === undefined || props.token==="" ? <Navigate to="/" relative={-1}/> :
             <div className="below-nav w-100 px-5 mx-0 my-5">
                 
                 <Container>
