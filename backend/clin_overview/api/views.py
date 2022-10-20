@@ -95,7 +95,37 @@ class ClinicalViewSet(viewsets.ModelViewSet):
             'neut' : neut_dict,
         }
 
+        fresh_sample = TimelineRecord.objects.filter(patient=patient, event="fresh_sample").order_by("date_relative")
+        fresh_sample_sequenced = TimelineRecord.objects.filter(patient=patient, event="fresh_sample_sequenced").order_by("date_relative")
+        tykslab_plasma = TimelineRecord.objects.filter(patient=patient, event="tykslab_plasma").order_by("date_relative")
+        ctdna_sample = TimelineRecord.objects.filter(patient=patient, event="ctdna_sample").order_by("date_relative")
+        radiology = TimelineRecord.objects.filter(patient=patient, event="radiology").order_by("date_relative")
+
+        event_series = {
+            'fresh_sample': {
+                    'date_relative': list(fresh_sample.values_list("date_relative", flat=True)),
+                    'name': list(fresh_sample.values_list("name", flat=True)),
+            },
+            'fresh_sample_sequenced': {
+                'date_relative': list(fresh_sample_sequenced.values_list("date_relative", flat=True)),
+                'name': list(fresh_sample_sequenced.values_list("name", flat=True)),
+            },
+            'tykslab_plasma': {
+                'date_relative': list(tykslab_plasma.values_list("date_relative", flat=True)),
+                'name': list(tykslab_plasma.values_list("name", flat=True)),
+            },
+            'ctdna_sample': {
+                'date_relative': list(ctdna_sample.values_list("date_relative", flat=True)),
+                'name': list(ctdna_sample.values_list("name", flat=True)),
+            },
+            'radiology': {
+                'date_relative': list(radiology.values_list("date_relative", flat=True)),
+                'name': list(radiology.values_list("name", flat=True)),
+            },
+        }
+
         patient.time_series = simplejson.dumps(time_series, ignore_nan=True)
+        patient.event_series = simplejson.dumps(event_series, ignore_nan=True)
         # patient.bmi = patient.weight/(patient.height**2)
         return Response(serializer_class(patient).data)
 

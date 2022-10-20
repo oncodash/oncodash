@@ -16,9 +16,6 @@ class Command(BaseCommand):
 
     help = "Import data for the database of clinical records faking patient data using faker."
 
-
-
-
     def add_arguments(self, parser):
         parser.add_argument(
             "-clinicalpath",

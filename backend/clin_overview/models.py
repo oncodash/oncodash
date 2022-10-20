@@ -167,6 +167,7 @@ class ClinicalData(models.Model):
     other_medication = models.CharField(max_length=100, blank=True)
     cancer_in_family = models.CharField(max_length=100, blank=True)
     time_series = models.CharField(max_length=255*20, blank=True, null= True)
+    event_series = models.CharField(max_length=255*20, blank=True, null= True)
 
     # enums
     cud_histology = models.CharField(max_length=20, choices=CudHistology.choices)
