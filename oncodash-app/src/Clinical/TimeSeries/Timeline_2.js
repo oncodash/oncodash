@@ -21,7 +21,7 @@ function create_chart(dayzero, time_series, name){
     // let isca125 = name === "ca125";
     let thresholds = time_series.thresholds;
     if(name === "ca125"){
-        thresholds = [-10, 35];
+        thresholds = [-10, 80000];
     }
     if(name === "hb"){
         thresholds = [117, 155];
