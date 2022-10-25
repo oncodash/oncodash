@@ -15,7 +15,8 @@ function Patient(
                     cancer_in_family,
                     chronic_illness,
                     other_medication,    
-                    time_series,          
+                    time_series,  
+                    event_series,        
                     height,
                     weight,
                     BRCA,
@@ -35,6 +36,7 @@ function Patient(
     this.chronic_illness            = chronic_illness;
     this.other_medication           = other_medication;
     this.time_series                = time_series;
+    this.event_series                = event_series;
     this.height                     = height;
     this.weight                     = weight;
     this.bmi                        = Number((weight/((height/100)**2)).toFixed(1));

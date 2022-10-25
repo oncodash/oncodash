@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.db.models import Max, Min
 import numpy as np
+from collections import OrderedDict
 import pandas as pd
 
 
@@ -95,33 +96,30 @@ class ClinicalViewSet(viewsets.ModelViewSet):
             'neut' : neut_dict,
         }
 
-        fresh_sample = TimelineRecord.objects.filter(patient=patient, event="fresh_sample").order_by("date_relative")
-        fresh_sample_sequenced = TimelineRecord.objects.filter(patient=patient, event="fresh_sample_sequenced").order_by("date_relative")
-        tykslab_plasma = TimelineRecord.objects.filter(patient=patient, event="tykslab_plasma").order_by("date_relative")
-        ctdna_sample = TimelineRecord.objects.filter(patient=patient, event="ctdna_sample").order_by("date_relative")
-        radiology = TimelineRecord.objects.filter(patient=patient, event="radiology").order_by("date_relative")
+        fresh_sample = TimelineRecord.objects.filter(patient=patient, event="fresh_sample").order_by("date_relative").values_list("date_relative", "name").distinct()
+        fresh_sample_sequenced = TimelineRecord.objects.filter(patient=patient, event="fresh_sample_sequenced").order_by("date_relative").values_list("date_relative", "name").distinct()
+        tykslab_plasma = TimelineRecord.objects.filter(patient=patient, event="tykslab_plasma").order_by("date_relative").values_list("date_relative", "name").distinct()
+        ctdna_sample = TimelineRecord.objects.filter(patient=patient, event="ctdna_sample").order_by("date_relative").values_list("date_relative", "name").distinct()
+        radiology = TimelineRecord.objects.filter(patient=patient, event="radiology").order_by("date_relative").values_list("date_relative", "name").distinct()
+
+        def convert_to_dict(series):
+            diz = OrderedDict()
+            for k, v in series:
+                if k in diz:
+                    diz[k] = diz[k] + ", " + str(v)
+                else:
+                    diz[k] = str(v)
+            return {"date_relative": list(diz.keys()), "name": list(diz.values())}
+
+
+
 
         event_series = {
-            'fresh_sample': {
-                    'date_relative': list(fresh_sample.values_list("date_relative", flat=True)),
-                    'name': list(fresh_sample.values_list("name", flat=True)),
-            },
-            'fresh_sample_sequenced': {
-                'date_relative': list(fresh_sample_sequenced.values_list("date_relative", flat=True)),
-                'name': list(fresh_sample_sequenced.values_list("name", flat=True)),
-            },
-            'tykslab_plasma': {
-                'date_relative': list(tykslab_plasma.values_list("date_relative", flat=True)),
-                'name': list(tykslab_plasma.values_list("name", flat=True)),
-            },
-            'ctdna_sample': {
-                'date_relative': list(ctdna_sample.values_list("date_relative", flat=True)),
-                'name': list(ctdna_sample.values_list("name", flat=True)),
-            },
-            'radiology': {
-                'date_relative': list(radiology.values_list("date_relative", flat=True)),
-                'name': list(radiology.values_list("name", flat=True)),
-            },
+            'fresh_sample': convert_to_dict(fresh_sample),
+            'fresh_sample_sequenced': convert_to_dict(fresh_sample_sequenced),
+            'tykslab_plasma': convert_to_dict(tykslab_plasma),
+            'ctdna_sample': convert_to_dict(ctdna_sample),
+            'radiology': convert_to_dict(radiology),
         }
 
         patient.time_series = simplejson.dumps(time_series, ignore_nan=True)
