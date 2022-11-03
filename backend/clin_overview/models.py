@@ -226,7 +226,7 @@ def fetchTimeSeries():
 
 
 class ClinicalData(models.Model):
-    patient_id = models.CharField(max_length=100, unique=True)
+    patient_id = models.IntegerField(unique=True)
     '''
     "patient_id": {
         "category": "identifier",
@@ -261,7 +261,7 @@ class ClinicalData(models.Model):
     # extra_patient_info = models.CharField(max_length=400, blank=True)
     # other_diagnosis = models.CharField(max_length=100, blank=True)
 
-    chronic_illnesses_at_dg = models.BooleanField(blank=True)
+    chronic_illnesses_at_dg = models.BooleanField(null=True)
     '''
     "chronic_illnesses_at_dg": {
             "category": "additional baseline",
@@ -276,7 +276,7 @@ class ClinicalData(models.Model):
             "alreadyVisualized": false
         },
     '''
-    chronic_illnesses_type = models.CharField(max_length=100, blank=True, choices=ChronicIllnesses.choices)
+    chronic_illnesses_type = models.CharField(max_length=100, null=True, choices=ChronicIllnesses.choices)
     '''"chronic_illnesses_type": {
             "category": "additional baseline",
             "dataType": "string",
@@ -343,7 +343,7 @@ class ClinicalData(models.Model):
 
     #disease_origin = models.CharField(max_length=20, choices=TissueType.choices, blank=True)
 
-    stage = models.CharField(max_length=20, choices=StageFIGO2014.choices)
+    stage = models.CharField(max_length=20, null=True, choices=StageFIGO2014.choices)
     ''' 
         "stage": {
             "category": "baseline",
@@ -374,7 +374,7 @@ class ClinicalData(models.Model):
         },
         '''
 
-    primary_therapy_outcome = models.CharField(max_length=20, choices=PrimaryTherapyOutcome.choices)
+    primary_therapy_outcome = models.CharField(max_length=20, null=True, choices=PrimaryTherapyOutcome.choices) # The field is missing sometimes
     '''
     "primary_therapy_outcome": {
             "category": "outcome",

@@ -154,9 +154,9 @@ python manage.py flush --no-input
 python manage.py populate -p /path/to/indication_table.csv
 ```
 
-6. Populate a test database with (still fake clinical data) and real timeline data. "<clinical filepath>" is not used right now. "<timeline filepath>" can be downloaded from the edunni repository (DECIDER/Clinical Data/timeline.csv). The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
+6. Populate a test database with clinical data and real timeline data. "<clinical filepath>" is the path of clinical data file and can be downloaded from eduuni. "<timeline filepath>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
 ```sh
-python manage.py import_timelinerecords_and_fake_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline filepath>
+python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline filepath>
 ```
 
 7. Create an account. Type:
