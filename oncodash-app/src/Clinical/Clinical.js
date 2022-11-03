@@ -92,7 +92,7 @@ function Clinical(props) {
                                 <>
                                     {/* <PatientCard patient={props.patient} /> */}
                                     {/* <Button className="pe-auto mb-1">{selectedPatient.toString()}</Button>*/}
-                                    <Timeline2 time_series={props.patient.time_series}/> 
+                                    <Timeline2 time_series={props.patient.time_series} event_series={props.patient.event_series}/> 
                                 </>
                             {/* } */}
                         </Col>

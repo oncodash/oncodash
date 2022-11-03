@@ -54,7 +54,7 @@ import {Patient} from './Clinical/Patient.js';
                                               s.cancer_in_family,
                                               s.chronic_illness,
                                               s.other_medication,  
-                                              s.time_series,                                            
+                                              s.time_series,                                       
                                             ));
     });
   
@@ -85,7 +85,8 @@ import {Patient} from './Clinical/Patient.js';
                           patient.cancer_in_family,
                           patient.chronic_illness,
                           patient.other_medication,   
-                          JSON.parse(patient.time_series),   
+                          JSON.parse(patient.time_series),                             
+                          JSON.parse(patient.event_series),     
                           patient.height,
                           patient.weight,
                           patient.has_brca_mutation,                
