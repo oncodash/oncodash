@@ -99,28 +99,28 @@ def getXOfLength(n):
 def fetchTimeSeries(): 
     n = 100
     time_series = {
-        "Temperature_[°C]": {
-            'x': getXOfLength(n),
-            'y': randomVector(n, 6, 36),
-            'colors': [
-                "rgba(198, 198, 45, 1)",
+        # "Temperature_[°C]": {
+        #     'x': getXOfLength(n),
+        #     'y': randomVector(n, 6, 36),
+        #     'colors': [
+        #         "rgba(198, 198, 45, 1)",
                 
-                "rgba(255, 255, 255, 1)",
-                "rgba(250, 255, 0, 1)",
-            ],
-            'thresholds': [35, 37],
-        },
-        "Blood_Pressure_[mmHg]": {
-            'x': getXOfLength(n),
-            'y': randomVector(n, 50, 100),
-            'colors': [
-                "rgba(165, 128, 54, 1)",
+        #         "rgba(255, 255, 255, 1)",
+        #         "rgba(250, 255, 0, 1)",
+        #     ],
+        #     'thresholds': [35, 37],
+        # },
+        # "Blood_Pressure_[mmHg]": {
+        #     'x': getXOfLength(n),
+        #     'y': randomVector(n, 50, 100),
+        #     'colors': [
+        #         "rgba(165, 128, 54, 1)",
                 
-                "rgba(255, 255, 255, 1)",
-                "rgba(255, 131, 0, 1)",
-            ],
-            'thresholds': [80, 120],
-        },
+        #         "rgba(255, 255, 255, 1)",
+        #         "rgba(255, 131, 0, 1)",
+        #     ],
+        #     'thresholds': [80, 120],
+        # },
         "CA12-5_[units/mL]": {
             'x': getXOfLength(n),
             'y': randomVector(n, 16000, 7500),
@@ -160,12 +160,14 @@ def fetchTimeSeries():
 
 class ClinicalData(models.Model):
     patient = models.CharField(max_length=100, unique=True)
+    cohort_code = models.CharField(max_length=255)
     extra_patient_info = models.CharField(max_length=400, blank=True)
     other_diagnosis = models.CharField(max_length=100, blank=True)
     chronic_illnesses = models.CharField(max_length=100, blank=True)
     other_medication = models.CharField(max_length=100, blank=True)
     cancer_in_family = models.CharField(max_length=100, blank=True)
-    time_series = models.TextField(default=fetchTimeSeries)
+    time_series = models.CharField(max_length=255*20, blank=True, null= True)
+    event_series = models.CharField(max_length=255*20, blank=True, null= True)
 
     # enums
     cud_histology = models.CharField(max_length=20, choices=CudHistology.choices)
@@ -224,7 +226,8 @@ class ClinicalData(models.Model):
         validators=[MinValueValidator(0.0), MaxValueValidator(300.0)]
     )
 
-    # aqcuired data from patient
+
+    # acquired data from patient
     has_response_ct = models.BooleanField(default=False)
     has_ctdna = models.BooleanField(default=False)
     has_petct = models.BooleanField(default=False)
@@ -232,7 +235,7 @@ class ClinicalData(models.Model):
     has_singlecell = models.BooleanField(default=False)
     has_germline_control = models.BooleanField(default=False)
     has_paired_freshsample = models.BooleanField(default=False)
-    has_brca_mutation = models.BooleanField(default=False)
+    has_brca_mutation = models.BooleanField(default=False) # ✓
     has_hrd = models.BooleanField(default=False)
 
     @property
@@ -289,3 +292,33 @@ class ClinicalData(models.Model):
                 name="outcome-constraint2",
             ),
         ]
+
+# class RecordEvent(models.TextChoices):
+#     LABORATORY = "LABORATORY", _("laboratory")
+#
+# class RecordName(models.TextChoices):
+#     NAME = "NAME", _("name")
+
+# external means the identifier is from the external database
+
+
+class TimelineRecord(models.Model):
+    external_record_id      = models.IntegerField(unique=True)
+    patient                 = models.ForeignKey(ClinicalData, on_delete=models.CASCADE)
+    event                   = models.CharField(max_length=255)
+    interval                = models.BooleanField(blank=True, null=True)
+    ongoing                 = models.BooleanField(blank=True, null=True)
+    interval_length         = models.IntegerField(blank=True, null=True)
+    date_relative           = models.IntegerField(blank=True, null=True)
+    interval_end_relative   = models.IntegerField(blank=True, null=True)
+    name                    = models.CharField(max_length=255)
+    result                  = models.FloatField(blank=True, null=True)
+    aux_id                  = models.CharField(max_length=255, blank=True, null=True)
+    source_system           = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.external_record_id
+
+    class Meta:
+        constraints = []
+
