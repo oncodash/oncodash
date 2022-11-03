@@ -6,7 +6,7 @@ import random
 import json
 
 # Enums for model
-class CudStageFIGO2014(models.TextChoices):
+class StageFIGO2014(models.TextChoices):
     IA = "IA"
     IB = "IB"
     IC1 = "IC1"
@@ -23,7 +23,7 @@ class CudStageFIGO2014(models.TextChoices):
     IVB = "IVB"
 
 
-class CudTreatmentPhase(models.TextChoices):
+class TreatmentPhase(models.TextChoices):
     PROGRESSION = "PROGRESSION", _("Progression")
     FOLLOWUP = "FOLLOWUP", _("Follow-up")
     PRIMARYCHEMO = "PRIMARYCHEMO", _("Primary chemotherapy")
@@ -31,9 +31,10 @@ class CudTreatmentPhase(models.TextChoices):
     HORMONAL = "HORMONAL", _("Hormonal treatment")
 
 
-class CudTreatmentStrategy(models.TextChoices):
+class TreatmentStrategy(models.TextChoices):
     NACT = "NACT", _("Neo-adjuvant chemotherapy")
     PDS = "PDS", _("Primary debulking surgery")
+    Other = "Other", _("Other")
 
 
 class TissueType(models.TextChoices):
@@ -45,32 +46,98 @@ class TissueType(models.TextChoices):
     ASCITES = "ASCITES", _("Ascites")
 
 
-class CudHistology(models.TextChoices):
+class Histology(models.TextChoices):
     HGSOC = "HGSOC", _("High grade serous ovarian cancer")
     MUCINOUS = "MUCINOUS", _("Mucinous ovarian cancer")
     ENDOMETRIOID = "ENDOMETRIOID", _("Endometrioid")
 
 
-class CudSurvival(models.TextChoices):
+class Survival(models.TextChoices):
     DEATH_UNKNOWN = "DEATHUNKNOWN", _("Death due to unknown reason")
+    DEATH_OTHER = "DEATHOTHER", _("Death due to other reason")
     DEATH_CANCER = "DEATHCANCER", _("Death due to cancer")
     ALIVE = "ALIVE", _("Alive")
 
 
-class CudPrimaryTherapyOutcome(models.TextChoices):
+class PrimaryTherapyOutcome(models.TextChoices):
     PARTIAL = "PARTIAL", _("Partial response")
     COMPLETE = "COMPLETE", _("Complete response")
     PROGRESSIVE = "PROGRESSIVE", _("Progressive disease")
-    DEATH = "DEATH", _("Death during therapy")
-    STOPPED = "STOPPED", _("Stopped")
+    DEATH = "DEATH", _("Died during chemotherapy")
+    PROGRESSIVENACT = "PROGRESSIVENACT", _("Progressive disease after nact")
     STOPPED_SIDEFFECTS = "SIDEEFFECTSTOP", _("Stopped due to side effects")
-    UNKNOWN = "UNKNOWN", _("Unknown response")
+    STABLENACT = "STABLENACT", _("Stable disease after nact")
+    NOCHEMO = "NOCHEMO", _("No chemotherapy")
+    STABLE = "STABLE", _("Stable disease")
 
 
 class MainetenaceTherapy(models.TextChoices):
     NOMAINTENANCE = "NOMAINTENANCE", _("No maintenance therapy")
     BEVACIZUMAB = "BEVACIZUMAB", _("Bevacizumab")
     PARPI = "PARPI", _("PARP inhibition therapy")
+
+
+class ChronicIllnesses(models.TextChoices):
+    ASTMA = "ASTMA", _("Asma")
+    ARTHRORISARTRITIS = "ARTHRORISARTRITIS", _("Arthroris/artritis")
+    PARPI = "PARPI", _("Flimmer")
+    COPD = "COPD", _("COPD")
+    COLITISULSEROSA =  "COLITIS ULSEROSA", _("Colitis ulserosa")
+    DEPRESSION = "DEPRESSION", _("Depression")
+    DIABETESTYPE2 = "DIABETES TYPE2", _("Diabetes type2")
+    EPILEPSY ="EPILEPSY", _("Epilepsy")
+    FIBROMYALGIA = "FIBROMYALGIA", _("Fibromyalgia")
+    GLAUCOMA = "GLAUCOMA", _("Glaucoma")
+    HYPERCHOLESTEROLEMIA =  "HYPERCHOLESTEROLEMIA", _("Hypercholesterolemia")
+    HYPERTENSION = "HYPERTENSION", _("Hypertension")
+    HYPOTHYREOSIS = "HYPOTHYREOSIS", _("Hypothyreosis")
+    MCC =  "MCC", _("MCC")
+    MYOCARDIALINFARCT = "MYOCARDIAL INFARCT", _("Myocardial infarct")
+    OSTEOPOROSIS = "OSTEOPOROSIS", _("Osteoporosis")
+    PULMONARYEMBO = "PULMONARY EMBO", _("Pulmonary Embo")
+    STROKE = "STROKE", _("Stroke")
+    REFLUX = "REFLUX", _("Reflux")
+    RENALINSUFFIENCY = "RENAL INSUFFIENCY", _("Renal insuffiency")
+    REUMATOIDARTRITIS = "REUMATOID ARTRITIS", _("Reumatoid artritis")
+    SCHITZOPHRENIA = "SCHITZOPHRENIA", _("Schitzophrenia")
+    VENOUSTROMB = "VENOUS TROMB", _("Venous tromb")
+    OTHER = "OTHER", _("Other")
+
+
+class ResidualTumorPDS(models.TextChoices):
+    ZERO = "ZERO", _("0")
+    ZEROTEN = "ZEROTEN", _("1 to 10mm")
+    OVERTEN = "OVERTEN", _("more than 10mm")
+
+
+class ResidualTumorIDS(models.TextChoices):
+    ZERO = "ZERO", _("0")
+    ZEROTEN = "ZEROTEN", _("1 to 10mm")
+    OVERTEN = "OVERTEN", _("more than 10mm")
+
+
+class BRCAMutation(models.TextChoices):
+    NOBRCA = "NOBRCA", _("No BRCA mut")
+    BRCA1TUMOR = "BRCA1TUMOR", _("BRCA1 in tumor")
+    BRCA1BLOOD = "BRCA1BLOOD", _("BRCA1 in blood")
+    BRCA2TUMOR = "BRCA2TUMOR", _("BRCA2 in tumor")
+    BRCA2BLOOD = "BRCA2BLOOD", _("BRCA2 in blood")
+
+
+class HRPretreatmentWGS(models.TextChoices):
+    HRD = "HRD", _("HRD")
+    HRP = "HRP", _("HRP")
+
+
+class HRPerPatient(models.TextChoices):
+    HRD = "HRD", _("HRD")
+    HRP = "HRP", _("HRP")
+
+
+class HRDMyriadStatus(models.TextChoices):
+    HRDPOSITIVE = "HRDPOSITIVE", _("HRD positive")
+    HRDNEGATIVE = "HRDNEGATIVE", _("HRD negative")
+
 
 def randomVector(n, a = 10, b = 0):
     vec = []
@@ -80,7 +147,7 @@ def randomVector(n, a = 10, b = 0):
         if (rand < 0):
             rand = 0
         vec.append(rand)
-    
+
     return vec
 
 
@@ -159,84 +226,682 @@ def fetchTimeSeries():
 
 
 class ClinicalData(models.Model):
-    patient = models.CharField(max_length=100, unique=True)
+    patient_id = models.CharField(max_length=100, unique=True)
+    '''
+    "patient_id": {
+        "category": "identifier",
+        "dataType": "integer",
+        "unit": null,
+        "notNull": true,
+        "listVariable": false,
+        "importance": 1,
+        "description": "Unique patient identifier",
+        "comment": "",
+        "originalOvcabaseColumn": "Patient ID",
+        "alreadyVisualized": true
+    },
+    '''
+
     cohort_code = models.CharField(max_length=255)
-    extra_patient_info = models.CharField(max_length=400, blank=True)
-    other_diagnosis = models.CharField(max_length=100, blank=True)
-    chronic_illnesses = models.CharField(max_length=100, blank=True)
-    other_medication = models.CharField(max_length=100, blank=True)
-    cancer_in_family = models.CharField(max_length=100, blank=True)
+    '''
+    "cohort_code": {
+        "category": "identifier",
+        "dataType": "string",
+        "unit": null,
+        "notNull": true,
+        "listVariable": false,
+        "importance": 1,
+        "description": "Alternative patient identifier",
+        "comment": "",
+        "originalOvcabaseColumn": "Patient card::Patient cohort code_Patient Card",
+        "alreadyVisualized": false
+    },
+    '''
+
+    # extra_patient_info = models.CharField(max_length=400, blank=True)
+    # other_diagnosis = models.CharField(max_length=100, blank=True)
+
+    chronic_illnesses_at_dg = models.BooleanField(blank=True)
+    '''
+    "chronic_illnesses_at_dg": {
+            "category": "additional baseline",
+            "dataType": "boolean",
+            "unit": null,
+            "notNull": false,
+            "listVariable": false,
+            "importance": 2,
+            "description": "",
+            "comment": "",
+            "originalOvcabaseColumn": "Chronic illnesses at Dg",
+            "alreadyVisualized": false
+        },
+    '''
+    chronic_illnesses_type = models.CharField(max_length=100, blank=True, choices=ChronicIllnesses.choices)
+    '''"chronic_illnesses_type": {
+            "category": "additional baseline",
+            "dataType": "string",
+            "unit": null,
+            "notNull": false,
+            "listVariable": true,
+            "importance": 2,
+            "description": "What illnesses patient had at time of diagnosis (from value list)",
+            "comment": "",
+            "originalOvcabaseColumn": "Chronic illnesses type",
+            "alreadyVisualized": false,
+            "valueSpace": [
+                "Astma",
+                "Arthroris/artritis",
+                "Flimmer",
+                "COPD",
+                "Colitis ulserosa",
+                "Depression",
+                "Diabetes type2",
+                "Epilepsy",
+                "Fibromyalgia",
+                "Glaucoma",
+                "Hypercholesterolemia",
+                "Hypertension",
+                "Hypothyreosis",
+                "MCC",
+                "Myocardial infarct",
+                "Osteoporosis",
+                "Pulmonary Embo",
+                "Stroke",
+                "Reflux",
+                "Renal insuffiency",
+                "Reumatoid artritis",
+                "Schitzophrenia",
+                "Venous tromb",
+                "Other"
+            ]
+        },
+    '''
+    # other_medication = models.CharField(max_length=100, blank=True)
+    # cancer_in_family = models.CharField(max_length=100, blank=True)
     time_series = models.CharField(max_length=255*20, blank=True, null= True)
     event_series = models.CharField(max_length=255*20, blank=True, null= True)
 
     # enums
-    cud_histology = models.CharField(max_length=20, choices=CudHistology.choices)
+    histology = models.CharField(max_length=20, choices=Histology.choices)
+    '''
+    "histology": {
+        "category": "baseline",
+        "dataType": "string",
+        "unit": null,
+        "notNull": true,
+        "listVariable": false,
+        "importance": 1,
+        "description": "",
+        "comment": "Are other values than high-grade serous even needed here or should they be filtered out?: Let\u00b4s filter them out",
+        "originalOvcabaseColumn": "CUD_Histology",
+        "alreadyVisualized": true,
+        "valueSpace": [
+            "high grade serous"
+        ]
+    },
+    '''
 
-    disease_origin = models.CharField(
-        max_length=20, choices=TissueType.choices, blank=True
-    )
+    #disease_origin = models.CharField(max_length=20, choices=TissueType.choices, blank=True)
 
-    cud_stage = models.CharField(max_length=20, choices=CudStageFIGO2014.choices)
+    stage = models.CharField(max_length=20, choices=StageFIGO2014.choices)
+    ''' 
+        "stage": {
+            "category": "baseline",
+            "dataType": "string",
+            "unit": null,
+            "notNull": false,
+            "listVariable": false,
+            "importance": 1,
+            "description": "FIGO2014 classification of disease spread at diagnosis",
+            "comment": "",
+            "originalOvcabaseColumn": "CUD_Stage_FIGO2014",
+            "alreadyVisualized": true,
+            "valueSpace": [
+                "IA",
+                "IB",
+                "IC1",
+                "IC2",
+                "IC3",
+                "IIA",
+                "IIB",
+                "IIIA1",
+                "IIIA2",
+                "IIIB",
+                "IIIC",
+                "IVA",
+                "IVB"
+            ]
+        },
+        '''
 
-    cud_primary_therapy_outcome = models.CharField(
-        max_length=20, choices=CudPrimaryTherapyOutcome.choices, blank=True
-    )
+    primary_therapy_outcome = models.CharField(max_length=20, choices=PrimaryTherapyOutcome.choices)
+    '''
+    "primary_therapy_outcome": {
+            "category": "outcome",
+            "dataType": "string",
+            "unit": null,
+            "notNull": true,
+            "listVariable": false,
+            "importance": 1,
+            "description": "RECIST class of primary therapy outcome",
+            "comment": "",
+            "originalOvcabaseColumn": "CUD_Primary therapy outcome",
+            "alreadyVisualized": true,
+            "valueSpace": [
+                "progressive disease",
+                "complete response",
+                "partial response",
+                "progressive disease after nact",
+                "stable disease after nact",
+                "died during chemotherapy",
+                "stopped due to side effects",
+                "no chemotherapy",
+                "stable disease"
+            ]
+        },
+    '''
+    survival = models.CharField(max_length=20, choices=Survival.choices)
+    '''
+        "survival": {
+            "category": "outcome",
+            "dataType": "string",
+            "unit": null,
+            "notNull": true,
+            "listVariable": false,
+            "importance": 1,
+            "description": "",
+            "comment": "",
+            "originalOvcabaseColumn": "CUD_Survival",
+            "alreadyVisualized": true,
+            "valueSpace": [
+                "alive",
+                "death due to cancer",
+                "death due to other reason",
+                "death reason unknown"
+            ]
+        },
+        '''
 
-    cud_survival = models.CharField(max_length=20, choices=CudSurvival.choices)
+    treatment_strategy = models.CharField(max_length=20, choices=TreatmentStrategy.choices)
+    '''
+    "treatment_strategy": {
+            "category": "baseline",
+            "dataType": "string",
+            "unit": null,
+            "notNull": true,
+            "listVariable": false,
+            "importance": 1,
+            "description": "",
+            "comment": "Other means either palliative or atypical. Mostly PDS or NACT",
+            "originalOvcabaseColumn": "CUD_Treatment strategy",
+            "alreadyVisualized": true,
+            "valueSpace": [
+                "PDS",
+                "NACT",
+                "Other"
+            ]
+        },
+        '''
 
-    cud_treatment_strategy = models.CharField(
-        max_length=20, choices=CudTreatmentStrategy.choices
-    )
+    # current_treatment_phase = models.CharField(max_length=20, choices=TreatmentPhase.choices)
 
-    cud_current_treatment_phase = models.CharField(
-        max_length=20, choices=CudTreatmentPhase.choices
-    )
-
-    maintenance_therapy = models.CharField(
-        max_length=25, choices=MainetenaceTherapy.choices
-    )
+    # maintenance_therapy = models.CharField(max_length=25, choices=MainetenaceTherapy.choices)
 
     # extra info related to the enums
-    cud_stage_info = models.CharField(max_length=200, blank=True)
-    progression_detection_method = models.CharField(max_length=100, blank=True)
+    # progression_detection_method = models.CharField(max_length=100, blank=True)
 
     # chemo cycles info
-    primary_chemo_cycles = models.PositiveIntegerField(null=True)
-    nact_cycles = models.PositiveIntegerField(null=True)
-    post_ids_cycles = models.PositiveIntegerField(null=True)
+    # primary_chemo_cycles = models.PositiveIntegerField(null=True)
+    # nact_cycles = models.PositiveIntegerField(null=True)
+    # post_ids_cycles = models.PositiveIntegerField(null=True)
 
     # Dates
-    cud_time_of_diagnosis = models.DateTimeField(blank=True, null=True)
-    primary_operation_date = models.DateTimeField(blank=True, null=True)
-    primary_laprascopy_date = models.DateTimeField(blank=True, null=True)
-    secondary_operation_date = models.DateTimeField(blank=True, null=True)
-    last_followup_visit = models.DateTimeField(blank=True, null=True)
-    next_followup_visit = models.DateTimeField(blank=True, null=True)
-    cud_progression_date = models.DateTimeField(blank=True, null=True)
-    cud_last_primary_chemo = models.DateTimeField(blank=True, null=True)
-    cud_date_of_outcome = models.DateTimeField(blank=True, null=True)
-    cud_date_of_death = models.DateTimeField(blank=True, null=True)
-    maintenance_therapy_end = models.DateTimeField(blank=True, null=True)
-    response_ct_date = models.DateTimeField(blank=True, null=True)
+    followup_time = models.IntegerField(null=True)
+    '''
+    "followup_time": {
+            "category": "outcome",
+            "dataType": "integer",
+            "unit": "day",
+            "notNull": false,
+            "listVariable": false,
+            "importance": 1,
+            "description": "",
+            "comment": "",
+            "originalOvcabaseColumn": "CUD_Follow up time_months from Dg alive",
+            "alreadyVisualized": false
+        },
+    '''
+
+    platinum_free_interval_at_update = models.IntegerField(null=True)
+    '''
+            "platinum_free_interval_at_update": {
+            "category": "outcome",
+            "dataType": "integer",
+            "unit": "day",
+            "notNull": false,
+            "listVariable": false,
+            "importance": 1,
+            "description": "Lower limit of platinum free interval, which is equal to time from last day of primary therapy to followup, if not relapsed",
+            "comment": "Null, if progressed",
+            "originalOvcabaseColumn": "PFI at outcome update when no prog",
+            "alreadyVisualized": false
+        },
+    '''
+
+    platinum_free_interval = models.IntegerField(null=True)
+    '''
+    "platinum_free_interval": {
+            "category": "outcome",
+            "dataType": "integer",
+            "unit": "day",
+            "notNull": false,
+            "listVariable": false,
+            "importance": 1,
+            "description": "Time from last day of primary therapy to progression",
+            "comment": "Null, if not progressed",
+            "originalOvcabaseColumn": "CUD_Platinum free interval days if Prog",
+            "alreadyVisualized": false
+        },
+    '''
+
+    days_to_progression = models.IntegerField(null=True)
+    '''
+    "days_to_progression": {
+            "category": "outcome",
+            "dataType": "integer",
+            "unit": "day",
+            "notNull": false,
+            "listVariable": false,
+            "importance": 1,
+            "description": "Days from diagnosis to first progression",
+            "comment": "Also in timeline dataset, event \"primary_progression\", is this needed here?",
+            "originalOvcabaseColumn": "CUD_Time to progression_days",
+            "alreadyVisualized": false
+        },
+    '''
+
+    days_from_beva_maintenance_end_to_progression = models.IntegerField(null=True)
+    '''
+    "days_from_beva_maintenance_end_to_progression": {
+            "category": "outcome",
+            "dataType": "integer",
+            "unit": "day",
+            "notNull": false,
+            "listVariable": false,
+            "importance": 2,
+            "description": "Days from end of bevacizumab maintenance end to progression",
+            "comment": "",
+            "originalOvcabaseColumn": "TFIbev Time from end of beva maintenance to prog",
+            "alreadyVisualized": false
+        },
+    '''
+
+    days_to_death = models.IntegerField(null=True)
+    '''
+    "days_to_death": {
+                "category": "outcome",
+                "dataType": "integer",
+                "unit": "day",
+                "notNull": false,
+                "listVariable": false,
+                "importance": 1,
+                "description": "Days from diagnosis to death",
+                "comment": "Also in timeline dataset, event \"death\", is this needed here?",
+                "originalOvcabaseColumn": "CUD_Time to death_days",
+                "alreadyVisualized": false
+            },    
+    '''
+
+    # time_of_diagnosis = models.DateTimeField(blank=True, null=True)
+    # primary_operation_date = models.DateTimeField(blank=True, null=True)
+    # primary_laprascopy_date = models.DateTimeField(blank=True, null=True)
+    # secondary_operation_date = models.DateTimeField(blank=True, null=True)
+    # last_followup_visit = models.DateTimeField(blank=True, null=True)
+    # next_followup_visit = models.DateTimeField(blank=True, null=True)
+    # progression_date = models.DateTimeField(blank=True, null=True)
+    # last_primary_chemo = models.DateTimeField(blank=True, null=True)
+    # date_of_outcome = models.DateTimeField(blank=True, null=True)
+    # date_of_death = models.DateTimeField(blank=True, null=True)
+    # maintenance_therapy_end = models.DateTimeField(blank=True, null=True)
+    # response_ct_date = models.DateTimeField(blank=True, null=True)
 
     # Basic patient info
-    age = models.PositiveIntegerField(validators=[MaxValueValidator(150)])
-    height = models.PositiveIntegerField(validators=[MaxValueValidator(250)])  # cm
-    weight = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(300.0)]
-    )
+    age_at_diagnosis = models.PositiveIntegerField(validators=[MaxValueValidator(150)])
+    '''
+    "age_at_diagnosis": {
+            "category": "baseline",
+            "dataType": "float",
+            "unit": "year",
+            "notNull": true,
+            "listVariable": false,
+            "importance": 1,
+            "description": "",
+            "comment": "",
+            "originalOvcabaseColumn": "Age at Diagnosis",
+            "alreadyVisualized": true
+        },
+    '''
+    height_at_diagnosis = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(300.0)])
+    '''
+    "height_at_diagnosis": {
+            "category": "baseline",
+            "dataType": "float",
+            "unit": "meter",
+            "notNull": true,
+            "listVariable": false,
+            "importance": 2,
+            "description": "",
+            "comment": "",
+            "originalOvcabaseColumn": "Height at dg",
+            "alreadyVisualized": false
+        },
+    '''
+    weight_at_diagnosis = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(500.0)])
+    '''
+    "weight_at_diagnosis": {
+            "category": "baseline",
+            "dataType": "float",
+            "unit": "kilogram",
+            "notNull": true,
+            "listVariable": false,
+            "importance": 2,
+            "description": "",
+            "comment": "",
+            "originalOvcabaseColumn": "Weight at dg",
+            "alreadyVisualized": false
+        },
+    '''
+    bmi_at_diagnosis = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
+    '''
+    "bmi_at_diagnosis": {
+        "category": "baseline",
+        "dataType": "float",
+        "unit": "kilogram / meter / meter",
+        "notNull": true,
+        "listVariable": false,
+        "importance": 2,
+        "description": "Body mass index at diagnosis",
+        "comment": "",
+        "originalOvcabaseColumn": "BMI at Dg",
+        "alreadyVisualized": true
+    },
+    '''
 
+    # Acquired data from patient
+    previous_cancer = models.BooleanField(null=True)
+    '''
+    "previous_cancer": {
+            "category": "additional baseline",
+            "dataType": "boolean",
+            "unit": null,
+            "notNull": false,
+            "listVariable": false,
+            "importance": 2,
+            "description": "",
+            "comment": "",
+            "originalOvcabaseColumn": "Previous cancer yes no",
+            "alreadyVisualized": false
+        },
+    '''
+    previous_cancer_diagnosis = models.CharField(max_length=1000, null=True)
+    '''
+    "previous_cancer_diagnosis": {
+            "category": "additional baseline",
+            "dataType": "string",
+            "unit": null,
+            "notNull": false,
+            "listVariable": false,
+            "importance": 1,
+            "description": "Previous cancer as free text, no ICD-10 code",
+            "comment": "",
+            "originalOvcabaseColumn": "Previous cancer dg",
+            "alreadyVisualized": false
+        },
+    '''
 
-    # acquired data from patient
-    has_response_ct = models.BooleanField(default=False)
-    has_ctdna = models.BooleanField(default=False)
-    has_petct = models.BooleanField(default=False)
-    has_wgs = models.BooleanField(default=False)
-    has_singlecell = models.BooleanField(default=False)
-    has_germline_control = models.BooleanField(default=False)
-    has_paired_freshsample = models.BooleanField(default=False)
-    has_brca_mutation = models.BooleanField(default=False) # ✓
-    has_hrd = models.BooleanField(default=False)
+    progression = models.BooleanField()
+    '''
+    "progression": {
+            "category": "outcome",
+            "dataType": "boolean",
+            "unit": null,
+            "notNull": true,
+            "listVariable": false,
+            "importance": 1,
+            "description": "Whether or not the disease has progressed",
+            "comment": "",
+            "originalOvcabaseColumn": "CUD_Progression",
+            "alreadyVisualized": false
+        },
+    '''
+
+    operation1_cancelled = models.BooleanField(null=True)
+    '''
+    "operation1_cancelled": {
+            "category": "operation",
+            "dataType": "boolean",
+            "unit": null,
+            "notNull": false,
+            "listVariable": false,
+            "importance": 2,
+            "description": "",
+            "comment": "",
+            "originalOvcabaseColumn": "Oper1_cancelled",
+            "alreadyVisualized": false
+        },
+    '''
+
+    residual_tumor_pds = models.CharField(max_length=100, null=True, choices=ResidualTumorPDS.choices)
+    '''
+    "residual_tumor_pds": {
+            "category": "operation",
+            "dataType": "string",
+            "unit": null,
+            "notNull": false,
+            "listVariable": false,
+            "importance": 1,
+            "description": "How much tumor is left in patient after primary debulking surgery (PDS)",
+            "comment": "",
+            "originalOvcabaseColumn": "Residual tumor PDS",
+            "alreadyVisualized": false,
+            "valueSpace": [
+                "0",
+                "1 to 10mm",
+                "more than 10mm"
+            ]
+        },
+    '''
+
+    wgs_available = models.BooleanField()
+    '''
+    "wgs_available": {
+            "category": "subset",
+            "dataType": "boolean",
+            "unit": null,
+            "notNull": true,
+            "listVariable": false,
+            "importance": 1,
+            "description": "Any sample in any time point where WGS is flagged OK",
+            "comment": "maybe some other source more reliable for this than Ovcabase?",
+            "originalOvcabaseColumn": "Patient card::Patient with any WGS samples",
+            "alreadyVisualized": false
+        },
+    '''
+
+    operation2_cancelled = models.BooleanField(null=True)
+    '''
+    "operation2_cancelled": {
+            "category": "operation",
+            "dataType": "boolean",
+            "unit": null,
+            "notNull": false,
+            "listVariable": false,
+            "importance": 1,
+            "description": "",
+            "comment": "",
+            "originalOvcabaseColumn": "Oper2_cancelled",
+            "alreadyVisualized": false
+        },
+    '''
+
+    residual_tumor_ids = models.CharField(max_length=100, null=True, choices=ResidualTumorIDS.choices)
+    '''
+    "residual_tumor_ids": {
+            "category": "operation",
+            "dataType": "string",
+            "unit": null,
+            "notNull": false,
+            "listVariable": false,
+            "importance": 1,
+            "description": "How much tumor is left in patient after interval debulking surgery (IDS)",
+            "comment": "",
+            "originalOvcabaseColumn": "Residual tumor IDS",
+            "alreadyVisualized": false,
+            "valueSpace": [
+                "0",
+                "1 to 10mm",
+                "more than 10mm"
+            ]
+        },
+    '''
+
+    debulking_surgery_ids = models.BooleanField(null=True)
+    '''
+    "debulking_surgery_ids": {
+            "category": "operation",
+            "dataType": "boolean",
+            "unit": null,
+            "notNull": false,
+            "listVariable": false,
+            "importance": 1,
+            "description": "Is tumor mass surgically removed in IDS or not",
+            "comment": "",
+            "originalOvcabaseColumn": "Oper2_debulking surgery",
+            "alreadyVisualized": false
+        },
+    '''
+
+    brca_mutation_status = models.CharField(max_length=100, null=True, choices=BRCAMutation.choices)
+    '''
+    "brca_mutation_status": {
+        "category": "basic genetic info",
+        "dataType": "string",
+        "unit": null,
+        "notNull": false,
+        "listVariable": true,
+        "importance": 1,
+        "description": "Sources both clinical test (Ovcabase) and Decider",
+        "comment": "",
+        "originalOvcabaseColumn": "BRCA mutation status",
+        "alreadyVisualized": true,
+        "valueSpace": [
+            "No BRCA mut",
+            "BRCA1 in tumor",
+            "BRCA1 in blood",
+            "BRCA2 in tumor",
+            "BRCA2 in blood"
+        ]
+    },
+    '''
+
+    hr_signature_pretreatment_wgs = models.CharField(max_length=100, null=True, choices=HRPretreatmentWGS.choices)
+    '''
+    "hr_signature_pretreatment_wgs": {
+            "category": "basic genetic info",
+            "dataType": "string",
+            "unit": null,
+            "notNull": false,
+            "listVariable": false,
+            "importance": 1,
+            "description": "HRsignature patient level HautaniemiLab",
+            "comment": "only pretreatment WGS samples included",
+            "originalOvcabaseColumn": "HR signature SBS3 pretreatment WGS",
+            "alreadyVisualized": false,
+            "valueSpace": [
+                "HRD",
+                "HRP"
+            ]
+        },
+    '''
+
+    hr_signature_per_patient = models.CharField(max_length=100, null=True, choices=HRPerPatient.choices)
+    '''
+    "hr_signature_per_patient": {
+        "category": "basic genetic info",
+        "dataType": "string",
+        "unit": null,
+        "notNull": false,
+        "listVariable": false,
+        "importance": 1,
+        "description": "HRsignature HautaniemiLab",
+        "comment": "WEG, WES, pretreatment/postNACT",
+        "originalOvcabaseColumn": "HR signature SBS3 per patient",
+        "alreadyVisualized": false,
+        "valueSpace": [
+            "HRD",
+            "HRP"
+        ]
+    },
+    '''
+
+    hrd_myriad_status = models.CharField(max_length=100, null=True, choices=HRDMyriadStatus.choices)
+    '''
+    "hrd_myriad_status": {
+        "category": "basic genetic info",
+        "dataType": "string",
+        "unit": null,
+        "notNull": false,
+        "listVariable": false,
+        "importance": 1,
+        "description": "Commercial validated HRD test",
+        "comment": "",
+        "originalOvcabaseColumn": "HRD Myriad status",
+        "alreadyVisualized": false,
+        "valueSpace": [
+            "HRD positive",
+            "HRD negative"
+        ]
+    }
+    '''
+
+    sequencing_available = models.BooleanField()
+    '''
+    "sequencing_available": {
+            "category": "subset",
+            "dataType": "boolean",
+            "unit": null,
+            "notNull": true,
+            "listVariable": false,
+            "importance": 1,
+            "description": "If there are at least one WGS or RNASeq done from patient's fresh tissue samples",
+            "comment": "maybe some other source more reliable for this than Ovcabase?",
+            "originalOvcabaseColumn": "Patient card::Patient with any sequenced tissue",
+            "alreadyVisualized": false
+        },```
+    '''
+
+    paired_fresh_samples_available = models.BooleanField()
+    '''
+    "paired_fresh_samples_available": {
+            "category": "subset",
+            "dataType": "boolean",
+            "unit": null,
+            "notNull": true,
+            "listVariable": false,
+            "importance": 1,
+            "description": "any fresh sample pair available: primary+IDS, primary+residive or IDS+residive",
+            "comment": "This in manually filled info in Ovcabase, not always up to date?",
+            "originalOvcabaseColumn": "Patient card::Patient with paired fresh samples",
+            "alreadyVisualized": false
+        },
+        '''
+
+    # has_response_ct = models.BooleanField(default=False)
+    # has_ctdna = models.BooleanField(default=False)
+    # has_petct = models.BooleanField(default=False)
+
+    # has_singlecell = models.BooleanField(default=False)
+    # has_germline_control = models.BooleanField(default=False)
 
     @property
     def bmi(self):
@@ -251,46 +916,46 @@ class ClinicalData(models.Model):
     #                                          5. oper2 6.prog, 7.out, 8.death
     class Meta:
         constraints = [
-            models.CheckConstraint(
-                check=Q(primary_laprascopy_date__lt=F("cud_time_of_diagnosis")),
-                name="lapra-constraint1",
-            ),
-            models.CheckConstraint(
-                check=Q(cud_time_of_diagnosis__lt=F("primary_operation_date")),
-                name="diagnosis-constraint1",
-            ),
-            models.CheckConstraint(
-                check=Q(primary_operation_date__lt=F("cud_last_primary_chemo")),
-                name="operation-constraint1",
-            ),
-            models.CheckConstraint(
-                check=Q(primary_operation_date__lt=F("secondary_operation_date")),
-                name="operation-constraint2",
-            ),
-            models.CheckConstraint(
-                check=Q(primary_operation_date__lt=F("last_followup_visit")),
-                name="followup-constraint1",
-            ),
-            models.CheckConstraint(
-                check=Q(last_followup_visit__lt=F("next_followup_visit")),
-                name="followup-constraint2",
-            ),
-            models.CheckConstraint(
-                check=Q(cud_last_primary_chemo__lt=F("maintenance_therapy_end")),
-                name="maintenance-constraint1",
-            ),
-            models.CheckConstraint(
-                check=Q(maintenance_therapy_end__lt=F("cud_progression_date")),
-                name="progression-constraint1",
-            ),
-            models.CheckConstraint(
-                check=Q(cud_progression_date__lt=F("cud_date_of_death")),
-                name="outcome-constraint1",
-            ),
-            models.CheckConstraint(
-                check=Q(cud_date_of_outcome__lt=F("cud_date_of_death")),
-                name="outcome-constraint2",
-            ),
+            # models.CheckConstraint(
+            #     check=Q(primary_laprascopy_date__lt=F("time_of_diagnosis")),
+            #     name="lapra-constraint1",
+            # ),
+            # models.CheckConstraint(
+            #     check=Q(time_of_diagnosis__lt=F("primary_operation_date")),
+            #     name="diagnosis-constraint1",
+            # ),
+            # models.CheckConstraint(
+            #     check=Q(primary_operation_date__lt=F("last_primary_chemo")),
+            #     name="operation-constraint1",
+            # ),
+            # models.CheckConstraint(
+            #     check=Q(primary_operation_date__lt=F("secondary_operation_date")),
+            #     name="operation-constraint2",
+            # ),
+            # models.CheckConstraint(
+            #     check=Q(primary_operation_date__lt=F("last_followup_visit")),
+            #     name="followup-constraint1",
+            # ),
+            # models.CheckConstraint(
+            #     check=Q(last_followup_visit__lt=F("next_followup_visit")),
+            #     name="followup-constraint2",
+            # ),
+            # models.CheckConstraint(
+            #     check=Q(last_primary_chemo__lt=F("maintenance_therapy_end")),
+            #     name="maintenance-constraint1",
+            # ),
+            # # models.CheckConstraint(
+            #     check=Q(maintenance_therapy_end__lt=F("progression_date")),
+            #     name="progression-constraint1",
+            # ),
+            # models.CheckConstraint(
+            #     check=Q(progression_date__lt=F("date_of_death")),
+            #     name="outcome-constraint1",
+            # ),
+            # models.CheckConstraint(
+            #     check=Q(date_of_outcome__lt=F("date_of_death")),
+            #     name="outcome-constraint2",
+            # ),
         ]
 
 # class RecordEvent(models.TextChoices):
