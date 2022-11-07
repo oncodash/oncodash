@@ -61,7 +61,7 @@ function App() {
             try{
                 // setToken(cookie["token"]);
                 // setLogged(true);
-                console.log(cookie);
+                // console.log(cookie);
                 setWaiting(true);
                 const patients = await API.getPatients(token);
                 setPatients([...patients]);
@@ -80,7 +80,7 @@ function App() {
   const getFilteredPatients = () =>{
     let filteredPatients = [...patients];
     if(filter!=="")
-      filteredPatients = filteredPatients.filter(p=>String(p.id).includes(String(filter)) || String(p.stage).toLowerCase().includes(String(filter).toLowerCase()));
+      filteredPatients = filteredPatients.filter(p=>String(p.patient_id).includes(String(filter)) || String(p.stage).toLowerCase().includes(String(filter).toLowerCase()));
     if(statusFilter!=="")
       filteredPatients = filteredPatients.filter(p=>String(p.survival).toLowerCase()===String(statusFilter).toLowerCase()); 
     return filteredPatients;

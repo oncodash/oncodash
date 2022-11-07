@@ -14,6 +14,11 @@ function Navigator(props) {
         props.setFilterCallback("");
     };
 
+    const changeStatusFilter = (filter)=>{
+        props.setStatusFilterCallback(filter);
+        props.firstPageCallback();
+    };
+
     return(
             <>
             <Navbar  expand="lg">
@@ -37,10 +42,12 @@ function Navigator(props) {
                                 <Nav navbarScroll className="d-flex justify-content-end w-100" >
 
                                     <NavDropdown id="status" className="mx-1 border border-secondary rounded" title={<div style={{float: 'left'}}><div className="d-flex align-items-center float"><Tag className="mr-1 fa-lg"/><div className="px-1  fs-6">Status</div></div></div>}>
-                                        <NavDropdown.Item onClick={()=>props.setStatusFilterCallback("ALIVE")}>Alive</NavDropdown.Item>
-                                        <NavDropdown.Item onClick={()=>props.setStatusFilterCallback("DEAD")}>Dead</NavDropdown.Item>
+                                        <NavDropdown.Item onClick={()=>changeStatusFilter("alive")}>Alive</NavDropdown.Item>
+                                        <NavDropdown.Item onClick={()=>changeStatusFilter("death due to cancer")}>Death due to cancer</NavDropdown.Item>
+                                        <NavDropdown.Item onClick={()=>changeStatusFilter("death reason unknown")}>Death reason unknown</NavDropdown.Item>
+                                        <NavDropdown.Item onClick={()=>changeStatusFilter("death due to other reason")}>Death due to other reason</NavDropdown.Item>
                                         <NavDropdown.Divider />
-                                        <NavDropdown.Item onClick={()=>props.setStatusFilterCallback("")}>
+                                        <NavDropdown.Item onClick={()=>changeStatusFilter("")}>
                                             Remove
                                         </NavDropdown.Item>
                                     </NavDropdown>

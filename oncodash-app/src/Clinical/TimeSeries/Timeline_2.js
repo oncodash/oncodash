@@ -18,10 +18,24 @@ function create_chart(dayzero, time_series, name){
     let points = [];
     let points_below = [];
     let points_above = [];
+    let derivative = [];
+    let derivative_left  = [];
+    const derivative_threshold = 50;
     // let isca125 = name === "ca125";
     let thresholds = time_series.thresholds;
     if(name === "ca125"){
-        thresholds = [-10, 80000];
+        thresholds = [-10, 10000] //[-10, 8000];
+        let diff_x;
+        let diff_y;
+        for(let i=1; i<time_series.sparse_x.length; i++){
+            diff_y = time_series.sparse_y[i]-time_series.sparse_y[i-1];
+            diff_x = Math.abs(time_series.sparse_x[i]-time_series.sparse_x[i-1]);
+            derivative.push(diff_y/diff_x);
+            // console.log("diff_y: ", diff_y);
+            // console.log("diff_x: ", diff_x);
+        }
+        // console.log("derivative: ", derivative);
+        // console.log("time_series: ", time_series);
     }
     if(name === "hb"){
         thresholds = [117, 155];
@@ -37,6 +51,7 @@ function create_chart(dayzero, time_series, name){
     }
     // let min_x_value = Math.min(...time_series.x);
     // time_series.x = time_series.x.map(x=>x-min_x_value+1);
+    let max_y = Math.max.apply(null, time_series.y)*1.2;
     for(let i=0; i<time_series.x.length; i++){
         let date = new Date(dayzero);
         // console.log("date: ", date)
@@ -45,22 +60,68 @@ function create_chart(dayzero, time_series, name){
         // console.log("x: ", time_series.x[i])
         points.push({x: date, y: time_series.y[i]})
         //below
-        if(time_series.y[i]!==null){
-            if(time_series.y[i]<thresholds[0]){
-                points_below.push({x: date, y: [0, time_series.y[i]]})  
-            }else{  
-                points_below.push({x: date, y: [null, null]})
-            }
-            //above
-            if(time_series.y[i]>thresholds[1]){
-                points_above.push({x: date, y: [time_series.y[i], Math.max.apply(null, time_series.y)*1.2]})
-            }else{
-                points_above.push({x: date, y: [null, null]})
+        if(name!=="ca125"){
+            if(time_series.y[i]!==null){
+                if(time_series.y[i]<thresholds[0]){
+                    points_below.push({x: date, y: [0, time_series.y[i]], markerType: "circle",  markerSize: 10})  
+                }else{  
+                    points_below.push({x: date, y: [null, null]})
+                }
+                //above
+                if(time_series.y[i]>thresholds[1]){
+                    points_above.push({x: date, y: [time_series.y[i], max_y], markerType: "circle",  markerSize: 10})
+                }else{
+                    points_above.push({x: date, y: [null, null]});
+                }
             }
         }
         
-        
     }
+    if(name==="ca125"){
+        let k = -1;
+        for(let i=0; i<time_series.x.length; i++){
+            let date = new Date(dayzero);
+            date.setDate(date.getDate() + time_series.x[i]);
+            if(time_series.sparse_x.includes(time_series.x[i])){    
+                k = k + 1; 
+                if(k>0){
+                    // console.log("included: ", time_series.x[i]);
+                    // console.log("derivative[k-1]: ", derivative[k-1]);
+                    let previous_day = new Date(dayzero);
+                    previous_day.setDate(previous_day.getDate() + time_series.sparse_x[k-1]);
+                    if(derivative[k-1]>derivative_threshold){
+                        points_above.push({x: previous_day, y: [time_series.sparse_y[k-1], max_y]});
+                        points_above.push({x: date, y: [time_series.y[i], max_y], 
+                            // markerType: "circle",  markerSize: 10
+                        });
+                        points_below.push({x: date, y: [null, null]});
+                    }else{
+                        points_above.push({x: date, y: [null, null]})
+                    }
+                    if(derivative[k-1]<-derivative_threshold){
+                        points_below.push({x: previous_day, y: [-100, time_series.sparse_y[k-1]]});
+                        points_below.push({x: date, y: [-100, time_series.y[i]], 
+                            // markerType: "circle",  markerSize: 10
+                        });
+                        points_above.push({x: date, y: [null, null]});
+                    }else{
+                        points_below.push({x: date, y: [null, null]})
+                    }
+                }else{
+                    // points_above.push({x: date, y: [null, null]})
+                    // points_below.push({x: date, y: [null, null]})
+                }
+            }else{
+                // points_above.push({x: date, y: [null, null]})
+                // points_below.push({x: date, y: [null, null]})
+            }
+        }
+        // console.log("name: ", name);
+        // console.log("points above: ", points_above);
+        // console.log("points below: ", points_below);
+    }
+
+
     let axisXtemplate = {
         gridThickness: 1,
         tickLength: 0,
@@ -120,6 +181,7 @@ function create_chart(dayzero, time_series, name){
         ]
     };
     // console.log("points: ", points);
+    // console.log("Chart: ", chart);
     return chart;
 }
 
@@ -184,7 +246,7 @@ function create_chart2(data_points, name="event_timeline"){
             margin:20,
             // titleFontWeight: "bold",
             includeZero: true,
-            titleFontSize: 14,
+            titleFontSize: 12,
             // maximum: Math.max.apply(null, time_series.y)*1.1,
             // minimum: Math.min.apply(null, time_series.y.filter(x=>x!==null))*0.9,
             labelFormatter: function ( e ) {
@@ -232,6 +294,7 @@ function Timeline2(props) {
     const dayzero = new Date("2000-01-01");
     const min = Math.min(props.time_series["ca125"].x)
     const max = Math.max(props.time_series["ca125"].x)
+    
     let datemin = new Date(dayzero);
     datemin.setDate(dayzero.getDate() + min);
     let datemax = new Date(dayzero);
@@ -241,7 +304,7 @@ function Timeline2(props) {
     });
     const charts2 = create_chart2(charts2_points);
     const charts = displayOrder.filter((d)=>!props.time_series[d].y.every(e=>e===null)).map((d)=> {
-        return create_chart(dayzero, props.time_series[d], d);
+        return create_chart(dayzero, props.time_series[d], d); 
     });
     const concat = charts2.concat(charts);
 

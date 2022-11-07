@@ -10,7 +10,7 @@ function ExplAIner(props) {
                     ExplAIner
                 </Col>
             </Row>
-        </Container>
+        </Container> 
     );
 }
 export default ExplAIner;
