@@ -90,6 +90,12 @@ python manage.py fake_data -n <num samples>
 ## Development
 
 1. Run the images in containers:
+
+If you are running containers for the first time:
+```sh
+docker-compose up -d && docker-compose exec nodeserver sh -c "mkdir -p node_modules/.cache/ && touch node_modules/.cache/.eslintcache && chown -R node:node node_modules/.cache && chmod -R 777 node_modules/.cache/"
+``` 
+Otherwise just run:
 ```sh
 docker-compose up
 ``` 
