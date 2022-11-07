@@ -26,10 +26,11 @@ SECRET_KEY = "django-insecure-av!*96e0e^r3i6#57oe7v2sm4ur5we^-kxhh8=p-#g3c)g5gjj
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+PRODUCTION = False
 # DEBUG = config('DEBUG', default=True, cast=bool)
 
 
-ALLOWED_HOSTS = ["0.0.0.0", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["0.0.0.0", "localhost", "127.0.0.1", "oncodash.ing.unimore.it", "http://0.0.0.0:3000/"]
 
 
 # Application definition
@@ -48,7 +49,15 @@ INSTALLED_APPS = [
     # third-party
     "rest_framework",
     "corsheaders",
+    'rest_framework.authtoken',
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://0.0.0.0:3000", #For React Project
+    "http://0.0.0.0:8888"  #For Django Project
+]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -145,7 +154,10 @@ AUTH_USER_MODEL = "core.User"
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
-    ]
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 }
 
 CORS_ALLOWED_ORIGINS = [

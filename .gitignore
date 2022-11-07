@@ -1,6 +1,6 @@
 ## editors
-/.idea
-/.vscode
+**/.idea
+**/.vscode
 
 ## system files
 .DS_Store
@@ -33,5 +33,12 @@ nbs
 
 **/build/
 **/env/
-backenEnv
-django.log
+
+**/django.log
+**/package-lock.json
+
+**/backendEnv/
+
+**/migrations/
+
+*.csv

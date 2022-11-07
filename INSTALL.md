@@ -1,6 +1,6 @@
 
 To build and run Oncodash, you have two options:
-- use *docker-compose* and run from a container (recommended),
+- use *docker-compose* and run from a container (not working),
 - run from your own local configuration.
 
 
@@ -113,13 +113,11 @@ docker-compose run --rm nodeserver sh -c "npm test"
 ## Requirements
 
 - [nodejs](https://nodejs.org/en/download/)
-- typescript `npm install -g typescript`
 - Python >= 3.7
-
 
 ## Installation
 
-#### Back-end
+#### Backend
 
 1. Clone the repository & move to the `backend` directory:
 ```sh
@@ -140,6 +138,7 @@ pip install -U pip
 conda create --name backendEnv python=3.7
 conda activate backendEnv
 ```
+
 3. Install python dependencies:
 ```sh
 pip install -r requirements.txt
@@ -155,10 +154,16 @@ python manage.py flush --no-input
 python manage.py populate -p /path/to/indication_table.csv
 ```
 
-6. Populate a test database with clinical data (clin_overview-app)
+6. Populate a test database with clinical data and real timeline data. "<clinical filepath>" is the path of clinical data file and can be downloaded from eduuni. "<timeline filepath>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
 ```sh
-python manage.py fake_data -n <num samples>
+python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline filepath>
 ```
+
+7. Create an account. Type:
+```sh
+python manage.py createsuperuser
+```
+and then follow the prompt instruction.
 
 #### Front-end
 
@@ -168,7 +173,7 @@ cd oncodash/oncodash-app/
 ```
 2. Install node dependencies:
 ```
-npm install
+npm install --legacy-peer-deps
 ```
 
 
@@ -182,7 +187,7 @@ python manage.py runserver 0.0.0.0:8888
 ```
 npm start
 ```
-3. Open up the browser at [localhost:8000/](http://localhost:8000/).
+3. Open up the browser at [localhost:3000/](http://localhost:3000/) and login with the previously created backend credentials. Tested with Chrome.
 4. Browsable API endpoints at [localhost:8888/api/explainer/networks/](http://localhost:8888/api/explainer/networks/).
 
 

@@ -1,66 +1,48 @@
 {
-  "name": "oncodash-app",
-  "description": "Webcomponent oncodash-app following open-wc recommendations",
-  "license": "MIT",
-  "author": "oncodash-app",
-  "version": "0.0.0",
-  "scripts": {
-    "lint": "eslint --ext .ts,.html . --ignore-path ../.gitignore && prettier \"**/*.ts\" --check --ignore-path ../.gitignore",
-    "format": "eslint --ext .ts,.html . --fix --ignore-path ../.gitignore && prettier \"**/*.ts\" --write --ignore-path ../.gitignore",
-    "test": "tsc && wtr --coverage",
-    "test:watch": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wtr --watch\"",
-    "build": "rimraf dist && tsc && rollup -c rollup.config.js && npm run analyze -- --exclude dist",
-    "start:build": "web-dev-server --root-dir dist --app-index index.html --open ",
-    "analyze": "cem analyze --litelement",
-    "start": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds\""
-  },
+  "name": "oncodash",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "chart.js": "^3.8.2",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "bootstrap": "^5.2.1",
+    "chart.js": "^3.9.1",
     "chartjs-plugin-zoom": "^1.2.1",
-    "d3": "^7.0.1",
-    "lit": "^2.1.0"
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.5.0",
+    "react-bootstrap-icons": "^1.8.4",
+    "react-canvas-js": "^1.0.1",
+    "react-chartjs-2": "^4.3.1",
+    "react-cookie": "^4.1.1",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.4.1",
+    "react-scripts": "4.0.3",
+    "web-vitals": "^2.1.4"
   },
-  "devDependencies": {
-    "@babel/preset-env": "^7.15.4",
-    "@custom-elements-manifest/analyzer": "^0.4.17",
-    "@open-wc/building-rollup": "^1.10.0",
-    "@open-wc/eslint-config": "^4.3.0",
-    "@open-wc/testing": "next",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-node-resolve": "^13.0.4",
-    "@types/d3": "^7.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.10.0",
-    "@typescript-eslint/parser": "^5.10.0",
-    "@web/dev-server": "^0.1.22",
-    "@web/rollup-plugin-html": "^1.10.0",
-    "@web/rollup-plugin-import-meta-assets": "^1.0.7",
-    "@web/test-runner": "next",
-    "babel-plugin-template-html-minifier": "^4.1.0",
-    "concurrently": "^5.3.0",
-    "deepmerge": "^4.2.2",
-    "eslint": "^8.7.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.25.4",
-    "husky": "^4.3.8",
-    "lint-staged": "^10.5.4",
-    "prettier": "^2.3.2",
-    "rimraf": "^3.0.2",
-    "rollup": "^2.56.3",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-workbox": "^6.2.0",
-    "tslib": "^2.3.1",
-    "typescript": "^4.4.2"
+  "scripts": {
+    "build": "react-scripts build",
+    "start": "react-scripts start",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.ts": [
-      "eslint --fix",
-      "prettier --write"
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
     ]
   },
-  "customElements": "custom-elements.json"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "proxy": "http://localhost:8888/"
 }
