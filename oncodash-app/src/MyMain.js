@@ -60,6 +60,7 @@ function MyMain(props) {
                 filter={props.filter}
                 statusFilter={props.statusFilter}
                 setStatusFilterCallback={props.setStatusFilterCallback}
+                firstPageCallback={firstPage}
             ></Navigator>
             {viewMode === "GRID"? 
                 <GridView patients={viewPatients()}></GridView>

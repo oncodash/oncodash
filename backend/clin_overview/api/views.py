@@ -20,10 +20,9 @@ class ClinicalViewSet(viewsets.ModelViewSet):
     queryset = ClinicalData.objects.all()
 
     def retrieve(self, request, pk=None):
-
         serializer_class = ClinicalDataSerializer
         queryset = ClinicalData.objects.all()
-        patient = get_object_or_404(queryset, pk=pk)
+        patient = get_object_or_404(queryset, patient_id=pk)
         timelinerecords = TimelineRecord.objects.filter(patient=patient, event="laboratory")
         date_relative_max = timelinerecords.aggregate(Max("date_relative"))['date_relative__max']
         date_relative_min = timelinerecords.aggregate(Min("date_relative"))['date_relative__min']
@@ -69,16 +68,35 @@ class ClinicalViewSet(viewsets.ModelViewSet):
                                         ],
                 }
 
+        # def add_data(data, range_min, range_max, thresholds, colors):
+        #     date_relative = []
+        #     result        = []
+        #     for item in data.iterator():
+        #         date_relative.append(item.date_relative)
+        #         result.append(item.result)
+        #     newdict = {'y': result,
+        #                'x': date_relative,
+        #                'colors': colors,
+        #                'thresholds': thresholds,
+        #               }
+        #     return newdict
+
         def add_data(data, range_min, range_max, thresholds, colors):
             date_relative = np.arange(range_min, range_max + 1)
             result        = np.empty_like(date_relative, dtype=np.float32)
             result[:]     = np.nan
+            sparse_date = []
+            sparse_result = []
             for item in data.iterator():
                 result[item.date_relative-range_min] = item.result
+                sparse_date.append(item.date_relative)
+                sparse_result.append(item.result)
             newdict = {'y': result.tolist(),
                        'x': date_relative.tolist(),
                        'colors': colors,
                        'thresholds': thresholds,
+                       'sparse_y': sparse_result,
+                       'sparse_x': sparse_date,
                       }
             return newdict
 
@@ -87,6 +105,7 @@ class ClinicalViewSet(viewsets.ModelViewSet):
         leuk_dict      = add_data(leuk,        date_relative_min, date_relative_max, thresholds["leuk"], colors["leuk"])
         platelets_dict = add_data(platelets,   date_relative_min, date_relative_max, thresholds["platelets"], colors["platelets"])
         neut_dict      = add_data(neut,        date_relative_min, date_relative_max, thresholds["neut"], colors["neut"])
+        # navigator      = {'x': np.arange(date_relative_min, date_relative_max + 1).tolist()}
 
         time_series = {
             'ca125': ca125_dict,
@@ -94,6 +113,7 @@ class ClinicalViewSet(viewsets.ModelViewSet):
             'leuk': leuk_dict,
             'platelets': platelets_dict,
             'neut' : neut_dict,
+            # 'navigator': navigator,
         }
 
         fresh_sample = TimelineRecord.objects.filter(patient=patient, event="fresh_sample").order_by("date_relative").values_list("date_relative", "name").distinct()
@@ -170,6 +190,7 @@ class TimelineViewSet(viewsets.ModelViewSet): # id paziente
     serializer_class = TimelineRecordSerializer
 
     def retrieve(self, request, patient_id=None):
+        print(patient_id)
         queryset = TimelineRecord.objects.filter(patient_id=patient_id, event="laboratory")
         ca125 = queryset.filter(name="ca125").order_by("date_relative")
         hb = queryset.filter(name="hb").order_by("date_relative")

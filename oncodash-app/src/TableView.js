@@ -7,8 +7,8 @@ import { useNavigate } from 'react-router-dom';
 
 function TableView(props) {
     const navigate = useNavigate();
-    const handleRowClick = (id) => {
-        navigate("/patientview", {state:{patient_id: id}});
+    const handleRowClick = (patient_id) => {
+        navigate("/patientview", {state:{patient_id: patient_id}});
     }  
 
     return(
@@ -25,9 +25,9 @@ function TableView(props) {
                     <tbody>
                         {props.patients.map(p=>
                             // <Link to={"/patientview"} state={{patient_id:}}>
-                                <tr key={p.id} onClick={()=> handleRowClick(p.id)} role="button">     
-                                    <td>{p.id}</td>
-                                    <td>{p.age}</td>
+                                <tr key={p.patient_id} onClick={()=> handleRowClick(p.patient_id)} role="button">     
+                                    <td>{p.patient_id}</td>
+                                    <td>{p.age_at_diagnosis}</td>
                                     <td>{p.survival}</td>
                                     <td>{p.stage}</td>                            
                                 </tr>

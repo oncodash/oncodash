@@ -4,7 +4,7 @@ import Timeline2 from './TimeSeries/Timeline_2';
 // import { useEffect, useState } from 'react';
 
 function PatientCard(props) {
-    const displayOrder = ["id", "age", "cud_survival", "cud_histology", "cud_stage"];
+    const displayOrder = ["patient_id", "age_at_diagnosis", "survival", "histology", "stage"];
 
     return(
         <Row className='mb-2'>    

@@ -4,9 +4,9 @@ import alive from '../assets/alive.svg';
 import dead from '../assets/not-alive.svg';
 
 function Clinical(props) {
-    const displayOrder1 = ["id", "age", "survival", "histology", "stage", "bmi"];
-    const displayOrder2 = ["cancer_in_family", "BRCA"];
-    const displayOrder3 = ["strategy", "primary_outcome", "current_phase", "maintenance"];
+    const displayOrder1 = ["patient_id", "age_at_diagnosis", "survival", "histology", "stage", "bmi_at_diagnosis"];
+    const displayOrder2 = ["brca_mutation_status"]; // cancer_in_family deprecated
+    const displayOrder3 = ["treatment_strategy", "primary_therapy_outcome", ]; // "current_phase", "maintenance" deprecated
   
     // const location = useLocation();
 
@@ -69,7 +69,7 @@ function Clinical(props) {
                                     {displayOrder2.map(d=>
                                                         <Row key={d} className="text-center text-primary font-weight-bold">
                                                             <Col className="text-end text-dark">{d.replace('', '')}: </Col> 
-                                                            <Col className="text-start">{props.patient[d]}{props.patient[d]===true?"True": ""}{props.patient[d]===false?"False": ""}{props.patient[d]===NaN?"NaN": ""}</Col> 
+                                                            <Col className="text-start">{props.patient[d]}{props.patient[d]===true?"True": ""}{props.patient[d]===false?"False": ""}{props.patient[d]===NaN?"NaN": ""}{props.patient[d]===null?"Not Available": ""}</Col> 
                                                         </Row>)}    
                                 </div> 
                             </Col>

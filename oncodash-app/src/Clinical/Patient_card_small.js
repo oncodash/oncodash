@@ -3,7 +3,7 @@ import {Button, Row} from 'react-bootstrap';
 // import { useEffect, useState } from 'react';
 
 function PatientCardSmall(props) {
-    const displayOrder = ["id", "age", "cud_survival", "cud_histology", "cud_stage"];
+    const displayOrder = ["patient_id", "age_at_diagnosis", "survival", "histology", "stage"];
 
     return(
         <Row className='mb-2'>
