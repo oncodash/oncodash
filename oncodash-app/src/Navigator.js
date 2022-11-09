@@ -19,6 +19,11 @@ function Navigator(props) {
         props.firstPageCallback();
     };
 
+    const changeFilter = (filter)=>{
+        props.setFilterCallback(filter);
+        props.firstPageCallback();
+    };
+
     return(
             <>
             <Navbar  expand="lg">
@@ -31,7 +36,7 @@ function Navigator(props) {
                                     placeholder="Search by patient_ID, STAGE"
                                     className="p-2 border border-secondary rounded"
                                     aria-label="Search"
-                                    onChange={(event)=>props.setFilterCallback(event.target.value)}
+                                    onChange={(event)=>changeFilter(event.target.value)}
                                     value={props.filter}
                                 />
                                 

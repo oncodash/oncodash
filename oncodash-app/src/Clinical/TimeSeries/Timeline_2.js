@@ -136,8 +136,10 @@ function create_chart(dayzero, time_series, name){
             endValue:thresholds[1],                
             color:"#d8d8d8",
             label : ""+thresholds[0]+" - "+thresholds[1],
-            labelFontColor: "#a8a8a8",
-            labelPlacement: "inside",
+            labelFontColor: "grey",
+            labelPlacement: "outside",
+            labelAlign: "far",
+            showOnTop: false
         }
     ];
     let stripLines = name!=="ca125" ? stripLinesTemplate : [];
@@ -153,7 +155,7 @@ function create_chart(dayzero, time_series, name){
             maximum: Math.max.apply(null, time_series.y)*1.1,
             minimum: Math.min.apply(null, time_series.y.filter(x=>x!==null))*0.9,
             labelFormatter: function ( e ) {
-                return leftPad(e.value, 5);
+                return leftPad(e.value, 10);
             },
             // labelFormatter: function ( e ) {
             //     return "";
@@ -252,19 +254,21 @@ function create_chart2(data_points, name="event_timeline"){
             labelFormatter: function ( e ) {
                 // console.log("e: ", e);
                 if(e.value===1)
-                    return leftPad("ctdna_sample", 10);
+                    return leftPad("ctdna_sample", 22);
                 else if(e.value===2)
-                    return leftPad("fresh_sample", 10);
+                    return leftPad("fresh_sample", 22);
                 else if(e.value===3)
-                    return leftPad("fresh_sample_sequenced", 10);
+                    return leftPad("fresh_sample_sequenced", 22);
                 else if(e.value===4)
-                    return leftPad("radiology", 10);  
+                    return leftPad("radiology", 22);  
                 else if(e.value===5)
-                    return leftPad("tykslab_plasma", 10);                     
+                    return leftPad("tykslab_plasma", 22);                     
                 else 
-                    return leftPad("", 10);
+                    return leftPad("", 22);
                 
             },
+            viewportMinimum: 0,
+            viewportMaximum: 5,
         },
         axisX:{
             gridThickness: 1,
@@ -289,7 +293,9 @@ function Timeline2(props) {
     if(props.time_series!==null){
         const displayOrder = ['ca125', 'neut', 'hb', 'leuk', 'platelets'];
         const displayOrder2 = [    
-                                    'ctdna_sample',   'fresh_sample', 'fresh_sample_sequenced', 
+                                    'ctdna_sample', 
+                                    'fresh_sample', 
+                                    'fresh_sample_sequenced',   
                                     'radiology', 
                                     'tykslab_plasma'
                                 ];
@@ -306,7 +312,7 @@ function Timeline2(props) {
             return create_chart2_points(dayzero, props.event_series[d], d, min, max);
         });
         const charts2 = create_chart2(charts2_points);
-        const charts = displayOrder.filter((d)=>!props.time_series[d].y.every(e=>e===null)).map((d)=> {
+        const charts = displayOrder.filter((d)=>props.time_series[d].sparse_x.length!==0).map((d)=> {
             return create_chart(dayzero, props.time_series[d], d); 
         });
         const concat = charts2.concat(charts);
