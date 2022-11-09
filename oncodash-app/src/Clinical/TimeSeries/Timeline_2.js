@@ -284,70 +284,74 @@ function create_chart2(data_points, name="event_timeline"){
 
 
 function Timeline2(props) {
-    const displayOrder = ['ca125', 'neut', 'hb', 'leuk', 'platelets'];
-    const displayOrder2 = [    
-                                'ctdna_sample',   'fresh_sample', 'fresh_sample_sequenced', 
-                                'radiology', 
-                                'tykslab_plasma'
-                            ];
-    // console.log(props.event_series);
-    const dayzero = new Date("2000-01-01");
-    const min = Math.min(props.time_series["ca125"].x)
-    const max = Math.max(props.time_series["ca125"].x)
-    
-    let datemin = new Date(dayzero);
-    datemin.setDate(dayzero.getDate() + min);
-    let datemax = new Date(dayzero);
-    datemax.setDate(dayzero.getDate() + max);
-    const charts2_points = displayOrder2.filter((d)=>props.event_series[d].date_relative.length!==0).map((d)=> {
-        return create_chart2_points(dayzero, props.event_series[d], d, min, max);
-    });
-    const charts2 = create_chart2(charts2_points);
-    const charts = displayOrder.filter((d)=>!props.time_series[d].y.every(e=>e===null)).map((d)=> {
-        return create_chart(dayzero, props.time_series[d], d); 
-    });
-    const concat = charts2.concat(charts);
+    let options;
+    let containerProps;
+    if(props.time_series!==null){
+        const displayOrder = ['ca125', 'neut', 'hb', 'leuk', 'platelets'];
+        const displayOrder2 = [    
+                                    'ctdna_sample',   'fresh_sample', 'fresh_sample_sequenced', 
+                                    'radiology', 
+                                    'tykslab_plasma'
+                                ];
+        // console.log(props.event_series);
+        const dayzero = new Date("2000-01-01");
+        const min = Math.min(props.time_series["ca125"].x)
+        const max = Math.max(props.time_series["ca125"].x)
+        
+        let datemin = new Date(dayzero);
+        datemin.setDate(dayzero.getDate() + min);
+        let datemax = new Date(dayzero);
+        datemax.setDate(dayzero.getDate() + max);
+        const charts2_points = displayOrder2.filter((d)=>props.event_series[d].date_relative.length!==0).map((d)=> {
+            return create_chart2_points(dayzero, props.event_series[d], d, min, max);
+        });
+        const charts2 = create_chart2(charts2_points);
+        const charts = displayOrder.filter((d)=>!props.time_series[d].y.every(e=>e===null)).map((d)=> {
+            return create_chart(dayzero, props.time_series[d], d); 
+        });
+        const concat = charts2.concat(charts);
 
-    
-    // console.log("charts: \n", charts);
-    const options = {
+        
+        // console.log("charts: \n", charts);
+        options = {
 
-        title: {
-            text: "",
-            fontSize: "14",
-        },
-        navigator:{
-            // slider:{
-            //     minimum: datemin,
-            //     maximum: datemax,
-          
-            // },
-            data: charts[0].data
-        },
-        rangeSelector:{
-            buttonStyle: {
-                labelFontSize: 18,
-                labelFontStyle: "normal",
-                spacing: 5, 
-                // borderColor: "#81C5D7",
-                borderThickness: 1,
-                borderRadius: 20,
-
+            title: {
+                text: "",
+                fontSize: "14",
             },
-            inputFields: {
-                style: {
-                  fontSize: 18,
-                  fontStyle: "normal",
+            navigator:{
+                // slider:{
+                //     minimum: datemin,
+                //     maximum: datemax,
+            
+                // },
+                data: charts[0].data
+            },
+            rangeSelector:{
+                buttonStyle: {
+                    labelFontSize: 18,
+                    labelFontStyle: "normal",
+                    spacing: 5, 
+                    // borderColor: "#81C5D7",
+                    borderThickness: 1,
+                    borderRadius: 20,
+
+                },
+                inputFields: {
+                    style: {
+                    fontSize: 18,
+                    fontStyle: "normal",
+                    }
                 }
-            }
-        },
-        charts: concat, 
-      };
-      const containerProps = {
-        width: "100%",
-        height: "800px",
-        margin: "auto"
-      };
+            },
+            charts: concat, 
+        };
+        containerProps = {
+            width: "100%",
+            height: "800px",
+            margin: "auto"
+        };
+    }
 
 
 
@@ -355,11 +359,12 @@ function Timeline2(props) {
           <Container fluid className="py-4 px-0">
                     <Row  className="d-inline-block w-100 py-2 px-0">
                         <div style={{width: '100%', padding: '0px'}}>   
+                            {props.time_series===null?<div>No TimeSeries data available for this patient</div>:
                             <CanvasJSStockChart
                                 options={options}
                                 containerProps = {containerProps}
                                 // onRef={ref => this.stockChart = ref}
-                            />
+                            />}
                         </div>
                     </Row>
           </Container>
