@@ -3,13 +3,12 @@ version: "3.2"
 services:
   # nodeserver
   nodeserver:
-    image: oncodash/nodeserver
     user: $UID:$GID
     build:
       context: ./oncodash-app
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "3000:3000"
     volumes:
       - type: bind
         source: ./oncodash-app
@@ -23,6 +22,8 @@ services:
       - type: volume
         source: notused
         target: /opt/node_app/app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
 
   # django backend gunicorn server (communicates with nginx proxy)
   backend:

@@ -7,75 +7,75 @@
    viewBox="0 0 4.2333333 4.2333335"
    version="1.1"
    id="svg5"
-   inkscape:version="1.2 (1:1.2+202206011327+fc4e4096c5)"
-   sodipodi:docname="alive.svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   inkscapeVersion="1.2 (1:1.2+202206011327+fc4e4096c5)"
+   sodipodiDocname="alive.svg"
+   xmlnsInkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlnsSodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:dc="http://purl.org/dc/elements/1.1/">
+   xmlnsSvg="http://www.w3.org/2000/svg"
+   xmlnsRdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlnsCc="http://creativecommons.org/ns#"
+   xmlnsDc="http://purl.org/dc/elements/1.1/">
   <title
      id="title825">Oncodash icon — alive</title>
-  <sodipodi:namedview
+  <sodipodiNamedview
      id="namedview7"
      pagecolor="#ffffff"
      bordercolor="#666666"
      borderopacity="1.0"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:document-units="mm"
+     inkscapePageshadow="2"
+     inkscapePageopacity="0.0"
+     inkscapePagecheckerboard="0"
+     inkscapeDocument-units="mm"
      showgrid="false"
      units="px"
      width="128px"
      showguides="false"
-     inkscape:guide-bbox="true"
-     inkscape:snap-center="true"
-     inkscape:zoom="22.388925"
-     inkscape:cx="7.0123956"
-     inkscape:cy="25.95033"
-     inkscape:current-layer="layer1"
-     inkscape:snap-page="true"
-     inkscape:snap-bbox="true"
-     inkscape:bbox-nodes="true"
-     inkscape:showpageshadow="2"
-     inkscape:deskcolor="#d1d1d1">
-    <sodipodi:guide
+     inkscapeGuide-bbox="true"
+     inkscapeSnap-center="true"
+     inkscapeZoom="22.388925"
+     inkscapeCx="7.0123956"
+     inkscapeCy="25.95033"
+     inkscapeCurrent-layer="layer1"
+     inkscapeSnap-page="true"
+     inkscapeSnap-bbox="true"
+     inkscapeBbox-nodes="true"
+     inkscapeShowpageshadow="2"
+     inkscapeDeskcolor="#d1d1d1">
+    <sodipodiGuide
        position="17,16.866667"
        orientation="-1,0"
        id="guide824"
-       inkscape:label=""
-       inkscape:locked="false"
-       inkscape:color="rgb(0,0,255)" />
-  </sodipodi:namedview>
+       inkscapeLabel=""
+       inkscapeLocked="false"
+       inkscapeColor="rgb(0,0,255)" />
+  </sodipodiNamedview>
   <defs
      id="defs2" />
   <g
-     inkscape:label="Calque 1"
-     inkscape:groupmode="layer"
+     inkscapeLabel="Calque 1"
+     inkscapeGroupmode="layer"
      id="layer1">
     <path
        id="path848"
-       style="fill:#f55;stroke:#d40000;stroke-width:0.264583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:28.3465"
-       inkscape:transform-center-x="-0.99217271"
-       inkscape:transform-center-y="-0.968426"
+       style="fill:#f55;stroke:#d40000;stroke-width:0.264583;stroke-linecapRound;stroke-linejoinRound;stroke-miterlimit:4;stroke-dasharrayNone;stroke-dashoffset:28.3465"
+       inkscapeTransform-center-x="-0.99217271"
+       inkscapeTransform-center-y="-0.968426"
        d="M 1.1245427,0.13231909 C 0.57655231,0.1322997 0.13231338,0.56590587 0.13233354,1.1007802 C 0.13233354,2.1662448 2.11668,3.3025627 2.1166806,4.1029822 C 2.116681,3.3025627 4.1010275,2.1662449 4.1010275,1.1007802 C 4.1010476,0.56590587 3.6568087,0.1322997 3.1088183,0.13231909 C 2.5608558,0.13233818 2.1166605,0.56593317 2.1166806,1.1007802 C 2.1167006,0.56593317 1.6725051,0.13233818 1.1245427,0.13231909 Z" />
   </g>
   <metadata
      id="metadata823">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:title>Oncodash icon — alive</dc:title>
-        <dc:date>2022-03-23</dc:date>
-        <dc:creator>
-          <cc:Agent>
-            <dc:title>nojhan</dc:title>
-          </cc:Agent>
-        </dc:creator>
-      </cc:Work>
-    </rdf:RDF>
+    <rdfRDF>
+      <ccWork
+         rdfAbout="">
+        <dcTitle>Oncodash icon — alive</dcTitle>
+        <dcDate>2022-03-23</dcDate>
+        <dcCreator>
+          <ccAgent>
+            <dcTitle>nojhan</dcTitle>
+          </ccAgent>
+        </dcCreator>
+      </ccWork>
+    </rdfRDF>
   </metadata>
 </svg>
