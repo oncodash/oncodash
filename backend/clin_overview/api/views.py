@@ -9,13 +9,17 @@ from django.db.models import Max, Min
 import numpy as np
 from collections import OrderedDict
 import pandas as pd
+from rest_framework.permissions import IsAuthenticated
 
+
+    
 
 class ClinicalViewSet(viewsets.ModelViewSet):
     """
     API endpoint for the clinical data of the patients. Provides
     `list`, `create`, `retrieve`, `update` and `destroy` actions.
     """
+    permission_classes = (IsAuthenticated,)
     serializer_class = ClinicalDataSerializer
     queryset = ClinicalData.objects.all()
 
@@ -186,7 +190,7 @@ class TimelineViewSet(viewsets.ModelViewSet): # id paziente
     API endpoint for the clinical data of the patients. Provides
     `list`, `create`, `retrieve`, `update` and `destroy` actions.
     """
-
+    permission_classes = (IsAuthenticated,)
     queryset = TimelineRecord.objects.all()
     serializer_class = TimelineRecordSerializer
 

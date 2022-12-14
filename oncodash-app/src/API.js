@@ -4,8 +4,9 @@ import {Patient} from './Clinical/Patient.js';
 /**
  * All the API calls
  */
+ const PROTOCOL = "https";
  const HOST = "oncodash.ing.unimore.it"
- const BASEURL =  'http://'+HOST+'/:8888/api/';
+ const BASEURL =  PROTOCOL+'://'+HOST+'/api/';
  const CLIN_OVERVIEW = `clinical-overview/data/`;
 
  
@@ -138,7 +139,7 @@ import {Patient} from './Clinical/Patient.js';
   }  
 
   async function logIn(username, password) {
-    let response = await fetch('http://'+HOST+':8888/api-token-auth/', {
+    let response = await fetch(PROTOCOL+'://'+HOST+'/api-token-auth/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -148,6 +149,7 @@ import {Patient} from './Clinical/Patient.js';
     if(response.ok) {
       
       const res = await response.json();
+      // console.log(res);
       return res;
     }
     else {
@@ -162,7 +164,7 @@ import {Patient} from './Clinical/Patient.js';
   }
   
   async function logOut(token) {
-    await fetch('http://'+HOST+':8888/logout/', {
+    await fetch(PROTOCOL+'://'+HOST+'/logout/', {
       method: 'GET',
       headers: {
         'Authorization': 'Token '+token,
