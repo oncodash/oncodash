@@ -5,12 +5,13 @@ import Tabs from 'react-bootstrap/Tabs';
 import {useLocation, Navigate} from 'react-router-dom';
 import API from "./API.js";
 import { useEffect, useState } from 'react';
-import alive from './assets/alive.svg';
-import dead from './assets/not-alive.svg';
+// import alive from './assets/alive.svg';
+// import dead from './assets/not-alive.svg';
 import ExplAIner from './Explainer/Explainer';
 import Genomic from './Genomic/Genomic';
 import Extra from './Extra/Extra';
 import { ArrowClockwise } from 'react-bootstrap-icons';
+import PatientSummary from './PatientSummary';
 
 function PatientView(props) {
     // const displayOrder = ["id", "age", "cud_survival", "cud_histology", "cud_stage"];
@@ -46,7 +47,7 @@ function PatientView(props) {
             }
         };
             getPatients();
-        }, []   
+        }, [props.token, state.patient_id]   
     );
 
     return(
@@ -67,7 +68,7 @@ function PatientView(props) {
                         </Row>
                     :
                     <>
-
+                        <PatientSummary patient={selectedPatient}/>
                         <Row className='fs-5'>
                             <Tabs   
                                 className="border-bottom border-secondary"
@@ -91,7 +92,7 @@ function PatientView(props) {
                                         {state !== undefined? <ExplAIner patient={selectedPatient}></ExplAIner>: "" }
                                     </Row>
                                 </Tab>      
-                                <Tab eventKey="extra" title="Extra">
+                                <Tab eventKey="extra" title="Other">
                                     <Row className="px-2">
                                         {state !== undefined? <Extra patient={selectedPatient}></Extra>: "" }
                                     </Row>

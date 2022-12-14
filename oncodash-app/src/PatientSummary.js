@@ -1,0 +1,78 @@
+import {Row, Col} from 'react-bootstrap';
+import { PersonCheck, PersonX } from 'react-bootstrap-icons';
+import StaticToggle from './Clinical/StaticToggle';
+
+function PatientSummary(props) {
+    const displayOrder1 = ["patient_id", "age_at_diagnosis", "stage"];
+    const displayOrder2 = ["survival", "progression"]; // current phase is missing
+    const displayOrder3 = ["paired_fresh_samples_available", "platinum_free_interval"]; // OS is missing
+    const dictionary = {
+        "patient_id":"Patient ID",
+        "age_at_diagnosis":"Age",
+        "stage":"Stage",
+        "survival":"Status",
+        "progression":"Progression",
+        "paired_fresh_samples_available":"PFS",
+        "platinum_free_interval":"PFI"
+    };
+    const survcolor = props.patient["survival"] === "alive" ? "green":"red"
+
+    return(
+        <Row className='m-5'>    
+            <Col className='d-flex justify-content-center align-items-center'>
+                <div  style={{   "padding": "10px",
+                                "borderStyle": "solid",
+                                "borderRadius": "50%",
+                                "borderColor": survcolor,
+                                "color": survcolor,
+                            }}>
+                    {props.patient["survival"] === "alive" ?<PersonCheck size={60} />:<PersonX size={60} />}
+                </div>
+            </Col>
+
+            <Col>
+                    <div className="bg-opacity-25  px-4 py-2  rounded mx-0">    
+                        {
+                            displayOrder1.map(d=>
+                                    <Row key={d} className="text-center text-primary font-weight-bold">
+                                        <Col className="text-end text-dark">{dictionary[d]}:</Col> 
+                                        <Col className="text-start">{props.patient[d]}</Col>
+                                    </Row>  
+                                )
+                        }
+                    </div> 
+            </Col>
+
+            <Col>
+            <div className="bg-opacity-25  px-4 py-2  rounded mx-0">    
+                        {displayOrder2.map(d=>
+                                <Row key={d} className="text-center text-primary font-weight-bold">
+                                    <Col className="text-end text-dark">{dictionary[d]}: </Col> 
+                                    <Col className="text-start d-flex align-items-center">{props.patient[d]}
+                                                                {props.patient[d]===true?<StaticToggle answer={"Yes"} label={"Yes"}/>: ""}
+                                                                {props.patient[d]===false?<StaticToggle answer={"No"} label={"No"}/>: ""}
+                                                                {props.patient[d]===NaN && d!=="primary_therapy_outcome"?<StaticToggle answer={"NA"} label={"NA"}/>: ""}
+                                                                {props.patient[d]===null && d!=="primary_therapy_outcome"?<StaticToggle answer={"NA"} label={"NA"}/>: ""}</Col> 
+                                </Row>)}    
+                        </div>           
+            </Col>
+
+            <Col>
+                     <div className="bg-opacity-25  px-4 py-2  rounded mx-0">    
+                        {
+                            displayOrder3.map(d=>
+                                    <Row key={d} className="text-center text-primary font-weight-bold">
+                                        <Col className="text-end text-dark">{dictionary[d]}:</Col> 
+                                        <Col className="text-start">{props.patient[d]}</Col>
+                                    </Row>  
+                                )
+                        }
+                    </div> 
+            </Col>
+        </Row>
+    );
+
+
+} 
+
+export default PatientSummary;

@@ -4,7 +4,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import { Row, Col} from 'react-bootstrap';
 import logo from './assets/oncodash-logo.svg';
 import {Link} from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import LoginModal from './LoginModal';
 
 function MyNavBar(props) {

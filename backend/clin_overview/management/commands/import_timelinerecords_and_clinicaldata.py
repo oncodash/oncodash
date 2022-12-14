@@ -127,7 +127,8 @@ class Command(BaseCommand):
                 patient = ClinicalData.objects.get(patient_id=row["patient_id"])
             except:
                 print("No patient", row["patient_id"], "available in the database")
-                break
+                continue
+                #break
             try:
                 rec = TimelineRecord.objects.create(
                     external_record_id      = handle_string_field(row["id"]),

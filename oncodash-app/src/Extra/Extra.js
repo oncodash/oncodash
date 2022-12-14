@@ -7,7 +7,7 @@ function Extra(props) {
         <Container className="py-4">
             <Row>
                 <Col className="d-flex align-items-center justify-content-center">
-                    Extra
+                    Other
                 </Col>
             </Row>
         </Container>
