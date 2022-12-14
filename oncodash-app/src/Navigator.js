@@ -5,7 +5,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Row, Col} from 'react-bootstrap';
-import { Calendar, Tag, Table, Sliders2Vertical, Microsoft} from 'react-bootstrap-icons';
+import { Tag, Table, Microsoft} from 'react-bootstrap-icons';
 
 function Navigator(props) {
 

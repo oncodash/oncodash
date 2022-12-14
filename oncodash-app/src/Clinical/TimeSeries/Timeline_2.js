@@ -19,7 +19,6 @@ function create_chart(dayzero, time_series, name){
     let points_below = [];
     let points_above = [];
     let derivative = [];
-    let derivative_left  = [];
     const derivative_threshold = 50;
     // let isca125 = name === "ca125";
     let thresholds = time_series.thresholds;
@@ -190,7 +189,6 @@ function create_chart(dayzero, time_series, name){
 function create_chart2_points(dayzero, event_series, name, min, max){
     let points = [];
     let value=1;
-    let z = 10;
     if(name === "ctdna"){
         value = 1;
     }

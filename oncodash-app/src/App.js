@@ -52,7 +52,7 @@ function App() {
       setToken(cookie["token"]);
       setLogged(true);
     }
-  },[]
+  },[cookie]
   );
 
   useEffect(()=>{
