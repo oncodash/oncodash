@@ -5,6 +5,12 @@
 ## system files
 .DS_Store
 
+##letsencrypt
+data/
+
+##data
+backend/clinical_export*
+
 ## npm
 node_modules/
 /npm-debug.log
