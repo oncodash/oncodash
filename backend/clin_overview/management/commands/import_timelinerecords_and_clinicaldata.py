@@ -43,7 +43,7 @@ class Command(BaseCommand):
                 return None if field is None or field.__dict__["field"].null else default
 
         def handle_float_field(value):
-            return None if pd.isna(value) else float(value.replace(",", "."))
+            return None if pd.isna(value) else (value if type(value) == float else float(str(value).replace(",", ".")))
 
         def handle_string_field(value):
             return None if pd.isna(value) else value
