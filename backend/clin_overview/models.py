@@ -24,11 +24,18 @@ class StageFIGO2014(models.TextChoices):
 
 
 class TreatmentPhase(models.TextChoices):
+    NEOADJUVANT = "NEOADJUVANT", _("Neoadjuvant")
+    PRIMARY_CHEMOTHERAPY = "PRIMARY_CHEMOTHERAPY", _("Primary chemotherapy")
+    BMAPTPARPMAPT = "BMAPTPARPMAPT", _("Bev maintenance after primary therapyPARP maintenance after prim therapy")
+    IN_DRUG_TRIALIN_DRUG_TRIAL = "IN_DRUG_TRIAL", _("Currently in drug trial")
+    HORMONAL_TREATMENT = "HORMONAL_TREATMENT", _("Hormonal treatment")
+    FOLLOW_UP = "FOLLOW_UP", _("Follow-up")
+    REGULAR_FOLLOWUP_VISITS_ENDED = "REGULAR_FOLLOWUP_VISITS_ENDED", _("Regular follow up visits ended")
     PROGRESSION = "PROGRESSION", _("Progression")
-    FOLLOWUP = "FOLLOWUP", _("Follow-up")
-    PRIMARYCHEMO = "PRIMARYCHEMO", _("Primary chemotherapy")
-    DRUGTRIAL = "DRUGTRIAL", _("Drug trial")
-    HORMONAL = "HORMONAL", _("Hormonal treatment")
+    PARP_MAINTENANCE_AFTER_PROG = "PARP_MAINTENANCE_AFTER_PROG", _("Parp maintenance after prog")
+    FOLLOWUP_AFTER_PROG_TREATMENT = "FOLLOWUP_AFTER_PROG_TREATMENT", _("Follow-up after prog treatment")
+    PROGRESSION_ACTIVE_TREATMENT_ENDED = "PROGRESSION_ACTIVE_TREATMENT_ENDED", _("Progression, active treatment ended")
+    OTHER = "OTHER", _("Other")
 
 
 class TreatmentStrategy(models.TextChoices):
@@ -137,6 +144,17 @@ class HRPerPatient(models.TextChoices):
 class HRDMyriadStatus(models.TextChoices):
     HRDPOSITIVE = "HRDPOSITIVE", _("HRD positive")
     HRDNEGATIVE = "HRDNEGATIVE", _("HRD negative")
+
+
+class DrugTrialName(models.TextChoices):
+    AVANOVA = "AVANOVA", _("AVANOVA")
+    MK3475 = "MK3475", _("MK3475")
+    PAOLA = "PAOLA", _("PAOLA")
+    PRIMA = "PRIMA", _("PRIMA")
+    IMAGYN = "IMAGYN", _("IMAGYN")
+    DUOO = "DUOO", _("DUO-O")
+    FIRST = "FIRST", _("FIRST")
+    EPIKO = "EPIKO", _("EPIK-O")
 
 
 def randomVector(n, a = 10, b = 0):
@@ -443,9 +461,90 @@ class ClinicalData(models.Model):
         },
         '''
 
-    # current_treatment_phase = models.CharField(max_length=20, choices=TreatmentPhase.choices)
+    '''
+    "current_phase_of_treatment": {
+        "category": "treatment",
+        "dataType": "string",
+        "unit": NaN,
+        "notNull": false,
+        "listVariable": false,
+        "importance": 2,
+        "description": NaN,
+        "comment": "String of free-text treatment info",
+        "originalOvcabaseColumn": "Current phase of treatment",
+        "alreadyVisualized": false,
+        "valueSpace": "['Neoadjuvant','Primary chemotherapy','Bev maintenance after primary therapy','PARP maintenance after prim therapy','Currently in drug trial','Hormonal treatment','Follow-up','Regular follow up visits ended','Progression','Parp maintenance after prog','Follow-up after prog treatment','Progression, active treatment ended','Other']"
+    }
+    '''
+    current_treatment_phase = models.CharField(max_length=100, null=True, blank=True, choices=TreatmentPhase.choices)
 
-    # maintenance_therapy = models.CharField(max_length=25, choices=MainetenaceTherapy.choices)
+    '''
+    "maintenance_therapy_after_1st_line": {
+        "category": "treatment",
+        "dataType": "string",
+        "unit": NaN,
+        "notNull": false,
+        "listVariable": false,
+        "importance": 3,
+        "description": "String of free-text treatment info",
+        "comment": NaN,
+        "originalOvcabaseColumn": "Maintenance therary after 1st line",
+        "alreadyVisualized": false,
+        "valueSpace": NaN
+    },
+    '''
+    maintenance_therapy = models.CharField(max_length=2000, null=True, blank=True)
+    '''
+    "clinical_trials_participation": {
+        "category": "clinical_trial",
+        "dataType": "boolean",
+        "unit": NaN,
+        "notNull": false,
+        "listVariable": false,
+        "importance": 3,
+        "description": "Participation in any clinical trials",
+        "comment": NaN,
+        "originalOvcabaseColumn": "DrugTr Participation in clinical trials",
+        "alreadyVisualized": false,
+        "valueSpace": NaN
+    }
+    '''
+    clinical_trial = models.BooleanField(null=True)
+
+    '''
+    "drug_trial_unblinded": {
+        "category": "clinical_trial",
+        "dataType": "boolean",
+        "unit": NaN,
+        "notNull": false,
+        "listVariable": false,
+        "importance": 3,
+        "description": "Drug / placebo unblinding",
+        "comment": "True or null",
+        "originalOvcabaseColumn": "Drugtrial unblinded",
+        "alreadyVisualized": false,
+        "valueSpace": NaN
+    }
+    '''
+    drug_trial_unblinded = models.BooleanField(null=True)
+
+    '''
+    "drug_trial_name": {
+        "category": "clinical_trial",
+        "dataType": "string",
+        "unit": NaN,
+        "notNull": false,
+        "listVariable": false,
+        "importance": 3,
+        "description": "The clinical trial the patient has participated",
+        "comment": NaN,
+        "originalOvcabaseColumn": "DrugTrial name",
+        "alreadyVisualized": false,
+        "valueSpace": "['AVANOVA', 'MK 3475', 'PAOLA', 'PRIMA', 'IMAGYN', 'DUO-O', 'FIRST', 'EPIK-O]'"
+    }
+    '''
+    drug_trial_name = models.CharField(max_length=2000, null=True, blank=True, choices=DrugTrialName.choices)
+
 
     # extra info related to the enums
     # progression_detection_method = models.CharField(max_length=100, blank=True)
@@ -896,12 +995,30 @@ class ClinicalData(models.Model):
         },
         '''
 
+
+
     # has_response_ct = models.BooleanField(default=False)
     # has_ctdna = models.BooleanField(default=False)
     # has_petct = models.BooleanField(default=False)
 
     # has_singlecell = models.BooleanField(default=False)
-    # has_germline_control = models.BooleanField(default=False)
+
+    '''
+    "germline_pathogenic_variant": {
+        "category": "baseline",
+        "dataType": "string",
+        "unit": NaN,
+        "notNull": false,
+        "listVariable": false,
+        "importance": 3,
+        "description": "Gene site",
+        "comment": "'NotDetected', if no pathogenic variant is detected, can also be null if no testing is done",
+        "originalOvcabaseColumn": "Gene Germ line pathogenic variant",
+        "alreadyVisualized": false,
+        "valueSpace": NaN
+    }
+    '''
+    germline_pathogenic_variant = models.CharField(max_length=2000, null=True, blank=True)
 
     @property
     def bmi(self):

@@ -88,6 +88,10 @@ class Command(BaseCommand):
                     hr_signature_pretreatment_wgs                 = handle_string_field(row["hr_signature_pretreatment_wgs"]),
                     hr_signature_per_patient                      = handle_string_field(row["hr_signature_per_patient"]),
                     hrd_myriad_status                             = handle_string_field(row["hrd_myriad_status"]),
+                    maintenance_therapy                           = handle_string_field(row["maintenance_therapy"]),
+                    current_treatment_phase                       = handle_string_field(row["current_treatment_phase"]),
+                    drug_trial_name                               = handle_string_field(row["drug_trial_name"]),
+                    germline_pathogenic_variant                   = handle_string_field(row["germline_pathogenic_variant"]),
 
 
                     chronic_illnesses_at_dg                       = handle_boolean_field(row["chronic_illnesses_at_dg"], ClinicalData.chronic_illnesses_at_dg),
@@ -99,6 +103,12 @@ class Command(BaseCommand):
                     debulking_surgery_ids                         = handle_boolean_field(row["debulking_surgery_ids"], ClinicalData.debulking_surgery_ids),
                     sequencing_available                          = handle_boolean_field(row["sequencing_available"], ClinicalData.sequencing_available),
                     paired_fresh_samples_available                = handle_boolean_field(row["paired_fresh_samples_available"], ClinicalData.paired_fresh_samples_available),
+                    drug_trial_unblinded                          = handle_boolean_field(row["drug_trial_unblinded"], ClinicalData.drug_trial_unblinded),
+                    clinical_trial                                = handle_boolean_field(row["clinical_trial"], ClinicalData.clinical_trial),
+
+
+
+
                 )
                 rec.save()
             except Exception as e:
