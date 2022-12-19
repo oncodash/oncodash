@@ -10,6 +10,11 @@ function Patient(
     primary_therapy_outcome,
     survival,
     treatment_strategy,
+    current_treatment_phase,
+    maintenance_therapy,
+    clinical_trial,
+    drug_trial_unblinded,
+    drug_trial_name,
     followup_time,
     platinum_free_interval_at_update,
     platinum_free_interval,
@@ -35,6 +40,7 @@ function Patient(
     hrd_myriad_status,
     sequencing_available,
     paired_fresh_samples_available,
+    germline_pathogenic_variant,
 ){
     this.patient_id                                     = patient_id
     this.cohort_code                                    = cohort_code    
@@ -46,7 +52,12 @@ function Patient(
     this.stage                                          = stage
     this.primary_therapy_outcome                        = primary_therapy_outcome                
     this.survival                                       = survival
-    this.treatment_strategy                             = treatment_strategy        
+    this.treatment_strategy                             = treatment_strategy  
+    this.current_treatment_phase                        = current_treatment_phase    
+    this.maintenance_therapy                            = maintenance_therapy
+    this.clinical_trial                                 = clinical_trial
+    this.drug_trial_unblinded                           = drug_trial_unblinded
+    this.drug_trial_name                                = drug_trial_name     
     this.followup_time                                  = followup_time    
     this.platinum_free_interval_at_update               = platinum_free_interval_at_update                        
     this.platinum_free_interval                         = platinum_free_interval            
@@ -71,7 +82,8 @@ function Patient(
     this.hr_signature_per_patient                       = hr_signature_per_patient                
     this.hrd_myriad_status                              = hrd_myriad_status        
     this.sequencing_available                           = sequencing_available            
-    this.paired_fresh_samples_available                 = paired_fresh_samples_available                    
+    this.paired_fresh_samples_available                 = paired_fresh_samples_available      
+    this.germline_pathogenic_variant                    = germline_pathogenic_variant              
 
 this.toString = ()=>{
 return `id: ${this.patient_id}, age: ${this.age_at_diagnosis}, survival: ${this.survival}, histology: ${this.histology}, stage: ${this.stage}`;

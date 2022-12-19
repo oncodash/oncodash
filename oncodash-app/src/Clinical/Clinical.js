@@ -6,8 +6,8 @@ import StaticToggle from './StaticToggle';
 
 function Clinical(props) {
     const displayOrder1 = ["age_at_diagnosis", "bmi_at_diagnosis","previous_cancer"]; // date of diagnosis is missing
-    const displayOrder2 = ["treatment_strategy", "primary_therapy_outcome", "progression"]; // maintenance after 1st line is missing // participation in drug trial is missing
-    const displayOrder3 = ["hrd_myriad_status", "brca_mutation_status", ]; // germ line pathogenic variants is missing // genetic alteration with druggable target is misssing
+    const displayOrder2 = ["treatment_strategy", "primary_therapy_outcome", "maintenance_therapy", "drug_trial_name", "progression"]; // maintenance after 1st line is missing // participation in drug trial is missing
+    const displayOrder3 = ["hrd_myriad_status", "brca_mutation_status", "germline_pathogenic_variant"]; // germ line pathogenic variants is missing // genetic alteration with druggable target is misssing
 
     const dictionary = {
                         "age_at_diagnosis":"Age at diagnosis",
@@ -17,7 +17,10 @@ function Clinical(props) {
                         "primary_therapy_outcome":"Primary outcome",
                         "progression":"Progression",
                         "hrd_myriad_status":"HRD status",
-                        "brca_mutation_status":"BRCA mutation"
+                        "brca_mutation_status":"BRCA mutation",
+                        "maintenance_therapy": "Maintenance after 1st line",
+                        "drug_trial_name": "Participation in drug trial",
+                        "germline_pathogenic_variant": "Germ line pathogenic variants",
                     }
   
     // const location = useLocation();

@@ -108,6 +108,11 @@ import {Patient} from './Clinical/Patient.js';
               patient.primary_therapy_outcome,
               patient.survival,
               patient.treatment_strategy,
+              patient.current_treatment_phase,
+              patient.maintenance_therapy,
+              patient.clinical_trial,
+              patient.drug_trial_unblinded,
+              patient.drug_trial_name,
               patient.followup_time,
               patient.platinum_free_interval_at_update,
               patient.platinum_free_interval,
@@ -132,7 +137,8 @@ import {Patient} from './Clinical/Patient.js';
               patient.hr_signature_per_patient,
               patient.hrd_myriad_status,
               patient.sequencing_available,
-              patient.paired_fresh_samples_available,               
+              patient.paired_fresh_samples_available, 
+              patient.germline_pathogenic_variant,              
                         );
     });
   
