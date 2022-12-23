@@ -35,9 +35,9 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         print("." * 100)
         def handle_boolean_field(value, field=None, default=False,):
-            if str(value).lower() in ["yes", "t"]:
+            if str(value).lower() in ["yes", "t", "vero"]:
                 return True
-            elif str(value).lower() in ["no", "f"]:
+            elif str(value).lower() in ["no", "f", "falso"]:
                 return False
             else:
                 return None if field is None or field.__dict__["field"].null else default
