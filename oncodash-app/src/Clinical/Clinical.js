@@ -6,8 +6,8 @@ import StaticToggle from './StaticToggle';
 
 function Clinical(props) {
     const displayOrder1 = ["age_at_diagnosis", "bmi_at_diagnosis","previous_cancer"]; // date of diagnosis is missing
-    const displayOrder2 = ["treatment_strategy", "primary_therapy_outcome", "maintenance_therapy", "drug_trial_name", "progression"]; // maintenance after 1st line is missing // participation in drug trial is missing
-    const displayOrder3 = ["hrd_myriad_status", "brca_mutation_status", "germline_pathogenic_variant"]; // germ line pathogenic variants is missing // genetic alteration with druggable target is misssing
+    const displayOrder2 = ["treatment_strategy", "primary_therapy_outcome", "maintenance_therapy", "drug_trial_name", "progression"]; 
+    const displayOrder3 = ["hrd_myriad_status", "brca_mutation_status", "germline_pathogenic_variant"]; //genetic alteration with druggable target is misssing
 
     const dictionary = {
                         "age_at_diagnosis":"Age at diagnosis",
@@ -57,7 +57,7 @@ function Clinical(props) {
             <div className="below-nav w-100 pb-5 mx-0">
                 <Container className="p-0">
                                             {/* overview generale paziente */}
-                        <Row className="my-5">
+                        <Row className="my-5 mx-0">
                             <Col>
                                 <div className="text-center fw-bold">Baseline</div>
                                 
@@ -106,7 +106,7 @@ function Clinical(props) {
                                     {displayOrder3.map(d=>  
                                                             <Row key={d} className="text-center text-primary font-weight-bold">
                                                                 <Col className="text-end text-dark">{dictionary[d]}:</Col> 
-                                                                <Col className="text-start d-flex align-items-end">{d==="brca_mutation_status" ? 
+                                                                <Col className="text-start d-flex align-items-end text-break">{d==="brca_mutation_status" ? 
                                                                                                     props.patient[d] !=="No BRCA mut" && props.patient[d] !==null  && props.patient[d] !==NaN ? 
                                                                                                                                         <StaticToggle answer={"Yes"} label={props.patient[d].slice(0,14)}/>
                                                                                                                                         : props.patient[d] === "No BRCA mut" ?  <StaticToggle answer={"No"} label={props.patient[d]}/>
