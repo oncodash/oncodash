@@ -4,8 +4,8 @@ import StaticToggle from './Clinical/StaticToggle';
 
 function PatientSummary(props) {
     const displayOrder1 = ["patient_id", "age_at_diagnosis", "stage"];
-    const displayOrder2 = ["survival", "progression"]; // current phase is missing
-    const displayOrder3 = ["paired_fresh_samples_available", "platinum_free_interval"]; // OS is missing
+    const displayOrder2 = ["survival", "current_treatment_phase", "progression"]; 
+    const displayOrder3 = ["paired_fresh_samples_available", "platinum_free_interval", "days_to_death"]; 
     const dictionary = {
         "patient_id":"Patient ID",
         "age_at_diagnosis":"Age",
@@ -13,7 +13,9 @@ function PatientSummary(props) {
         "survival":"Status",
         "progression":"Progression",
         "paired_fresh_samples_available":"PFS",
-        "platinum_free_interval":"PFI"
+        "platinum_free_interval":"PFI",
+        "days_to_death":"OS",
+        "current_treatment_phase": "current phase"
     };
     const survcolor = props.patient["survival"] === "alive" ? "green":"red"
 
@@ -51,8 +53,8 @@ function PatientSummary(props) {
                                     <Col className="text-start d-flex align-items-center">{props.patient[d]}
                                                                 {props.patient[d]===true?<StaticToggle answer={"Yes"} label={"Yes"}/>: ""}
                                                                 {props.patient[d]===false?<StaticToggle answer={"No"} label={"No"}/>: ""}
-                                                                {props.patient[d]===NaN && d!=="primary_therapy_outcome"?<StaticToggle answer={"NA"} label={"NA"}/>: ""}
-                                                                {props.patient[d]===null && d!=="primary_therapy_outcome"?<StaticToggle answer={"NA"} label={"NA"}/>: ""}</Col> 
+                                                                {props.patient[d]===NaN && d==="progression"?<StaticToggle answer={"NA"} label={"NA"}/>: ""}
+                                                                {props.patient[d]===null && d==="progression"?<StaticToggle answer={"NA"} label={"NA"}/>: ""}</Col> 
                                 </Row>)}    
                         </div>           
             </Col>
