@@ -18,6 +18,8 @@ core.views
    .. autosummary::
    
       FrontendRenderView
+      HelloView
+      LogoutView
    
    
 
