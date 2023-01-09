@@ -84,7 +84,7 @@ system.
 
 4. Populate a test database with clinical data and real timeline data. "<clinical filepath>" is the path of clinical data file and can be downloaded from eduuni. "<timeline filepath>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
 ```sh
-python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline filepath>
+docker-compose run --rm backend sh -c "python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline filepath>"
 ```
 
 5. Create an account. Type:
