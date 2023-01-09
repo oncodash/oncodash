@@ -69,21 +69,20 @@ select Software:Nginx System:Your-Host-OS
 follow the instruction to install certbot and get certificates
 
 1. Build the back-end, front-end and nginx docker-images:
-```sh
-docker-compose build
-```
+    ```sh
+    docker-compose build
+    ```
 1. Create a development SQLlite database inside the container and add tables to it:
-```sh
-docker-compose run --rm backend sh -c "python manage.py makemigrations"
-docker-compose run --rm backend sh -c "python manage.py migrate"
-```
+    ```sh
+    docker-compose run --rm backend sh -c "python manage.py makemigrations"
+    docker-compose run --rm backend sh -c "python manage.py migrate"
+    ```
 
 1. Populate a test database with network data (Explainer-app)
-
-```sh
-docker-compose run --rm backend sh -c "python manage.py flush --no-input"
-docker-compose run --rm backend sh -c "python manage.py populate -p /opt/app/path/to/indf.csv"
-```
+    ```sh
+    docker-compose run --rm backend sh -c "python manage.py flush --no-input"
+    docker-compose run --rm backend sh -c "python manage.py populate -p /opt/app/path/to/indf.csv"
+    ```
 Note: `/opt/app/` points by default to wherever is `oncodash/backend/` on your
 system.
 
@@ -93,9 +92,9 @@ docker-compose run --rm backend sh -c "python manage.py import_timelinerecords_a
 ```
 
 1. Create an account. Type:
-```sh
-docker-compose run --rm backend sh -c "python manage.py createsuperuser"
-```
+    ```sh
+    docker-compose run --rm backend sh -c "python manage.py createsuperuser"
+    ```
 and then follow the prompt instruction.
 
 
