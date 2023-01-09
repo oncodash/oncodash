@@ -63,17 +63,22 @@ You will be asked to accept some user contract at first launch.
 
 ## Installation
 
+1. Let's Encrypt installation: 
+go to https://certbot.eff.org/
+select Software:Nginx System:Your-Host-OS
+follow the instruction to install certbot and get certificates
+
 1. Build the back-end, front-end and nginx docker-images:
 ```sh
 docker-compose build
 ```
-2. Create a development SQLlite database inside the container and add tables to it:
+1. Create a development SQLlite database inside the container and add tables to it:
 ```sh
 docker-compose run --rm backend sh -c "python manage.py makemigrations"
 docker-compose run --rm backend sh -c "python manage.py migrate"
 ```
 
-3. Populate a test database with network data (Explainer-app)
+1. Populate a test database with network data (Explainer-app)
 
 ```sh
 docker-compose run --rm backend sh -c "python manage.py flush --no-input"
@@ -82,12 +87,12 @@ docker-compose run --rm backend sh -c "python manage.py populate -p /opt/app/pat
 Note: `/opt/app/` points by default to wherever is `oncodash/backend/` on your
 system.
 
-4. Populate a test database with clinical data and real timeline data. "<clinical filepath>" is the path of clinical data file and can be downloaded from eduuni. "<timeline filepath>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
+1. Populate a test database with clinical data and real timeline data. "<clinical filepath>" is the path of clinical data file and can be downloaded from eduuni. "<timeline filepath>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
 ```sh
 docker-compose run --rm backend sh -c "python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline filepath>"
 ```
 
-5. Create an account. Type:
+1. Create an account. Type:
 ```sh
 docker-compose run --rm backend sh -c "python manage.py createsuperuser"
 ```
