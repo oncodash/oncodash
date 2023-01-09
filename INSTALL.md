@@ -64,9 +64,9 @@ You will be asked to accept some user contract at first launch.
 ## Installation
 
 1. Let's Encrypt installation: 
-- go to https://certbot.eff.org/
-- select Software:Nginx System:Your-Host-OS
-- follow the instruction to install certbot and get certificates
+    - go to https://certbot.eff.org/
+    - select Software:Nginx System:Your-Host-OS
+    - follow the instruction to install certbot and get certificates
 
 1. Build the back-end, front-end and nginx docker-images:
     ```sh
