@@ -83,35 +83,30 @@ You will be asked to accept some user contract at first launch.
     docker-compose run --rm backend sh -c "python manage.py flush --no-input"
     docker-compose run --rm backend sh -c "python manage.py populate -p /opt/app/path/to/indf.csv"
     ```
-Note: `/opt/app/` points by default to wherever is `oncodash/backend/` on your
-system.
+    Note: `/opt/app/` points by default to wherever is `oncodash/backend/` on your
+    system.
 
 1. Populate a test database with clinical data and real timeline data. "<clinical filepath>" is the path of clinical data file and can be downloaded from eduuni. "<timeline filepath>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
-```sh
-docker-compose run --rm backend sh -c "python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline filepath>"
-```
+    ```sh
+    docker-compose run --rm backend sh -c "python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline       filepath>"
+    ```
 
 1. Create an account. Type:
     ```sh
     docker-compose run --rm backend sh -c "python manage.py createsuperuser"
     ```
-and then follow the prompt instruction.
+    and then follow the prompt instruction.
 
 
 ## Development
 
 1. Run the images in containers:
-
-If you are running containers for the first time:
-```sh
-docker-compose up -d && docker-compose exec nodeserver sh -c "mkdir -p node_modules/.cache/ && touch node_modules/.cache/.eslintcache && chown -R node:node node_modules/.cache && chmod -R 777 node_modules/.cache/"
-```
-Otherwise just run:
-```sh
-docker-compose up
-```
-2. Open up the browser at [localhost](http://localhost).
-3. Browsable API endpoints at [localhost/api/explainer/networks/](http://localhost/api/explainer/networks/).
+    If you are running containers for the first time:
+    ```sh
+    docker-compose up -d
+    ```
+1. Open up the browser at [localhost](http://localhost).
+1. Browsable API endpoints at [localhost/api/explainer/networks/](http://localhost/api/explainer/networks/).
 
 
 ## Testing
