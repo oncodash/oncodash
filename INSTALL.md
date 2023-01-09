@@ -89,7 +89,7 @@ python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical
 
 5. Create an account. Type:
 ```sh
-python manage.py createsuperuser
+docker-compose run --rm backend sh -c "python manage.py createsuperuser"
 ```
 and then follow the prompt instruction.
 
