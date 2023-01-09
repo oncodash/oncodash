@@ -82,10 +82,17 @@ docker-compose run --rm backend sh -c "python manage.py populate -p /opt/app/pat
 Note: `/opt/app/` points by default to wherever is `oncodash/backend/` on your
 system.
 
-4. Populate a test database with clinical data (clin_overview-app)
+4. Populate a test database with clinical data and real timeline data. "<clinical filepath>" is the path of clinical data file and can be downloaded from eduuni. "<timeline filepath>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
 ```sh
-python manage.py fake_data -n <num samples>
+python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline filepath>
 ```
+
+5. Create an account. Type:
+```sh
+python manage.py createsuperuser
+```
+and then follow the prompt instruction.
+
 
 ## Development
 
@@ -94,11 +101,11 @@ python manage.py fake_data -n <num samples>
 If you are running containers for the first time:
 ```sh
 docker-compose up -d && docker-compose exec nodeserver sh -c "mkdir -p node_modules/.cache/ && touch node_modules/.cache/.eslintcache && chown -R node:node node_modules/.cache && chmod -R 777 node_modules/.cache/"
-``` 
+```
 Otherwise just run:
 ```sh
 docker-compose up
-``` 
+```
 2. Open up the browser at [localhost](http://localhost).
 3. Browsable API endpoints at [localhost/api/explainer/networks/](http://localhost/api/explainer/networks/).
 
