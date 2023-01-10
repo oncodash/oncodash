@@ -51,9 +51,10 @@ jobs:
       with:
         python-version: '3.8'
 
-    - uses: bahmutov/npm-install@v1
+    - uses: actions/setup-node@v3.6.0
       with:
-        working-directory: oncodash-app
+        node-version: 16
+    - run: npm ci
     - name: Install typedoc
       run: |
         npm install -g typedoc
