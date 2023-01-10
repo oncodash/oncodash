@@ -44,7 +44,7 @@ function LoginModal(props) {
                 .then(()=>handleClose())
                 .catch((msg)=>{
                     setValidated(false);
-                    setLoginErr(msg);
+                    setLoginErr(true);
                 });
         }
 

@@ -314,9 +314,8 @@ function Timeline2(props) {
             return create_chart(dayzero, props.time_series[d], d); 
         });
         const concat = charts2.concat(charts);
-
+        console.log("charts: \n", charts[0].data[0]);
         
-        // console.log("charts: \n", charts);
         options = {
 
             title: {
@@ -324,12 +323,13 @@ function Timeline2(props) {
                 fontSize: "14",
             },
             navigator:{
+                // dynamicUpdate: false,
                 // slider:{
                 //     minimum: datemin,
-                //     maximum: datemax,
-            
+                //     maximum: datemax,            
                 // },
                 data: charts[0].data
+                // axisX: charts[0].data[0]
             },
             rangeSelector:{
                 buttonStyle: {
