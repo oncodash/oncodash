@@ -86,9 +86,9 @@ You will be asked to accept some user contract at first launch.
     Note: `/opt/app/` points by default to wherever is `oncodash/backend/` on your
     system.
 
-1. Populate a test database with clinical data and real timeline data. "<clinical filepath>" is the path of clinical data file and can be downloaded from eduuni. "<timeline filepath>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
+1. Populate a test database with clinical data and real timeline data. "\<clinical filepath\>" is the path of clinical data file and can be downloaded from eduuni. "\<timeline filepath\>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). **The expected column separator is ";"**. The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
     ```sh
-    docker-compose run --rm backend sh -c "python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline       filepath>"
+    docker-compose run --rm backend sh -c "python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline  filepath>"
     ```
 
 1. Create an account. Type:
@@ -129,6 +129,12 @@ docker-compose run --rm nodeserver sh -c "npm test"
 
 ## Installation
 
+#### Let's Encrypt
+    - go to https://certbot.eff.org/
+    - select Software:Nginx System:Your-Host-OS
+    - follow the instruction to install certbot and get certificates
+
+
 #### Backend
 
 1. Clone the repository & move to the `backend` directory:
@@ -166,7 +172,7 @@ python manage.py flush --no-input
 python manage.py populate -p /path/to/indication_table.csv
 ```
 
-6. Populate a test database with clinical data and real timeline data. "<clinical filepath>" is the path of clinical data file and can be downloaded from eduuni. "<timeline filepath>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
+6.opulate a test database with clinical data and real timeline data. "\<clinical filepath\>" is the path of clinical data file and can be downloaded from eduuni. "\<timeline filepath\>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). **The expected column separator is ";"**. The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
 ```sh
 python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline filepath>
 ```
@@ -187,7 +193,6 @@ cd oncodash/oncodash-app/
 ```
 npm install --legacy-peer-deps
 ```
-
 
 ## Development
 
