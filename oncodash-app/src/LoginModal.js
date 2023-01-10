@@ -79,7 +79,7 @@ function LoginModal(props) {
                             <Button variant="primary" type="submit" >Submit</Button>
                             <Button variant="secondary" onClick={() => handleClose()}>Close</Button>
                         </Modal.Footer>
-                        {loginErr ? <Alert variant='danger'>Incorrect username and/or password!!!</Alert> : ''}
+                        {loginErr ? <Alert variant='danger'>Incorrect email and/or password!!!</Alert> : ''}
                     </Form>
         </Modal>
     );
