@@ -1,15 +1,16 @@
-name: Release
+name: Release Workflow
 
 on:
-  push:
+  release:
     branches:
       - main
     paths-ignore:
       - 'package.json'
       - 'CHANGELOG.md'
 
+
 jobs:
-  release:
+  conventional-changelog:
     runs-on: ubuntu-latest
 
     steps:

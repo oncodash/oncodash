@@ -3,6 +3,7 @@ version: "3.2"
 services:
   # nodeserver
   nodeserver:
+    image: oncodash/nodeserver
     user: $UID:$GID
     build:
       context: ./oncodash-app
