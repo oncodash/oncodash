@@ -11,7 +11,7 @@ function Clinical(props) {
 
     const dictionary = {
                         "age_at_diagnosis":"Age at diagnosis",
-                        "bmi_at_diagnosis": "Bmi",
+                        "bmi_at_diagnosis": "BMI",
                         "previous_cancer": "Previous cancer",
                         "treatment_strategy":"Strategy",
                         "primary_therapy_outcome":"Primary outcome",
