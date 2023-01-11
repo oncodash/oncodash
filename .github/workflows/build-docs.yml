@@ -1,4 +1,4 @@
-name: build-docs
+name: Build Documentation
 
 on:
   push:
@@ -51,26 +51,26 @@ jobs:
       with:
         python-version: '3.8'
 
-    - uses: actions/setup-node@v3.6.0
-      with:
-        node-version: 16
-    - run: npm ci
-    - name: Install typedoc
-      run: |
-        npm install -g typedoc
-        npm install @open-wc/create
+#    - uses: actions/setup-node@v3.6.0
+#      with:
+#        node-version: 16
+#    - run: npm ci
+#    - name: Install typedoc
+#      run: |
+#        npm install -g typedoc
+#        npm install @open-wc/create
 
-    - name: Install Dependencies
-      run: |
-        pip install --upgrade pip
-        pip install -r ./oncodash-app/docs/sphinx-js/requirements.txt
+#    - name: Install Dependencies
+#      run: |
+#        pip install --upgrade pip
+#        pip install -r ./oncodash-app/docs/sphinx-js/requirements.txt
 
-    - name: Build (frontend) Doc
-      run: |
-        cd oncodash-app/docs/sphinx-js
-        make clean
-        make html
-        touch build/html/.nojekyll
+#    - name: Build (frontend) Doc
+#      run: |
+#        cd oncodash-app/docs/sphinx-js
+#        make clean
+#        make html
+#        touch build/html/.nojekyll
 
     - name: Deploy
       uses: JamesIves/github-pages-deploy-action@4.1.7
