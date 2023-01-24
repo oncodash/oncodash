@@ -6,7 +6,7 @@ import configData from "./conf.json";
  * All the API calls
  */
  const PROTOCOL = configData.PROTOCOL;
- const HOST = configDat.HOST
+ const HOST = configData.HOST
  const BASEURL =  PROTOCOL + '://' + HOST + '/api/';
  const CLIN_OVERVIEW = `clinical-overview/data/`;
 
