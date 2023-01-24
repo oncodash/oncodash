@@ -1,6 +1,6 @@
 // import of the Objects declarations
 import {Patient} from './Clinical/Patient.js';
-import configData from "../../conf.json";
+import configData from "./conf.json";
 
 /**
  * All the API calls
