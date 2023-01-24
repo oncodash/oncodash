@@ -8,6 +8,7 @@ jobs:
   docker-buildnpush:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -21,11 +22,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - uses: actions/checkout@v2
-      - name: Build the dockercompose stack
+      - name: Build the docker-compose Stack
         run: docker-compose build
-        
-      - name: Push docker images
+
+      - name: Push Docker Images
         run: docker-compose push
 
 

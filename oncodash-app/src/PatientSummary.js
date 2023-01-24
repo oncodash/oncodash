@@ -5,7 +5,7 @@ import StaticToggle from './Clinical/StaticToggle';
 function PatientSummary(props) {
     const displayOrder1 = ["patient_id", "age_at_diagnosis", "stage"];
     const displayOrder2 = ["survival", "current_treatment_phase", "progression"]; 
-    const displayOrder3 = ["paired_fresh_samples_available", "platinum_free_interval", "days_to_death"]; 
+    const displayOrder3 = ["paired_fresh_samples_available", "platinum_free_interval", "days_to_death", "followup_time"]; 
     const dictionary = {
         "patient_id":"Patient ID",
         "age_at_diagnosis":"Age",
@@ -15,7 +15,8 @@ function PatientSummary(props) {
         "paired_fresh_samples_available":"PFS",
         "platinum_free_interval":"PFI",
         "days_to_death":"OS",
-        "current_treatment_phase": "current phase"
+        "current_treatment_phase": "current phase",
+        "followup_time" : "F-UP"
     };
     const survcolor = props.patient["survival"] === "alive" ? "green":"red"
 
