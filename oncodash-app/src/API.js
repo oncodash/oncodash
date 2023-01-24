@@ -144,6 +144,37 @@ import {Patient} from './Clinical/Patient.js';
   
   }  
 
+  async function updatePatients(token, separator, type, file) {
+    // call: POST /api/tasks
+    const formData = new FormData();
+    formData.append("separator", separator);
+    formData.append("type", type);
+    formData.append("file", file);
+    let response = await fetch(BASEURL + CLIN_OVERVIEW + 'update/', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Token '+token,
+            // 'Content-Type': 'application/json',
+          },
+          body: formData,
+    });
+    if(response.ok) {
+  
+      const res = await response.json();
+      // console.log(res);
+      return res;
+    }
+    else {
+      try {
+        const errDetail = await response.json();
+        throw errDetail.message;
+      }
+      catch(err) {
+        throw err;
+      }
+    }
+  }  
+
   async function logIn(username, password) {
     let response = await fetch(PROTOCOL+'://'+HOST+'/api-token-auth/', {
       method: 'POST',
@@ -188,5 +219,5 @@ import {Patient} from './Clinical/Patient.js';
     }
   }  
 
-const API = {getPatients, getSelectedPatient, logIn, logOut, getUserInfo};
+const API = {getPatients, getSelectedPatient, updatePatients, logIn, logOut, getUserInfo};
 export default API;

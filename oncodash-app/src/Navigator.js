@@ -6,9 +6,11 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Row, Col} from 'react-bootstrap';
 import { Tag, Table, Microsoft} from 'react-bootstrap-icons';
+import UploadDataModal from './UploadDataModal';
+import {useState} from 'react';
 
 function Navigator(props) {
-
+    const [modalShow, setModalShow] = useState(false);
     const resetFields = ()=>{
         props.setStatusFilterCallback("");
         props.setFilterCallback("");
@@ -57,6 +59,7 @@ function Navigator(props) {
                                         </NavDropdown.Item>
                                     </NavDropdown>
                                     <Button className='bg-danger text-light' onClick={()=>resetFields()}>Reset</Button>
+                                    <Button className='bg-success text-light' onClick={() => setModalShow(true)}>Upload Data</Button>
                                 </Nav>
                             </Navbar.Collapse>
                         </Col> 
@@ -110,7 +113,11 @@ function Navigator(props) {
                     </Row>
                 </Container>
             </Navbar>
-            
+            <UploadDataModal
+                    show={modalShow}
+                    onHide={() => setModalShow(false)}
+                    uploadDataCallback={props.uploadDataCallback}
+                />
             </>
             
 

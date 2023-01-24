@@ -314,7 +314,7 @@ function Timeline2(props) {
             return create_chart(dayzero, props.time_series[d], d); 
         });
         const concat = charts2.concat(charts);
-        console.log("charts: \n", charts[0].data[0]);
+        // console.log("charts: \n", charts[0].data[0]);
         
         options = {
 

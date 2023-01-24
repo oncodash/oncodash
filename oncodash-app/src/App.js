@@ -47,6 +47,16 @@ function App() {
     }
   }
 
+  const uploadDataCallback = async (separator, type, file) => {
+    try {
+      const res = await API.updatePatients(token, separator, type, file)
+      alert(`MSG, ${res}!`); 
+      return false;
+    } catch(err) {
+      throw err;
+    }
+  }  
+
   useEffect(()=>{
     if(cookie["token"]!==undefined && cookie["token"]!=="undefined"){
       setToken(cookie["token"]);
@@ -102,6 +112,7 @@ function App() {
                                                           filter={filter}
                                                           statusFilter={statusFilter}
                                                           setStatusFilterCallback={setStatusFilter}
+                                                          uploadDataCallback={uploadDataCallback}
                                                       />}    
                 />
             </Routes>
