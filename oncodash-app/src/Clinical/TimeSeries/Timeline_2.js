@@ -342,6 +342,7 @@ function Timeline2(props) {
 
                 },
                 inputFields: {
+                    startValue: new Date("1999-12-1"),
                     style: {
                     fontSize: 18,
                     fontStyle: "normal",
