@@ -155,10 +155,8 @@ class Command(BaseCommand):
                     source_system           = handle_string_field(row["source_system"]),
                 )
                 rec.save()
-            except:
-                ...
-
-
+            except Exception as e:
+                print("Failed to import timeline data with external id", handle_string_field(row["id"]), "\nError:", str(e))
 
         # external_record_id = models.IntegerField(unique=True)
         # patient_id = models.ForeignKey(ClinicalData, on_delete=models.CASCADE)

@@ -10,7 +10,7 @@ import numpy as np
 from collections import OrderedDict
 import pandas as pd
 from rest_framework.permissions import IsAuthenticated
-
+import re
 
     
 
@@ -28,6 +28,7 @@ class ClinicalViewSet(viewsets.ModelViewSet):
         queryset = ClinicalData.objects.all()
         patient = get_object_or_404(queryset, patient_id=pk)
         timelinerecords = TimelineRecord.objects.filter(patient=patient, event="laboratory")
+        # clinicalrecords = TimelineRecord.objects.filter(patient=patient, )
         if len(timelinerecords) != 0:
             date_relative_max = timelinerecords.aggregate(Max("date_relative"))['date_relative__max']
             date_relative_min = timelinerecords.aggregate(Min("date_relative"))['date_relative__min']
@@ -126,6 +127,9 @@ class ClinicalViewSet(viewsets.ModelViewSet):
             tykslab_plasma = TimelineRecord.objects.filter(patient=patient, event="tykslab_plasma").order_by("date_relative").values_list("date_relative", "name").distinct()
             ctdna_sample = TimelineRecord.objects.filter(patient=patient, event="ctdna_sample").order_by("date_relative").values_list("date_relative", "name").distinct()
             radiology = TimelineRecord.objects.filter(patient=patient, event="radiology").order_by("date_relative").values_list("date_relative", "name").distinct()
+            clinical_a = TimelineRecord.objects.filter(patient=patient, event__in=['diagnosis', 'last_date_of_primary_therapy']).order_by(
+                "date_relative").values_list("date_relative", "event").distinct()
+            clinical_b = TimelineRecord.objects.filter(patient=patient, event__regex=r'.+?(?=_progression)').order_by("date_relative").values_list("date_relative", "event").distinct()
 
             def convert_to_dict(series):
                 diz = OrderedDict()
@@ -145,6 +149,7 @@ class ClinicalViewSet(viewsets.ModelViewSet):
                 'tykslab_plasma': convert_to_dict(tykslab_plasma),
                 'ctdna_sample': convert_to_dict(ctdna_sample),
                 'radiology': convert_to_dict(radiology),
+                'clinical': convert_to_dict(clinical_a) | convert_to_dict(clinical_b),
             }
 
             patient.time_series = simplejson.dumps(time_series, ignore_nan=True)
