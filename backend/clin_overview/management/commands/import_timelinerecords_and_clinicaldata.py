@@ -1,8 +1,6 @@
 from django.core.management.base import BaseCommand
-from faker import Faker
 
 from clin_overview.models import ClinicalData, TimelineRecord
-from clin_overview.tests.utils import Provider, create_data
 import pandas as pd
 
 
