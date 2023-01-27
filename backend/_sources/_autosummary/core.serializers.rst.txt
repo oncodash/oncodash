@@ -1,0 +1,29 @@
+core.serializers
+================
+
+.. automodule:: core.serializers
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      UploadSerializer
+   
+   
+
+   
+   
+   
+
+
+
