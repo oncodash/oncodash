@@ -4,8 +4,8 @@ import {Patient} from './Clinical/Patient.js';
 /**
  * All the API calls
  */
- const PROTOCOL = "https";
- const HOST = "oncodash.ing.unimore.it"
+ const PROTOCOL = "http";
+ const HOST = "oncodash.ing.unimore.it:8887"
  const BASEURL =  PROTOCOL+'://'+HOST+'/api/';
  const CLIN_OVERVIEW = `clinical-overview/data/`;
 

@@ -5,7 +5,7 @@ import Navbar from 'react-bootstrap/Navbar';
 function Footer(props) {
 
     return(
-        <Navbar className="bg-secondary py-3 bg-opacity-25 mt-5 fixed-bottom" expand="lg">
+        <Navbar className="bg-secondary py-3 mt-5 fixed-bottom" expand="lg">
             <Container fluid>
                 <Row className="w-100">
                     <Col className="col-2 d-flex justify-content-center align-items-start">
@@ -15,9 +15,9 @@ function Footer(props) {
 
                     </Col>
                     <Col className="col-3 d-flex justify-content-center">
-                            <div className="m-1">
+                            <div className="text-white m-1">
                                 Designed by 
-                                <a className="text-dark m-1" href="https://www.deciderproject.eu/">
+                                <a className="text-light m-1" href="https://www.deciderproject.eu/">
                                     DECIDER
                                 </a>
                             </div>

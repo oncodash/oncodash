@@ -189,38 +189,46 @@ function create_chart(dayzero, time_series, name){
 function create_chart2_points(dayzero, event_series, name, min, max){
     let points = [];
     let value=1;
-    if(name === "ctdna"){
+    if(name === "clinical"){
         value = 1;
     }
-    if(name === "fresh_sample"){
+    if(name === "ctdna"){
         value = 2;
     }
-    if(name === "fresh_sample_sequenced"){
+    if(name === "fresh_sample"){
         value = 3;
     }
-    if(name === "radiology"){
+    if(name === "fresh_sample_sequenced"){
         value = 4;
     }
-    if(name === "tykslab_plasma"){
+    if(name === "radiology"){
         value = 5;
     }
+    if(name === "tykslab_plasma"){
+        value = 6;
+    }
+    
+    const pointsColorDict = {
+        "diagnosis":                    ["orange"   , "square"],
+        "death":                        ["black"    , "square"],
+        "last_date_of_primary_therapy": ["red"      , "triangle"],
+        "ctdna":                        ["brown"    , "circle"],
+        "fresh_sample":                 ["green"    , "circle"],
+        "fresh_sample_sequenced":       ["grey"     , "circle"],
+        "radiology":                    ["red"      , "circle"],
+        "tykslab_plasma":               ["purple"   , "circle"]
 
+    }
     for(let i=0; i<event_series.date_relative.length; i++){
         let date = new Date(dayzero);
         date.setDate(date.getDate() + event_series.date_relative[i]);
-        // if(points[points.length-1]!==undefined){
-        //     // console.log(points[points.length-1], date, points[points.length-1].y, points[points.length-1].x===date);
-        //     // if(points[points.length-1].x.getTime()===date.getTime()){
-        //     //     value = value + 1;
-        //     // }else{
-        //     //     value = 1;
-        //     // }
-        // }
         points.push({
                     x: date, 
                     y: value, 
                     // z:z, 
                     name:event_series.name[i],
+                    markerColor: name!=="clinical"?pointsColorDict[name][0]:pointsColorDict.hasOwnProperty(event_series.name[i]) ? pointsColorDict[event_series.name[i]][0] : "blue",
+                    markerType:  name!=="clinical"?pointsColorDict[name][1]:pointsColorDict.hasOwnProperty(event_series.name[i]) ? pointsColorDict[event_series.name[i]][1] : "triangle",
                     // label: name   
         });
     }
@@ -252,21 +260,23 @@ function create_chart2(data_points, name="event_timeline"){
             labelFormatter: function ( e ) {
                 // console.log("e: ", e);
                 if(e.value===1)
-                    return leftPad("ctdna_sample", 22);
+                    return leftPad("clinical", 22);
                 else if(e.value===2)
-                    return leftPad("fresh_sample", 22);
+                    return leftPad("ctdna_sample", 22);
                 else if(e.value===3)
-                    return leftPad("fresh_sample_sequenced", 22);
+                    return leftPad("fresh_sample", 22);
                 else if(e.value===4)
-                    return leftPad("radiology", 22);  
+                    return leftPad("fresh_sample_sequenced", 22);
                 else if(e.value===5)
+                    return leftPad("radiology", 22);  
+                else if(e.value===6)
                     return leftPad("tykslab_plasma", 22);                     
                 else 
                     return leftPad("", 22);
                 
             },
             viewportMinimum: 0,
-            viewportMaximum: 5,
+            viewportMaximum: 7,
         },
         axisX:{
             gridThickness: 1,
@@ -291,6 +301,7 @@ function Timeline2(props) {
     if(props.time_series!==null){
         const displayOrder = ['ca125', 'neut', 'hb', 'leuk', 'platelets'];
         const displayOrder2 = [    
+                                    'clinical',
                                     'ctdna_sample', 
                                     'fresh_sample', 
                                     'fresh_sample_sequenced',   
@@ -328,7 +339,8 @@ function Timeline2(props) {
                 //     minimum: datemin,
                 //     maximum: datemax,            
                 // },
-                data: charts[0].data
+                data: charts[0].data,
+                height: 50,
                 // axisX: charts[0].data[0]
             },
             rangeSelector:{
@@ -353,7 +365,7 @@ function Timeline2(props) {
         };
         containerProps = {
             width: "100%",
-            height: "800px",
+            height: "700px",
             margin: "auto"
         };
     }
