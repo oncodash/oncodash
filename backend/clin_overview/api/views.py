@@ -27,11 +27,13 @@ class ClinicalViewSet(viewsets.ModelViewSet):
         serializer_class = ClinicalDataSerializer
         queryset = ClinicalData.objects.all()
         patient = get_object_or_404(queryset, patient_id=pk)
-        timelinerecords = TimelineRecord.objects.filter(patient=patient, event="laboratory")
+        timelinerecords = TimelineRecord.objects.filter(patient=patient, event__in=["laboratory", "death"])
         # clinicalrecords = TimelineRecord.objects.filter(patient=patient, )
         if len(timelinerecords) != 0:
             date_relative_max = timelinerecords.aggregate(Max("date_relative"))['date_relative__max']
+            date_relative_max += 15 # To better visualize data
             date_relative_min = timelinerecords.aggregate(Min("date_relative"))['date_relative__min']
+            timelinerecords = timelinerecords.exclude(event="death")
             ca125 = timelinerecords.filter(name="ca125").order_by("date_relative")
             hb = timelinerecords.filter(name="hb").order_by("date_relative")
             neut = timelinerecords.filter(name="neut").order_by("date_relative")
@@ -127,9 +129,8 @@ class ClinicalViewSet(viewsets.ModelViewSet):
             tykslab_plasma = TimelineRecord.objects.filter(patient=patient, event="tykslab_plasma").order_by("date_relative").values_list("date_relative", "name").distinct()
             ctdna_sample = TimelineRecord.objects.filter(patient=patient, event="ctdna_sample").order_by("date_relative").values_list("date_relative", "name").distinct()
             radiology = TimelineRecord.objects.filter(patient=patient, event="radiology").order_by("date_relative").values_list("date_relative", "name").distinct()
-            clinical_a = TimelineRecord.objects.filter(patient=patient, event__in=['diagnosis', 'last_date_of_primary_therapy']).order_by(
-                "date_relative").values_list("date_relative", "event").distinct()
-            clinical_b = TimelineRecord.objects.filter(patient=patient, event__regex=r'.+?(?=_progression)').order_by("date_relative").values_list("date_relative", "event").distinct()
+            clinical = TimelineRecord.objects.filter(patient=patient, event__in=['diagnosis', 'last_date_of_primary_therapy', 'primary_progression', '2nd_progression', '3rd_progression', '4th_progression', '5th_progression', '6th_progression', '7th_progression', '8th_progression', '9th_progression', '10th_progression', 'death']).order_by("date_relative").values_list("date_relative", "event").distinct() # This line assumes that we will have at most 10 progressions
+            # clinical_b = TimelineRecord.objects.filter(patient=patient, event__regex=r'.+?(?=_progression)').order_by("date_relative").values_list("date_relative", "event").distinct()
 
             def convert_to_dict(series):
                 diz = OrderedDict()
@@ -140,16 +141,13 @@ class ClinicalViewSet(viewsets.ModelViewSet):
                         diz[k] = str(v)
                 return {"date_relative": list(diz.keys()), "name": list(diz.values())}
 
-
-
-
             event_series = {
                 'fresh_sample': convert_to_dict(fresh_sample),
                 'fresh_sample_sequenced': convert_to_dict(fresh_sample_sequenced),
                 'tykslab_plasma': convert_to_dict(tykslab_plasma),
                 'ctdna_sample': convert_to_dict(ctdna_sample),
                 'radiology': convert_to_dict(radiology),
-                'clinical': convert_to_dict(clinical_a) | convert_to_dict(clinical_b),
+                'clinical': convert_to_dict(clinical),
             }
 
             patient.time_series = simplejson.dumps(time_series, ignore_nan=True)
