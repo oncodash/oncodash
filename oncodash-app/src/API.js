@@ -1,12 +1,13 @@
 // import of the Objects declarations
 import {Patient} from './Clinical/Patient.js';
+import configData from "./conf.json";
 
 /**
  * All the API calls
  */
- const PROTOCOL = "http";
- const HOST = "oncodash.ing.unimore.it:8887"
- const BASEURL =  PROTOCOL+'://'+HOST+'/api/';
+ const PROTOCOL = configData.PROTOCOL;
+ const HOST = configData.HOST
+ const BASEURL =  PROTOCOL + '://' + HOST + '/api/';
  const CLIN_OVERVIEW = `clinical-overview/data/`;
 
  

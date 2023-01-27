@@ -1093,10 +1093,10 @@ class TimelineRecord(models.Model):
     interval_length         = models.IntegerField(blank=True, null=True)
     date_relative           = models.IntegerField(blank=True, null=True)
     interval_end_relative   = models.IntegerField(blank=True, null=True)
-    name                    = models.CharField(max_length=255)
+    name                    = models.CharField(max_length=255, null=True)
     result                  = models.FloatField(blank=True, null=True)
     aux_id                  = models.CharField(max_length=255, blank=True, null=True)
-    source_system           = models.CharField(max_length=255)
+    source_system           = models.CharField(max_length=255, null=True)
 
     def __str__(self):
         return self.external_record_id

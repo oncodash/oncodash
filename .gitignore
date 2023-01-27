@@ -47,6 +47,6 @@ nbs
 
 **/migrations/
 
-*.csv
+**/*.csv
 
 backend/db.sqlite3-journal

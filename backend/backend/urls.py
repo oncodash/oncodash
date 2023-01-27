@@ -4,9 +4,20 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from django.views.generic import TemplateView
 from django.urls import path
-from core.views import HelloView, LogoutView
+from core.views import HelloView, LogoutView, UploadViewSet
 from rest_framework.authtoken.views import obtain_auth_token
 from django.contrib.auth import views
+
+from django.urls import path, include
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+router.register(r'upload', UploadViewSet, basename="upload")
+
+# Wire up our API using automatic URL routing.
+urlpatterns = [
+
+]
 
 urlpatterns = [
     path("hello/", HelloView.as_view(), name='hello'),
@@ -16,6 +27,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/explainer/", include("explainer.api.urls")),
     path("api/clinical-overview/", include("clin_overview.api.urls")),
+    path('', include(router.urls)),
 ] + staticfiles_urlpatterns()
 
 
