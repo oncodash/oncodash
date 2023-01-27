@@ -100,7 +100,7 @@ function App() {
   return (
     <Router>
         <MyNavBar logged={logged} loginCallback={loginCallback} logoutCallback={logoutCallback}/>
-        <Row className="vheight-100  m-0">
+        <Row className="vheight-100  mt-5">
             <Routes>
                 <Route path="/patientview"    element={<PatientView token={token}/>}    />
                 {/* <Route path="/clinical"       element={<Clinical/>}       />

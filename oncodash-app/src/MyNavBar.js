@@ -12,7 +12,7 @@ function MyNavBar(props) {
 
     return(
             
-            <Navbar className="bg-secondary py-3 bg-opacity-25" expand="lg">
+            <Navbar className="bg-secondary py-3 fixed-top" expand="lg">
                 <Container fluid>
                     <Row className="w-100">
                         <Col className="col-2 d-flex justify-content-center align-items-start">
@@ -20,7 +20,7 @@ function MyNavBar(props) {
                         </Col>
                         <Col className="col-9 d-flex justify-content-start align-items-center">
                             <Link className='' to="/">
-                                <Button className="bg-transparent text-secondary border-0 fw-bold fs-4">
+                                <Button className="bg-transparent text-light border-0 fw-bold fs-4">
                                     Patients List
                                 </Button>
                             </Link>
