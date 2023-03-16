@@ -30,7 +30,7 @@ PRODUCTION = False
 # DEBUG = config('DEBUG', default=True, cast=bool)
 
 
-ALLOWED_HOSTS = ["0.0.0.0", "localhost", "127.0.0.1", "oncodash.ing.unimore.it", "http://0.0.0.0:3000/"]
+ALLOWED_HOSTS = ["0.0.0.0", "localhost", "127.0.0.1", "oncodash.ing.unimore.it", "http://0.0.0.0:3000/", "http://0.0.0.0:3001"]
 
 
 # Application definition
@@ -55,8 +55,12 @@ INSTALLED_APPS = [
 CORS_ALLOWED_ORIGINS = [
     "http://0.0.0.0:3000", #For React Project
     "http://oncodash.ing.unimore.it:3000",
-    "http://0.0.0.0:8888"  #For Django Project
-    "http://oncodash.ing.unimore.it:8888"
+    "http://0.0.0.0:8888",  #For Django Project
+    "http://oncodash.ing.unimore.it:8888",
+    "https://0.0.0.0:3000", #For React Project
+    "https://oncodash.ing.unimore.it:3000",
+    "https://0.0.0.0:8888",  #For Django Project
+    "https://oncodash.ing.unimore.it:8888",
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -164,11 +168,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:8000",
-    "http://localhost:8000",
-    "http://localhost",
-]
+
 
 def skip_lib_python(record):
     """Filter that removes "File seen" events on a *lib/python* file."""

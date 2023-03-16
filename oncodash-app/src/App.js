@@ -35,6 +35,7 @@ function App() {
 
   const loginCallback = async (email, password) => {
     try {
+      console.log("LOGIN");
       const res = await API.logIn(email, password)
       // alert(`Token, ${res.token}!`);  
       setLogged(true);

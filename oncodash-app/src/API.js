@@ -177,6 +177,7 @@ import configData from "./conf.json";
   }  
 
   async function logIn(username, password) {
+    console.log(PROTOCOL+" "+HOST);
     let response = await fetch(PROTOCOL+'://'+HOST+'/api-token-auth/', {
       method: 'POST',
       headers: {
