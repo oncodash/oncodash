@@ -225,3 +225,7 @@ LOGGING = {
         },
     },
 }
+
+CGI_LOGIN = ""
+CGI_TOKEN = ""
+ONCOKB_TOKEN = ""
