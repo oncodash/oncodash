@@ -183,6 +183,13 @@ python manage.py createsuperuser
 ```
 and then follow the prompt instruction.
 
+8. Create CGI and OncoKB accounts to get corresponding tokens. Modify login email and tokens (OncoKB requires only token) in backend/backend/settings.py:
+```
+CGI_LOGIN = ""
+CGI_TOKEN = ""
+ONCOKB_TOKEN = ""
+```
+
 #### Front-end
 
 1. Move to the `oncodash-app` directory:
