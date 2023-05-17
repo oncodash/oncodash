@@ -292,7 +292,7 @@ class Command(BaseCommand):
         if kwargs["copy_number_alterations"]:
             index = 0
             print("Parse copy number data...", file=sys.stderr, flush=True)
-            with pd.read_csv(kwargs["copy_number_alterations"], sep=kwargs["\t"], encoding='utf-8', chunksize=kwargs["chunksize"]) as cnas:
+            with pd.read_csv(kwargs["copy_number_alterations"], sep=kwargs["sep"], encoding='utf-8', chunksize=kwargs["chunksize"]) as cnas:
                 print("Load copy number data...", file=sys.stderr, flush=True)
                 for chunk in cnas:
                     for index, row in chunk.iterrows():
