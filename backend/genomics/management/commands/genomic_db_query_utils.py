@@ -100,7 +100,8 @@ def query_cgi_job(patient_id, jobid):
     # curl --request GET --url 'https://www.cancergenomeinterpreter.org/api/v1/de04a9b5f30b1cedb53e' --header "Authorization: ilari.maarala@helsinki.fi token" -G --data 'action=download'
     request_url = "https://www.cancergenomeinterpreter.org/api/v1/"
     cgitoken = settings.CGI_TOKEN
-    header = dict(Authorization='ilari.maarala@helsinki.fi '+cgitoken)
+    cgilogin = settings.CGI_LOGIN
+    header = dict(Authorization=cgilogin+' '+cgitoken)
 
     print("Request CGI job by id")
     payload = dict(action='download')
@@ -545,14 +546,7 @@ class Command(BaseCommand):
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
                 print("Waiting 120 seconds for the next try...")
                 time.sleep(120)
-        #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --exonic"
-        if kwargs["cgiquery"] and kwargs["exonic"]: # Query all exonic mutations for all patients
-            snv = get_all_exonic_snvs()
-            generate_temp_cgi_query_files(snv,[],[])
-            jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/snvs.ext", None, None, "FRS", "hg38")
-            while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
-                print("Waiting 120 seconds for the next try...")
-                time.sleep(120)
+        #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --exonic --patientid=1"
         if kwargs["cgiquery"] and kwargs["exonic"] and kwargs["patientid"]: # Query all exonic mutations for given patient
             snv = get_all_exonic_snvs_of_patient(kwargs["patientid"])
             generate_temp_cgi_query_files(snv,[],[])
@@ -560,7 +554,7 @@ class Command(BaseCommand):
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
                 print("Waiting 120 seconds for the next try...")
                 time.sleep(120)
-        if kwargs["cgiquery"] and kwargs["proteinchange"] and kwargs["patientid"]: # Query all protein affecting mutations for all patients
+        if kwargs["cgiquery"] and kwargs["proteinchange"] and kwargs["patientid"]: # Query all protein affecting mutations for given patient
             snvs = get_actionable_snvs_by_aaChangeRefGene(kwargs["patientid"])
             generate_proteinchange_query_file(snvs)
             jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/prot.ext", None, None, "FRS", "hg38")

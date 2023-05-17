@@ -172,7 +172,7 @@ python manage.py flush --no-input
 python manage.py populate -p /path/to/indication_table.csv
 ```
 
-6.opulate a test database with clinical data and real timeline data. "\<clinical filepath\>" is the path of clinical data file and can be downloaded from eduuni. "\<timeline filepath\>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). **The expected column separator is ";"**. The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
+6. Populate a test database with clinical data and real timeline data. "\<clinical filepath\>" is the path of clinical data file and can be downloaded from eduuni. "\<timeline filepath\>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). **The expected column separator is ";"**. The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
 ```sh
 python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline filepath>
 ```
@@ -189,7 +189,10 @@ CGI_LOGIN = ""
 CGI_TOKEN = ""
 ONCOKB_TOKEN = ""
 ```
-
+6. Import genomic variants to the data. "\<clinical filepath\>" is the path of clinical data file and can be downloaded from eduuni. "\<timeline filepath\>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). **The expected column separator is ";"**. The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
+```sh
+python manage.py import_genomic_variants --copy_number_alterations \<cnv filepath\>"
+```
 #### Front-end
 
 1. Move to the `oncodash-app` directory:
