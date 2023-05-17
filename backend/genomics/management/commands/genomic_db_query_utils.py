@@ -97,7 +97,7 @@ def get_all_exonic_snvs():
 
 def query_cgi_job(patient_id, jobid):
 
-    # curl --request GET --url 'https://www.cancergenomeinterpreter.org/api/v1/de04a9b5f30b1cedb53e' --header "Authorization: ilari.maarala@helsinki.fi token" -G --data 'action=download'
+    # curl --request GET --url 'https://www.cancergenomeinterpreter.org/api/v1/de04a9b5f30b1cedb53e' --header "Authorization: email token" -G --data 'action=download'
     request_url = "https://www.cancergenomeinterpreter.org/api/v1/"
     cgitoken = settings.CGI_TOKEN
     cgilogin = settings.CGI_LOGIN
@@ -515,21 +515,17 @@ class Command(BaseCommand):
         parser.add_argument('--cgiquery',  action='store_true', help='Download results from CGI by jobid')
         parser.add_argument('--oncokbcna',  action='store_true',  help='Query OncoKB by gene id from given patient CNA. Input parameter: gene id')
         parser.add_argument('--oncokbsnv', action='store_true',  help='Query OncoKB by genomic location parsed patient SNV. Input parameter: ref id')
-        parser.add_argument('--sqlsnvs',  action='store_true', help='')
-        parser.add_argument('--exonic',  action='store_true', help='')
-        parser.add_argument('--proteinchange',  action='store_true', help='')
+        parser.add_argument('--exonic',  action='store_true', help='Query all exonic mutations for given patient id')
+        parser.add_argument('--proteinchange',  action='store_true', help='Query all protein affecting mutations for given patient id')
 
     def handle(self, *args, **kwargs):
-
-        if kwargs["sqlsnvs"]:
-            sql_query_db()
 
         #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --oncokbcna --geneid=ENSG00000230280 --patientid=1"
         if kwargs["oncokbcna"]:
             cna = get_cna(kwargs["patientid"], kwargs["geneid"])
             resp = query_oncokb_cna(cna, "HGSOC")
             print(resp)
-        #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --oncokbsnv=rs61769312 --patientid=1"
+        #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --oncokbsnv --refid=rs61769312 --patientid=1"
         if kwargs["oncokbsnv"]:
             snv = get_snv(kwargs["patientid"], kwargs["refid"])
             resp = query_oncokb_somatic_mutation(snv, "HGSOC")
@@ -546,6 +542,14 @@ class Command(BaseCommand):
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
                 print("Waiting 120 seconds for the next try...")
                 time.sleep(120)
+        #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --snv --refid=rs907584225 --patientid=1"
+        if kwargs["cgiquery"] and kwargs["snv"]:
+            snv = get_snv(kwargs["patientid"], kwargs["refid"])
+            generate_temp_cgi_query_files([snv],[],[])
+            jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/snvs.ext", None, None, "FRS", "hg38")
+            while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
+                print("Waiting 120 seconds for the next try...")
+                time.sleep(120)
         #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --exonic --patientid=1"
         if kwargs["cgiquery"] and kwargs["exonic"] and kwargs["patientid"]: # Query all exonic mutations for given patient
             snv = get_all_exonic_snvs_of_patient(kwargs["patientid"])
@@ -554,6 +558,7 @@ class Command(BaseCommand):
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
                 print("Waiting 120 seconds for the next try...")
                 time.sleep(120)
+        #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --proteinchange --patientid=1"
         if kwargs["cgiquery"] and kwargs["proteinchange"] and kwargs["patientid"]: # Query all protein affecting mutations for given patient
             snvs = get_actionable_snvs_by_aaChangeRefGene(kwargs["patientid"])
             generate_proteinchange_query_file(snvs)
@@ -561,6 +566,7 @@ class Command(BaseCommand):
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
                 print("Waiting 120 seconds for the next try...")
                 time.sleep(120)
+        #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --fusgenes BCR__ABL1,PML__PARA --patientid=1"
         if kwargs["cgiquery"] and kwargs["fusgenes"] and kwargs["patientid"]: # Query list of fusion genes for given patient
             fusgenes=kwargs["fusgenes"].split(',')
             generate_temp_cgi_query_files([],[],fusgenes)

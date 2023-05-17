@@ -190,10 +190,42 @@ CGI_LOGIN = ""
 CGI_TOKEN = ""
 ONCOKB_TOKEN = ""
 ```
-6. Import genomic variants to the data. "\<clinical filepath\>" is the path of clinical data file and can be downloaded from eduuni. "\<timeline filepath\>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). **The expected column separator is ";"**. The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
+9. Import genomic variants to the database. "\<filepath\>" is the path of file containing annotated variants. **The expected column separator is tabulator**. Optionally, you can filter the data by column and value with --filter \<column name\> --\<filter type\> \<value\>. See --help for different filter types. 
 ```sh
-python manage.py import_genomic_variants --copy_number_alterations \<cnv filepath\>"
+python manage.py import_genomic_variants --somatic_variants \<filepath\> --\<filter type\> \<value\>
 ```
+```sh
+python manage.py import_genomic_variants --copy_number_alterations \<filepath\> --\<filter type\> \<value\>
+```
+
+10. Cancer Genome Interpreter (CGI) example queries. \<refid\> refers to dbSNP id eg. rs907584225. \<geneid\> can be any known gene name in any standard format (converted automatically to Ensemble gene ID). \<pid\> is patient id in local Django database.
+```sh
+# SNV of given patient:
+python manage.py genomic_db_query_utils --cgiquery --snv --refid=\<refid\> --patientid=\<pid\>
+```
+```sh
+# CNA of given patient:
+python manage.py genomic_db_query_utils --cgiquery --cna --geneid=\<geneid\>PTPN14 --patientid=\<pid\>
+```
+```sh
+# All exonic variants of given patient:
+python manage.py genomic_db_query_utils --cgiquery --exonic --patientid=\<pid\>
+```
+```sh
+# All protein affecting variants of given patient:
+python manage.py genomic_db_query_utils --cgiquery --proteinchange --patientid=\<pid\>
+```
+
+11. OncoKB example queries. \<refid\> refers to dbSNP id eg. rs907584225. \<geneid\> can be any known gene name in any standard format (converted automatically to Ensemble gene ID). \<pid\> is patient id in local Django database.
+```sh
+# SNV of given patient:
+python manage.py genomic_db_query_utils --oncokbsnv=\<refid\> --patientid=\<pid\>
+```
+```sh
+# CNA of given patient:
+python manage.py genomic_db_query_utils --oncokbcna --geneid=\<geneid\> --patientid=\<pid\>
+```
+
 #### Front-end
 
 1. Move to the `oncodash-app` directory:

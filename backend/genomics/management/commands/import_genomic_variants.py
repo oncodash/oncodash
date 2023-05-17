@@ -77,31 +77,31 @@ class Command(BaseCommand):
             "--contains",
             type=str,
             required=False,
-            help="Value to filter data",
+            help="Field contains this value",
         )
         parser.add_argument(
             "--equal",
             type=str,
             required=False,
-            help="Value to filter data",
+            help="Field equals this value",
         )
         parser.add_argument(
             "--notequal",
             type=str,
             required=False,
-            help="Value to filter data",
+            help="Field does not equal this value",
         )
         parser.add_argument(
             "--gt",
             type=str,
             required=False,
-            help="Greater than value to filter data",
+            help="Field value is greater than this value",
         )
         parser.add_argument(
             "--lt",
             type=str,
             required=False,
-            help="Less than value to filter data",
+            help="Field value is less than this value",
         )
         parser.add_argument(
             "--deletesnvs",
