@@ -86,10 +86,11 @@ You will be asked to accept some user contract at first launch.
     Note: `/opt/app/` points by default to wherever is `oncodash/backend/` on your
     system.
 
-1. Populate a test database with clinical data and real timeline data. "\<clinical filepath\>" is the path of clinical data file and can be downloaded from eduuni. "\<timeline filepath\>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). **The expected column separator is ";"**. The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
+1. Populate a test database with clinical data and real timeline data. "\<clinical filepath\>" is the path of clinical data file and can be downloaded from eduuni. "\<timeline filepath\>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). The import takes several minutes, to shorten it you may reduce the timeline file by removing some lines.
     ```sh
     docker-compose run --rm backend sh -c "python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline  filepath>"
     ```
+    If the import shows some warnings, you may restart it with the `--errors-details` argument, to get which rows are affected.
 
 1. Create an account. Type:
     ```sh

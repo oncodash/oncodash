@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     'rest_framework.authtoken',
+    "genomics",
 ]
 
 CORS_ALLOWED_ORIGINS = [
