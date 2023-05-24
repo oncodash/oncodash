@@ -87,11 +87,18 @@ class Command(BaseCommand):
                     return value
                 else:
                     try:
-                        float(str(value).replace(",", "."))
+                        return float(str(value).replace(",", "."))
                     except ValueError as e:
                         errors.add(str(e)+" for field '"+field_name+"'", " in row "+str(index))
                         return None
             # return None if pd.isna(value) else (value if type(value) == float else float(str(value).replace(",", ".")))
+
+        def handle_float_int_field(row, field_name, errors, index):
+            float_value = handle_float_field(row, field_name, errors, index)
+            try:
+                return int(float_value)
+            except:
+                return None
 
         def handle_string_field(row, field_name, errors, index):
             if field_name not in row:
@@ -146,7 +153,7 @@ class Command(BaseCommand):
                     brca_mutation_status                          = handle_string_field(row,"brca_mutation_status", errors, index),
                     hr_signature_pretreatment_wgs                 = handle_string_field(row,"hr_signature_pretreatment_wgs", errors, index),
                     hr_signature_per_patient                      = handle_string_field(row,"hr_signature_per_patient", errors, index),
-                    hrd_myriad_status                             = handle_string_field(row,"hrd_myriad_status", errors, index),
+                    hrd_myriad_status                             = handle_string_field(row,"hrd_clinical_test_result ", errors, index),
                     maintenance_therapy                           = handle_string_field(row,"maintenance_therapy_after_1st_line", errors, index),
                     current_treatment_phase                       = handle_string_field(row,"current_phase_of_treatment", errors, index),
                     drug_trial_name                               = handle_string_field(row,"drug_trial_name", errors, index),
@@ -215,9 +222,9 @@ class Command(BaseCommand):
                     event                   = handle_string_field(row,"event", errors, index),
                     interval                = handle_boolean_field(row,"interval", errors, index),
                     ongoing                 = handle_boolean_field(row,"ongoing", errors, index),
-                    interval_length         = handle_int_field(row,"interval_length", errors, index),
-                    date_relative           = handle_int_field(row,"date_relative", errors, index),
-                    interval_end_relative   = handle_int_field(row,"interval_end_relative", errors, index),
+                    interval_length         = handle_float_int_field(row,"interval_length", errors, index),
+                    date_relative           = handle_float_int_field(row,"date_relative", errors, index),
+                    interval_end_relative   = handle_float_int_field(row,"interval_end_relative", errors, index),
                     name                    = handle_string_field(row,"name", errors, index),
                     result                  = handle_float_field(row,"result", errors, index),
                     aux_id                  = handle_string_field(row,"aux_id", errors, index),
