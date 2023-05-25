@@ -9,6 +9,7 @@ import configData from "./conf.json";
  const HOST = configData.HOST
  const BASEURL =  PROTOCOL + '://' + HOST + '/api/';
  const CLIN_OVERVIEW = `clinical-overview/data/`;
+ const CLIN_OVERVIEW_update = `clinical-overview/update/`;
 
  
  function getJson(httpResponsePromise) {
@@ -151,7 +152,7 @@ import configData from "./conf.json";
     formData.append("separator", separator);
     formData.append("type", type);
     formData.append("file", file);
-    let response = await fetch(BASEURL + CLIN_OVERVIEW + 'update/', {
+    let response = await fetch(BASEURL + CLIN_OVERVIEW_update, {
           method: 'POST',
           headers: {
             'Authorization': 'Token '+token,

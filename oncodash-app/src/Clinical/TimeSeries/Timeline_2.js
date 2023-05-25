@@ -192,43 +192,62 @@ function create_chart2_points(dayzero, event_series, name, min, max){
     if(name === "clinical"){
         value = 1;
     }
-    if(name === "ctdna"){
+    if(name === "chemotherapy"){
         value = 2;
-    }
-    if(name === "fresh_sample"){
+    }    
+    if(name === "ctdna"){
         value = 3;
     }
-    if(name === "fresh_sample_sequenced"){
+    if(name === "fresh_sample"){
         value = 4;
     }
-    if(name === "radiology"){
+    if(name === "fresh_sample_sequenced"){
         value = 5;
     }
-    if(name === "tykslab_plasma"){
+    if(name === "radiology"){
         value = 6;
+    }
+    if(name === "tykslab_plasma"){
+        value = 7;
     }
     
     const pointsColorDict = {
         "diagnosis":                    ["orange"   , "square"],
         "death":                        ["black"    , "square"],
         "last_date_of_primary_therapy": ["red"      , "triangle"],
+
         "ctdna":                        ["brown"    , "circle"],
         "fresh_sample":                 ["green"    , "circle"],
         "fresh_sample_sequenced":       ["grey"     , "circle"],
         "radiology":                    ["red"      , "circle"],
-        "tykslab_plasma":               ["purple"   , "circle"]
+        "tykslab_plasma":               ["purple"   , "circle"],
+        "None":                         ["black"    , "triangle"],
+
+        "chemotherapy_dose":            ["purple"   , "circle"],
+        "carboplatin":                  ["grey"     , "circle"],
+        "gemcitabine":                  ["purple"   , "circle"],
+        "paclitaxel":                   ["green"    , "circle"],
+        "doxorubicin":                  ["orange"   , "circle"],
+        "docetaxel":                    ["red"      , "circle"],
+        "pld":                          ["yellow"   , "circle"],
+        "bevacizumbab":                 ["blue"     , "circle"],
+        "topotecan":                    ["brown"    , "circle"],
+        "pembrolizumbab":               ["black"    , "circle"],
 
     }
     for(let i=0; i<event_series.date_relative.length; i++){
         let date = new Date(dayzero);
         date.setDate(date.getDate() + event_series.date_relative[i]);
+        if(event_series.name[i]==="None"){
+            continue
+        }
         points.push({
                     x: date, 
                     y: value, 
                     // z:z, 
                     name:event_series.name[i],
-                    markerColor: name!=="clinical"?pointsColorDict[name][0]:pointsColorDict.hasOwnProperty(event_series.name[i]) ? pointsColorDict[event_series.name[i]][0] : "blue",
-                    markerType:  name!=="clinical"?pointsColorDict[name][1]:pointsColorDict.hasOwnProperty(event_series.name[i]) ? pointsColorDict[event_series.name[i]][1] : "triangle",
+                    markerColor: name!=="clinical"&&name!=="chemotherapy"?pointsColorDict[name][0]:pointsColorDict.hasOwnProperty(event_series.name[i]) ? pointsColorDict[event_series.name[i]][0] : "blue",
+                    markerType:  name!=="clinical"&&name!=="chemotherapy"?pointsColorDict[name][1]:pointsColorDict.hasOwnProperty(event_series.name[i]) ? pointsColorDict[event_series.name[i]][1] : "triangle",
                     // label: name   
         });
     }
@@ -262,15 +281,17 @@ function create_chart2(data_points, name="event_timeline"){
                 if(e.value===1)
                     return leftPad("clinical", 22);
                 else if(e.value===2)
-                    return leftPad("ctdna_sample", 22);
+                    return leftPad("chemotherapy", 22);
                 else if(e.value===3)
-                    return leftPad("fresh_sample", 22);
+                    return leftPad("ctdna_sample", 22);
                 else if(e.value===4)
-                    return leftPad("fresh_sample_sequenced", 22);
+                    return leftPad("fresh_sample", 22);
                 else if(e.value===5)
-                    return leftPad("radiology", 22);  
+                    return leftPad("fresh_sample_sequenced", 22);  
                 else if(e.value===6)
-                    return leftPad("tykslab_plasma", 22);                     
+                    return leftPad("radiology", 22);     
+                else if(e.value===7)
+                    return leftPad("tykslab_plasma", 22);                                      
                 else 
                     return leftPad("", 22);
                 
@@ -302,6 +323,7 @@ function Timeline2(props) {
         const displayOrder = ['ca125', 'neut', 'hb', 'leuk', 'platelets'];
         const displayOrder2 = [    
                                     'clinical',
+                                    'chemotherapy',
                                     'ctdna_sample', 
                                     'fresh_sample', 
                                     'fresh_sample_sequenced',   
