@@ -66,7 +66,7 @@ function PatientSummary(props) {
                             displayOrder3.map(d=>
                                     <Row key={d} className="text-center text-primary font-weight-bold">
                                         <Col className="text-end text-dark">{dictionary[d]}:</Col> 
-                                        <Col className="text-start">{props.patient[d]}</Col>
+                                        <Col className="text-start">{props.patient[d]===null?'NA':props.patient[d]}</Col>
                                     </Row>  
                                 )
                         }
