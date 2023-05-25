@@ -238,7 +238,9 @@ function create_chart2_points(dayzero, event_series, name, min, max){
     for(let i=0; i<event_series.date_relative.length; i++){
         let date = new Date(dayzero);
         date.setDate(date.getDate() + event_series.date_relative[i]);
-        console.log(pointsColorDict[event_series.name[i]], event_series.name[i]);
+        if(event_series.name[i]==="None"){
+            continue
+        }
         points.push({
                     x: date, 
                     y: value, 
@@ -338,7 +340,6 @@ function Timeline2(props) {
         let datemax = new Date(dayzero);
         datemax.setDate(dayzero.getDate() + max);
         const charts2_points = displayOrder2.filter((d)=>props.event_series[d].date_relative.length!==0).map((d)=> {
-            console.log(d);
             return create_chart2_points(dayzero, props.event_series[d], d, min, max);
         });
         const charts2 = create_chart2(charts2_points);
