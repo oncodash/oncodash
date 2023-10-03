@@ -130,6 +130,8 @@ class ClinicalViewSet(viewsets.ModelViewSet):
             ctdna_sample = TimelineRecord.objects.filter(patient=patient, event="ctdna_sample").order_by("date_relative").values_list("date_relative", "name").distinct()
             radiology = TimelineRecord.objects.filter(patient=patient, event="radiology").order_by("date_relative").values_list("date_relative", "name").distinct()
             clinical = TimelineRecord.objects.filter(patient=patient, event__in=['diagnosis', 'last_date_of_primary_therapy', 'primary_progression', '2nd_progression', '3rd_progression', '4th_progression', '5th_progression', '6th_progression', '7th_progression', '8th_progression', '9th_progression', '10th_progression', 'death']).order_by("date_relative").values_list("date_relative", "event").distinct() # This line assumes that we will have at most 10 progressions
+            chemotherapy = TimelineRecord.objects.filter(patient=patient, event="chemotherapy_dose").order_by("date_relative", "name").values_list("date_relative", "name").distinct() # This line assumes that we will have at most 10 progressions
+
             # clinical_b = TimelineRecord.objects.filter(patient=patient, event__regex=r'.+?(?=_progression)').order_by("date_relative").values_list("date_relative", "event").distinct()
 
             def convert_to_dict(series):
@@ -148,6 +150,7 @@ class ClinicalViewSet(viewsets.ModelViewSet):
                 'ctdna_sample': convert_to_dict(ctdna_sample),
                 'radiology': convert_to_dict(radiology),
                 'clinical': convert_to_dict(clinical),
+                'chemotherapy': convert_to_dict(chemotherapy),
             }
 
             patient.time_series = simplejson.dumps(time_series, ignore_nan=True)
