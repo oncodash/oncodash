@@ -56,7 +56,7 @@ function Clinical(props) {
 
     return(
         
-            <div className="below-nav w-100 pb-5 mx-0">
+            <div className="below-nav w-100 pb-5 mx-0 px-0">
                 <Container className="p-0">
                                             {/* overview generale paziente */}
                         <Row className="my-5 mx-0">

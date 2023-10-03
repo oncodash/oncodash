@@ -28,8 +28,8 @@ function Navigator(props) {
 
     return(
             <>
-            <Navbar  expand="lg">
-                <Container>
+            <Navbar className="mt-5 py-0" expand="lg">
+                <Container className="bg-white topBorderRadius" >
                     <Row className="w-100">
                         <Col className="p-4 col-8 d-flex align-items-center">
                             <Form className="w-100">
@@ -58,8 +58,8 @@ function Navigator(props) {
                                             Remove
                                         </NavDropdown.Item>
                                     </NavDropdown>
-                                    <Button className='bg-danger text-light' onClick={()=>resetFields()}>Reset</Button>
-                                    <Button className='bg-success text-light' onClick={() => setModalShow(true)}>Upload Data</Button>
+                                    <Button className='mx-1 bg-danger text-light' onClick={()=>resetFields()}>Reset</Button>
+                                    <Button className='mx-1 bg-success text-light' onClick={() => setModalShow(true)}>Upload Data</Button>
                                 </Nav>
                             </Navbar.Collapse>
                         </Col> 
@@ -68,8 +68,8 @@ function Navigator(props) {
 
                 </Container>
             </Navbar>
-            <Navbar  expand="lg">
-                <Container>
+            <Navbar  className="py-0" expand="lg">
+                <Container  className="bg-white" >
                     <Row className="w-100">
                         <Col className="col-4 d-flex align-items-center p-4">
                             Selected {props.patients.length===0?0:(props.page-1)*props.patientsPerPage+1}-{Math.min(((props.page)*props.patientsPerPage), Math.ceil(props.patients.length))} of {props.patients.length} patients
@@ -89,25 +89,24 @@ function Navigator(props) {
                             >
                                         <NavDropdown.Item  onClick={()=>props.setPatientsPerPage_callback(8)}>8</NavDropdown.Item>
                                         <NavDropdown.Item  onClick={()=>props.setPatientsPerPage_callback(16)}>16</NavDropdown.Item>
-                                        <NavDropdown.Item  onClick={()=>props.setPatientsPerPage_callback(32)}>32</NavDropdown.Item>
                             </NavDropdown>
                         </Col>
                         <Col className="col-2 d-flex align-items-center justify-content-end">
                             <div className='p-2'>View: </div>
 
                             <Button className={props.viewMode === "TABLE"? 
-                                                    "mx-1 p-2 d-flex align-items-center float rounded-circle "
+                                                    "mx-1 p-3 d-flex align-items-center float rounded-circle "
                                                     :
-                                                    "mx-1 p-2 d-flex align-items-center float rounded-circle bg-secondary border-secondary"
+                                                    "mx-1 p-3 d-flex align-items-center float rounded-circle bg-secondary border-secondary"
                                             } onClick={()=>props.setViewMode_callback("TABLE")}>
-                                <Table/>
+                                <Table size={20}/>
                             </Button>
                             <Button className={props.viewMode === "GRID"? 
-                                                    "mx-1 p-2 d-flex align-items-center float rounded-circle"
+                                                    "mx-1 p-3 d-flex align-items-center float rounded-circle"
                                                     :
-                                                    "mx-1 p-2 d-flex align-items-center float rounded-circle bg-secondary border-secondary"
+                                                    "mx-1 p-3 d-flex align-items-center float rounded-circle bg-secondary border-secondary"
                                             } onClick={()=>props.setViewMode_callback("GRID")}>
-                                <Microsoft/>
+                                <Microsoft size={20}/>
                             </Button>
                         </Col>
                     </Row>

@@ -21,7 +21,7 @@ function PatientSummary(props) {
     const survcolor = props.patient["survival"] === "alive" ? "green":"red"
 
     return(
-        <Row className='m-5'>    
+        <Row style={{fontWeight:"bold",boxShadow:"5px 5px 20px rgba(0, 0, 0, 0.2)"}} className='bg-white my-5 py-3'>    
             <Col className='d-flex justify-content-center align-items-center'>
                 <div  style={{   "padding": "10px",
                                 "borderStyle": "solid",

@@ -1,4 +1,5 @@
 {
-    "PROTOCOL": "https",
-    "HOST": "oncodash.ing.unimore.it"
+    "PROTOCOL": "http",
+    "HOST": "localhost:8888"
+
 }

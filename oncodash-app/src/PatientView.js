@@ -54,7 +54,7 @@ function PatientView(props) {
             state === null ? <Navigate to="/" relative={-1}/> : state.patient_id === undefined || props.token==="" ? <Navigate to="/" relative={-1}/> :
             <div className="below-nav w-100 px-5 mx-0 my-5">
                 
-                <Container>
+                <Container style={{marginTop:"100px"}}>
                     {/* <Row>
                         <Col className="mb-5 py-2 fs-2 text-center bg-secondary bg-opacity-25 border-bottom">
                             Patient View
@@ -62,38 +62,43 @@ function PatientView(props) {
                     </Row> */}
                     {waitingSelected === true ? 
                         <Row>
-                            <Col className="d-flex justify-content-center">
+                            <Col className="mt-5 d-flex justify-content-center">
                                 <ArrowClockwise size={50}/>
                             </Col>
                         </Row>
                     :
                     <>
+                        <Row className="patientHeader mt-3">
+                            <Col>
+                                PATIENT {selectedPatient.patient_id}
+                            </Col>
+                        </Row>
                         <PatientSummary patient={selectedPatient}/>
                         <Row className='fs-5'>
                             <Tabs   
-                                className="border-bottom border-secondary"
+                                className="border-secondary px-0"
                                 defaultActiveKey="clinical"
                                 id="databrowser"
                                 transition={false}
                                 fill
                             >
-                                <Tab eventKey="clinical" title="Clinical data">
-                                    <Row className="px-2">
+                                <Tab eventKey="clinical" title="CLINICAL DATA">
+                                    <Row className="bg-white bottomBorderRadius">
                                         {state !== undefined? <Clinical patient={selectedPatient}></Clinical>: "" }
                                     </Row>
                                 </Tab>
-                                <Tab eventKey="genomic" title="Genomic data">
-                                    <Row className="px-2">
+                                <Tab eventKey="genomic" title="GENOMIC DATA">
+                                    <Row className="bg-white bottomBorderRadius">
                                         {state !== undefined? <Genomic patient={selectedPatient}></Genomic>: "" }
                                     </Row>
                                 </Tab>
-                                <Tab eventKey="explainer" title="ExplAIner">
-                                    <Row className="px-2">
+                                <Tab eventKey="explainer" title="EXPLAINER">
+                                    <Row className="bg-white bottomBorderRadius">
                                         {state !== undefined? <ExplAIner patient={selectedPatient}></ExplAIner>: "" }
                                     </Row>
                                 </Tab>      
-                                <Tab eventKey="extra" title="Other">
-                                    <Row className="px-2">
+                                <Tab eventKey="extra" title="OTHER">
+                                    <Row className="bg-white bottomBorderRadius">
                                         {state !== undefined? <Extra patient={selectedPatient}></Extra>: "" }
                                     </Row>
                                 </Tab>                                   

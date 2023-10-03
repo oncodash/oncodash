@@ -12,8 +12,8 @@ function TableView(props) {
     }  
 
     return(
-        <Container>
-                <Table striped bordered hover>
+        <Container className="p-0">
+                <Table className="tableView" striped bordered hover>
                     <thead>
                         <tr>
                         <th>ID</th>

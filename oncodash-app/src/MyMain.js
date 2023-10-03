@@ -45,11 +45,51 @@ function MyMain(props) {
         return props.patients.slice(start_index, end_index);
     }
 
+    let widget1 = <Navigator
+    key={1} 
+    patients={props.patients} 
+    viewMode={viewMode} 
+    setViewMode_callback={setViewMode}
+    patientsPerPage={patientsPerPage}
+    setPatientsPerPage_callback={setPatientsPerPageWrapper}
+    page={page}
+    setFilterCallback={props.setFilterCallback} 
+    filter={props.filter}
+    statusFilter={props.statusFilter}
+    setStatusFilterCallback={props.setStatusFilterCallback}
+    firstPageCallback={firstPage}
+    uploadDataCallback={props.uploadDataCallback}
+></Navigator>
+    let widget2 = viewMode === "GRID"? 
+    <GridView key={2} patients={viewPatients()}></GridView>
+    :
+    <TableView key={2} patients={viewPatients()}></TableView>
+    let widget3 = <Container style={{marginBottom:'250px'}} className="bg-white bottomBorderRadius" key={3}>
+    <Row>
+        <Col>
+            <Pagination className="mx-3 d-flex justify-content-end align-items-center">
+                <Pagination.First onClick={()=>firstPage()}/>
+                <Pagination.Prev  onClick={()=>decreasePage(page, props.patients.length, patientsPerPage)}/>
+                <div className="px-2">
+                    Page {page} of {Math.ceil(props.patients.length/patientsPerPage)}
+                </div>   
+                <Pagination.Next onClick={()=>increasePage(page, props.patients.length, patientsPerPage)}/>
+                <Pagination.Last onClick={()=>lastPage(props.patients.length, patientsPerPage)}/>
+            </Pagination>
+        </Col>
+    </Row>  
+</Container>
+    let widgets = [
+                        widget1, 
+                        widget2, 
+                        widget3
+                    ]
     return(
         props.waiting? "" :
         <main className="w-100 p-0 my-5 ">
-
-            <Navigator 
+            <Container style={{marginTop:"100px"}}>
+            {widgets.map(w=>w)}
+            {/* <Navigator 
                 patients={props.patients} 
                 viewMode={viewMode} 
                 setViewMode_callback={setViewMode}
@@ -82,6 +122,7 @@ function MyMain(props) {
                         </Pagination>
                     </Col>
                 </Row>  
+            </Container> */}
             </Container>
         </main>
     );

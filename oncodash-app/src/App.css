@@ -2,6 +2,54 @@
   text-align: center;
 }
 
+html{
+  height: 100vh!important;
+  margin: 0;
+  padding: 0;
+}
+
+#root{
+  background: linear-gradient(to bottom, #2B4493, #159FC1);
+}
+
+body {
+  margin:0;
+  padding: 0;
+  height: 100vh!important;
+  background: linear-gradient(to bottom, #2B4493, #159FC1);
+  background-repeat: repeat-y;
+  
+}
+.mainGreenB{
+  background-color: #47A36E;
+}
+.mainBlueB{
+  background-color: #159FC1;
+}
+.lightGreenB{
+  background-color: #E5F0EA;
+}
+.darkBlueB{
+  background-color: #2B4493;
+}
+
+.patientGridCard a{
+  font-family: Open-Sans!important;
+  color: black!important;
+  text-decoration: none!important;
+}
+
+.patientGridCard a:hover{
+  font-weight: bold;
+}
+
+.patientHeader{
+  text-align: center;
+  font-size: 4em;
+  color: white;
+  width: 100%;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -49,4 +97,106 @@
 .staticToggle div{
   float: left;
   padding: 0px 4px;
+}
+
+
+.nav-tabs {
+  border-top-left-radius: 30px!important; /* Adjust the value as needed */
+  border-top-right-radius: 30px!important; /* Adjust the value as needed */
+  border-bottom-left-radius: 0px!important; /* Adjust the value as needed */
+  border-bottom-right-radius: 0px!important; /* Adjust the value as needed */
+  border-bottom-width: 1px!important;
+}
+
+.noBottomBorder{
+  border-bottom-width: 0px!important;
+}
+
+.nav-item {
+  border-top-left-radius: 30px!important; /* Adjust the value as needed */
+  border-top-right-radius: 30px!important; /* Adjust the value as needed */
+  border-bottom-left-radius: 0px!important; /* Adjust the value as needed */
+  border-bottom-right-radius: 0px!important; /* Adjust the value as needed */
+  background-color: white;
+  
+}
+
+.nav-link:focus{
+  color: #2B4493!important;
+  border-color: #2B4493!important;
+  border-bottom-width: 3px!important;
+  z-index: -20;
+}
+
+li .active{
+  color: #2B4493!important;
+  border-color: #2B4493!important;
+  border-bottom-width: 3px!important;
+  z-index: -20;
+}
+
+
+.nav-link {
+  border-top-left-radius: 30px!important; /* Adjust the value as needed */
+  border-top-right-radius: 30px!important; /* Adjust the value as needed */
+  border-bottom-left-radius: 0px!important; /* Adjust the value as needed */
+  border-bottom-right-radius: 0px!important; /* Adjust the value as needed */
+  color: grey!important;
+  font-weight: 'bold'!important;
+}
+
+.tab-content {
+  border-top-left-radius: 30px!important; /* Adjust the value as needed */
+  border-top-right-radius: 30px!important; /* Adjust the value as needed */
+  border-bottom-left-radius: 30px!important; /* Adjust the value as needed */
+  border-bottom-right-radius: 30px!important; /* Adjust the value as needed */
+  margin-bottom: 150px;
+  box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.2)!important
+}
+
+
+.navBack{
+  background: linear-gradient(to bottom, #2B4493, #1a4995)!important;
+}
+
+.navLink:hover{
+  border-color: white!important;
+  border-bottom-width: 3px!important;
+}
+.navLink button:hover{
+  border-bottom: 3px solid white!important;
+  border-radius: 0px;
+}
+
+.topBorderRadius{
+  border-top-left-radius: 30px!important; /* Adjust the value as needed */
+  border-top-right-radius: 30px!important; /* Adjust the value as needed */
+}
+.bottomBorderRadius{
+  border-bottom-left-radius: 30px!important; /* Adjust the value as needed */
+  border-bottom-right-radius: 30px!important; /* Adjust the value as needed */
+}
+
+.tableView{
+  background-color: white;
+  margin: 0px!important;
+}
+.tableView td{
+  padding-left: 1.1em!important;
+}
+.tableView th{
+  padding-left: 1.1em!important;
+}
+
+.navActive{
+  border-bottom: 3px solid white!important;
+  border-right: 0px solid white!important;
+  border-top: 0px solid white!important;
+  border-left: 0px solid white!important;
+  border-radius: 0px!important;
+}
+
+.navDisactive{
+  border: 0px solid white!important;
+  border-radius: 0px!important;
 }

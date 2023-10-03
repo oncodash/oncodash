@@ -1,10 +1,54 @@
+@font-face {
+  font-family: 'Open-Sans';
+  src: url('./font/Open_Sans/OpenSans-VariableFont.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Livvic';
+  src: url('./font/Livvic/Livvic-Black.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Livvic-BlackItalic.ttf */
+@font-face {
+  font-family: 'Livvic Black Italic';
+  src: url('./font/Livvic/Livvic-BlackItalic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+/* Livvic-Bold.ttf */
+@font-face {
+  font-family: 'Livvic Bold';
+  src: url('./font/Livvic/Livvic-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* Livvic-BoldItalic.ttf */
+@font-face {
+  font-family: 'Livvic Bold Italic';
+  src: url('./font/Livvic/Livvic-BoldItalic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Open-Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+    sans-serif!important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+a{
+  font-family: 'Open-Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif!important;
 }
 
 code {

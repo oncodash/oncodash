@@ -7,7 +7,7 @@ function PatientCardSmall(props) {
 
     return(
         <Row className='mb-2'>
-            <Button className="p-4" onClick={()=>props.getSelectedPatientCallback(props.patient.id)}>
+            <Button className="p-4 borderBottomRadius borderTopRadius" onClick={()=>props.getSelectedPatientCallback(props.patient.id)}>
                 {displayOrder.map(d=><Row key={d} className="text-center  font-weight-bold">{d}: {props.patient[d]}</Row>)}
             </Button>
         </Row>

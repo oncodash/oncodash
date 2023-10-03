@@ -1,6 +1,8 @@
 body {
     margin:0;
+    height: 100vh!important;
 }
+
 
 #header {
     border-bottom: thin solid black;
@@ -52,3 +54,5 @@ body {
     display: inline;
     margin-left: 2em;
 }
+
+

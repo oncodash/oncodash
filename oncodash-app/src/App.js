@@ -97,25 +97,33 @@ function App() {
     return filteredPatients;
   }
 
+  
+  let main_props = {
+    "waiting":waiting, 
+    "patients":getFilteredPatients(), 
+    "setFilterCallback":setFilter, 
+    "filter":filter,
+    "statusFilter":statusFilter,
+    "setStatusFilterCallback":setStatusFilter,
+    "uploadDataCallback":uploadDataCallback,
+  }
+  let elem_type = <MyMain {...main_props}/>
+  let route1 = <Route key={1} path="/patientview"    element={<PatientView token={token}/>}    />
+  let route2 = <Route key={2} path="/"               element={elem_type}    />
+  let routes = [route1, route2]
+
 
   return (
     <Router>
         <MyNavBar logged={logged} loginCallback={loginCallback} logoutCallback={logoutCallback}/>
-        <Row className="vheight-100  mt-5">
+        <Row className="vheight-100 mx-0">
             <Routes>
-                <Route path="/patientview"    element={<PatientView token={token}/>}    />
+                {/* <Route path="/patientview"    element={<PatientView token={token}/>}    /> */}
                 {/* <Route path="/clinical"       element={<Clinical/>}       />
                 <Route path="/explainer"      element={<Explainer/>}      /> */}
-                <Route path="/"               element={<MyMain 
-                                                          waiting={waiting} 
-                                                          patients={getFilteredPatients()} 
-                                                          setFilterCallback={setFilter} 
-                                                          filter={filter}
-                                                          statusFilter={statusFilter}
-                                                          setStatusFilterCallback={setStatusFilter}
-                                                          uploadDataCallback={uploadDataCallback}
-                                                      />}    
-                />
+                {/* <Route path="/"               element={elem_type}    /> */}
+                {routes.map(p=>p)}
+                
             </Routes>
         </Row>
         <Footer/>

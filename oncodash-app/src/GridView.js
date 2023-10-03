@@ -9,15 +9,15 @@ function GridView(props) {
 
 
     return(
-        <Container>
+        <Container  className="patientGridCard bg-white" >
             <Row>
                 {props.patients.map(p=>
                     <Col key={p.patient_id} xs={12} sm={12} md={6} lg={4} xl={3} xxl={3}>
                         <Link to={"/patientview"} state={{patient_id:p.patient_id}}>
                             <div className={p.survival === "alive" ? 
-                                    "bg-success bg-opacity-25 border border-secondary py-5 px-2 m-3  rounded"
+                                    "bg-success bg-opacity-25 border border-secondary py-5 px-2 m-3   topBorderRadius bottomBorderRadius"
                                     :
-                                    "bg-danger bg-opacity-25 border border-secondary py-5 px-2 m-3  rounded"}
+                                    "bg-danger bg-opacity-25 border border-secondary py-5 px-2 m-3   topBorderRadius bottomBorderRadius"}
                                 role="button">
                                 {p.survival==="alive"?<img src={alive} alt="alive"/>:<img src={dead} alt="dead"/>}
                                 <div>ID: {p.patient_id}</div>
