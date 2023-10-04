@@ -14,6 +14,20 @@ class AlterationType(Enum):
     def __str__(self):
         return str(self.value)
 
+class LevelOfEvidence2MTBP(Enum):
+    LEVEL_1 = "putative_functionally_relevant_variant"
+    LEVEL_2 = "putative_functionally_relevant_variant"
+    LEVEL_3 = "putative_functionally_relevant_variant"
+    LEVEL_4 = "variants_of_uknown_functional_significance"
+    LEVEL_5 = "variants_of_uknown_functional_significance"
+    LEVEL_6 = "putative_functionally_neutral_variants"
+    LEVEL_7 = "other_alterations"
+    NULL = "other_alterations"
+    def __str__(self):
+        if self.value is None:
+            return "other_alterations"
+        else:
+            return str(self.value)
 # TODO: create model for target genes derived from OncoKB cancer gene list
 #class ActionableTargets:
 #    def targets_as_list(self):
@@ -188,6 +202,7 @@ class CGIDrugPrescriptions(models.Model):
 class OncoKBAnnotation(models.Model):
 
     patient_id = models.IntegerField()
+    sample_id = models.CharField(max_length=32, default=None, blank=True, null=True)
     referenceGenome = models.CharField(max_length=16, default=None, blank=True, null=True)
     hugoSymbol = models.CharField(max_length=32, default=None, blank=True, null=True)
     entrezGeneId = models.CharField(max_length=32, default=None, blank=True, null=True)
@@ -225,4 +240,4 @@ class OncoKBAnnotation(models.Model):
     treatments = models.CharField(max_length=1024, default=None, blank=True, null=True)
     dataVersion = models.CharField(max_length=16, default=None, blank=True, null=True)
     lastUpdate = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
-    vus = models.BooleanField(default=False, blank=False, null=True)
+    vus = models.BooleanField(default=False, blank=False, null=False)

@@ -12,6 +12,9 @@ from django.db.models import Field, TextChoices
 from django.db.models import Lookup
 from datetime import datetime
 
+from genomics.api.views import GenomicViewSet
+
+
 class NotEqual(Lookup):
     lookup_name = 'ne'
 
@@ -37,12 +40,15 @@ def handle_float_field(value):
 def handle_string_field(value):
     return None if pd.isna(value) else value
 
+def handle_list_field(value):
+    return None if len(value)==0 else value
+
 def handle_int_field(value):
     return None if pd.isna(value) else value
 
 def handle_date_field(value):
 
-    return None if pd.isna(value) else datetime.strptime(value, "%d/%m/%Y")
+    return None if pd.isna(value) else datetime.strptime(value, "%m/%d/%Y")
 
 def get_cna(patient_id, gene_id):
     try:
@@ -52,6 +58,14 @@ def get_cna(patient_id, gene_id):
     except Exception as e:
         print(e)
         print("No CNA", gene_id, "available in the database")
+
+def get_cnas(patient_id):
+    try:
+        return CopyNumberAlteration.objects.filter(patient_id=patient_id)
+
+    except Exception as e:
+        print(e)
+        print("No CNAs for patient", patient_id, "available in the database")
 
 def get_snv(patient_id, ref_id):
     try:
@@ -97,17 +111,24 @@ def get_all_exonic_snvs():
 
 def query_cgi_job(patient_id, jobid):
 
-    # curl --request GET --url 'https://www.cancergenomeinterpreter.org/api/v1/de04a9b5f30b1cedb53e' --header "Authorization: email token" -G --data 'action=download'
+    """
+      Query the CGI API with a job id and save the results to the database.
+
+      Parameters:
+          patient_id (int): The ID of the patient for whom the job was run.
+          jobid (str): The job ID for the CGI job to query.
+
+    """
+    # curl --request GET --url 'https://www.cancergenomeinterpreter.org/api/v1/de04a9b5f30b1cedb53e' --header "Authorization: ilari.maarala@helsinki.fi token" -G --data 'action=download'
     request_url = "https://www.cancergenomeinterpreter.org/api/v1/"
     cgitoken = settings.CGI_TOKEN
-    cgilogin = settings.CGI_LOGIN
-    header = dict(Authorization=cgilogin+' '+cgitoken)
+    header = dict(Authorization='ilari.maarala@helsinki.fi '+cgitoken)
 
     print("Request CGI job by id")
     payload = dict(action='download')
     response = requests.get(request_url+jobid, headers=header, params=payload)
 
-    if (response.status_code == 200):
+    if response.status_code == 200:
         z = zipfile.ZipFile(io.BytesIO(response.content))
         fnames=z.namelist()
         for fn in fnames:
@@ -236,6 +257,7 @@ def query_cgi_job(patient_id, jobid):
                         pass
         return 1
     else:
+        print(response.status_code)
         print("No CGI results available for job id: "+str(jobid))
         return 0
 
@@ -253,7 +275,9 @@ def generate_temp_cgi_query_files(snvs: [SomaticVariant], cnas: [CopyNumberAlter
     with open("./tmp/cnas.ext", "w") as file2:
         file2.write(header)
         for cna in cnas:
+            print(type(cna))
             row = cna.gene+'\t'+cna.CNstatus+'\n'
+            print(row)
             file2.write(row)
         file2.close()
 
@@ -267,6 +291,24 @@ def generate_temp_cgi_query_files(snvs: [SomaticVariant], cnas: [CopyNumberAlter
 
 
 def launch_cgi_job_with_mulitple_variant_types(mutations_file, cnas_file, transloc_file, cancer_type, reference):
+    """
+        This function launches a CGI (Cancer Genome Interpreter) job with multiple variant types,
+        using the CGI API. It takes in mutation, cnas, and translocation files, cancer type, and
+        reference as input, and returns a job ID if the request is successful.
+
+        Args:
+        mutations_file (str): The path to the mutation file.
+        cnas_file (str): The path to the cnas file.
+        transloc_file (str): The path to the translocation file.
+        cancer_type (str): The type of cancer.
+        reference (str): The reference genome.
+
+        Returns:
+        jobid (str): The job ID if the request is successful.
+
+        Raises:
+        None.
+        """
 
     request_url = "https://www.cancergenomeinterpreter.org/api/v1"
     login = settings.CGI_LOGIN
@@ -298,6 +340,21 @@ def launch_cgi_job_with_mulitple_variant_types(mutations_file, cnas_file, transl
 
 def query_oncokb_cna(cna: CopyNumberAlteration, tumorType):
 
+    """
+    This function queries the OncoKB API to get annotations for a given copy number alteration (CNA)
+    and tumor type. It then saves the annotations to the database.
+
+    Args:
+    cna (CopyNumberAlteration): A copy number alteration object.
+    tumorType (str): The tumor type for which the annotations are to be retrieved.
+
+    Returns:
+    None
+
+    Raises:
+    None
+    """
+
     token = settings.ONCOKB_TOKEN
     # curl -X GET "https://www.oncokb.org/api/v1/annotate/copyNumberAlterations?hugoSymbol=HNRNPA1P59&copyNameAlterationType=AMPLIFICATION&referenceGenome=GRCh38&tumorType=HGSOC" -H "accept: application/json" -H "Authorization: Bearer xx-xx-xx"
 
@@ -315,6 +372,7 @@ def query_oncokb_cna(cna: CopyNumberAlteration, tumorType):
         try:
             rec, created = OncoKBAnnotation.objects.get_or_create(
                 patient_id  = handle_int_field(cna.patient_id),
+                sample_id = handle_string_field(cna.sample_id),
                 hugoSymbol = handle_string_field(rjson["query"]["hugoSymbol"]),
                 entrezGeneId = handle_string_field(rjson["query"]["entrezGeneId"]),
                 alteration = handle_string_field(rjson["query"]["alteration"]),
@@ -357,22 +415,124 @@ def query_oncokb_cna(cna: CopyNumberAlteration, tumorType):
         except Exception as e:
             print(e)
             pass
+
+        return response
+    else:
+        print("[ERROR] Unable to request. Response: ", print(response.text))
+        exit()
+
+def query_oncokb_cna_direct(geneid, cnatype, tumorType, patient_id):
+
+    """
+    This function queries the OncoKB API to get annotations for a given copy number alteration (CNA)
+    and tumor type. It then saves the annotations to the database.
+
+    Args:
+    cna (CopyNumberAlteration): A copy number alteration object.
+    tumorType (str): The tumor type for which the annotations are to be retrieved.
+
+    Returns:
+    None
+
+    Raises:
+    None
+    """
+
+    token = settings.ONCOKB_TOKEN
+    # curl -X GET "https://www.oncokb.org/api/v1/annotate/copyNumberAlterations?hugoSymbol=HNRNPA1P59&copyNameAlterationType=AMPLIFICATION&referenceGenome=GRCh38&tumorType=HGSOC" -H "accept: application/json" -H "Authorization: Bearer xx-xx-xx"
+
+    hugosymbol = gene_id_convert(geneid, "HGNC")
+    api_url = "https://www.oncokb.org/api/v1/annotate/copyNumberAlterations?"
+    request_url = api_url + 'copyNameAlterationType='+cnatype+'&hugoSymbol='+hugosymbol+'&tumorType='+tumorType
+    header = dict(accept="application/json", Authorization='Bearer '+token)
+
+    print("Request OncoKB API "+request_url)
+    response = requests.get(request_url, headers=header)
+    print(response.status_code)
+    print(response.request.url)
+    if (response.status_code == 200):
+        rjson = response.json()
+        try:
+            rec, created = OncoKBAnnotation.objects.get_or_create(
+                patient_id  = handle_int_field(patient_id),
+                hugoSymbol = handle_string_field(rjson["query"]["hugoSymbol"]),
+                entrezGeneId = handle_string_field(rjson["query"]["entrezGeneId"]),
+                alteration = handle_string_field(rjson["query"]["alteration"]),
+                alterationType = handle_string_field(rjson["query"]["alterationType"]),
+                svType = handle_string_field(rjson["query"]["svType"]),
+                tumorType = handle_string_field(rjson["query"]["tumorType"]),
+                consequence = handle_string_field(rjson["query"]["consequence"]),
+                proteinStart = handle_int_field(rjson["query"]["proteinStart"]),
+                proteinEnd = handle_int_field(rjson["query"]["proteinEnd"]),
+                hgvs = handle_string_field(rjson["query"]["hgvs"]),
+                geneExist = handle_boolean_field(rjson["geneExist"]),
+                variantExist = handle_boolean_field(rjson["variantExist"]),
+                alleleExist = handle_boolean_field(rjson["alleleExist"]),
+                oncogenic = handle_string_field(rjson["oncogenic"]),
+                mutationEffectDescription = handle_string_field(rjson["mutationEffect"]["description"]),
+                knownEffect = handle_string_field(rjson["mutationEffect"]["knownEffect"]),
+                citationPMids = handle_string_field(",".join(rjson["mutationEffect"]["citations"]["pmids"])),
+                citationAbstracts = handle_string_field(",".join(rjson["mutationEffect"]["citations"]["abstracts"])),
+                highestSensitiveLevel = handle_string_field(rjson["alleleExist"]),
+                highestResistanceLevel = handle_string_field(rjson["highestResistanceLevel"]),
+                highestDiagnosticImplicationLevel = handle_string_field(rjson["highestDiagnosticImplicationLevel"]),
+                highestPrognosticImplicationLevel = handle_string_field(rjson["highestPrognosticImplicationLevel"]),
+                highestFdaLevel = handle_string_field(rjson["highestFdaLevel"]),
+                otherSignificantSensitiveLevels = handle_string_field(rjson["otherSignificantSensitiveLevels"]),
+                otherSignificantResistanceLevels = handle_string_field(rjson["otherSignificantResistanceLevels"]),
+                hotspot = handle_boolean_field(rjson["hotspot"]),
+                geneSummary = handle_string_field(rjson["geneSummary"]),
+                variantSummary = handle_string_field(rjson["variantSummary"]),
+                tumorTypeSummary = handle_string_field(rjson["tumorTypeSummary"]),
+                prognosticSummary = handle_string_field(rjson["prognosticSummary"]),
+                diagnosticSummary = handle_string_field(rjson["diagnosticSummary"]),
+                diagnosticImplications = handle_string_field(rjson["diagnosticImplications"]),
+                prognosticImplications = handle_string_field(rjson["prognosticImplications"]),
+                treatments = handle_string_field(rjson["treatments"]),
+                dataVersion = handle_string_field(rjson["dataVersion"]),
+                lastUpdate = handle_date_field(rjson["lastUpdate"]),
+                vus = handle_boolean_field(rjson["vus"])
+            )
+            print("Saving.", rec)
+            rec.save()
+        except Exception as e:
+            print("Exception",e)
+            pass
+
+        return response
     else:
         print("[ERROR] Unable to request. Response: ", print(response.text))
         exit()
 
 def query_oncokb_somatic_mutation(snv: SomaticVariant , tumorType):
+    """
+    This function queries the OncoKB API to get information about a somatic mutation.
+
+    Args:
+    snv (SomaticVariant): A SomaticVariant object representing the somatic mutation.
+    tumorType (str): The type of tumor for which the mutation information is being queried.
+
+    Returns:
+    None
+
+    Raises:
+    None
+    """
+
     # curl -X GET "https://www.oncokb.org/api/v1/annotate/mutations/byGenomicChange?genomicLocation=7%2C140453136%2C140453136%2CA%2CT&tumorType=Melanoma&evidenceType=ONCOGENIC" -H "accept: application/json" -H "Authorization: Bearer token"
     # genomicLocation=7,140453136,140453136,A,T
-    print(snv)
     altlength = len(snv.sample_allele)
     genomicLocation = snv.chromosome+','+str(snv.position)+','+(str(snv.position)+str(altlength))+','+snv.reference_allele+','+snv.sample_allele
+    print(genomicLocation)
     token = settings.ONCOKB_TOKEN
     header = dict(accept="application/json", Authorization='Bearer '+token)
     request_url = "https://www.oncokb.org/api/v1/annotate/mutations/byGenomicChange?"
 
     print("Request OncoKB API "+request_url)
-    response = requests.get(request_url+'genomicLocation='+genomicLocation+'&tumorType='+tumorType+'&evidenceType=ONCOGENIC', headers=header)
+    #response = requests.get(request_url+'genomicLocation='+genomicLocation+'&tumorType='+tumorType+'&evidenceType=ONCOGENIC', headers=header)
+    response = requests.get(
+        request_url + 'genomicLocation=' + genomicLocation + '&tumorType=' + tumorType,
+        headers=header)
 
     if (response.status_code == 200):
         rjson = response.json()
@@ -422,6 +582,7 @@ def query_oncokb_somatic_mutation(snv: SomaticVariant , tumorType):
             print(e)
             pass
 
+        return response
     else:
         print("[ERROR] Unable to request. Response: ", print(response.text))
         exit()
@@ -492,19 +653,30 @@ def generate_proteinchange_query_file(snvs: [SomaticVariant]):
                 file1.write(isoform+"\n")
         file1.close()
 
+def generate_cgi_cna_file_from_list(genelist):
+    header = "gene\tcna\n"
+    with open("./tmp/cnas.ext", "w") as file2:
+        file2.write(header)
+        genes = genelist
+        for gene in genes:
+            row = gene + '\tAMP\n'
+            print(row)
+            file2.write(row)
+        file2.close()
+
 def sql_query_db():
 
     try:
         for rec in SomaticVariant.objects.raw("SELECT * FROM genomics_somaticvariant"):
-            print(rec)
+            print(rec.ref_id, rec.sample_allele)
 
     except Exception as e:
         print("Not in the database")
 
+
 class Command(BaseCommand):
 
     def add_arguments(self, parser):
-        parser.add_argument('--debug_cid', type=str, help="CID to execute the script in 'debug' mode on a specific CID")
         parser.add_argument('--snv',  action='store_true', help='')
         parser.add_argument('--patientid', type=str, help='Give patient id (in internal DB)')
         parser.add_argument('--geneid', type=str, help='Give gene id (in format eg. ENSG00000272262, NM_032264 or NBPF3)')
@@ -515,38 +687,84 @@ class Command(BaseCommand):
         parser.add_argument('--cgiquery',  action='store_true', help='Download results from CGI by jobid')
         parser.add_argument('--oncokbcna',  action='store_true',  help='Query OncoKB by gene id from given patient CNA. Input parameter: gene id')
         parser.add_argument('--oncokbsnv', action='store_true',  help='Query OncoKB by genomic location parsed patient SNV. Input parameter: ref id')
-        parser.add_argument('--exonic',  action='store_true', help='Query all exonic mutations for given patient id')
-        parser.add_argument('--proteinchange',  action='store_true', help='Query all protein affecting mutations for given patient id')
+        parser.add_argument('--sqlsnvs',  action='store_true', help='')
+        parser.add_argument('--exonic',  action='store_true', help='')
+        parser.add_argument('--proteinchange',  action='store_true', help='')
+        parser.add_argument('--genelist', type=str, help='')
+        parser.add_argument('--all', action='store_true', help='')
+        parser.add_argument('--direct', action='store_true', help='')
+
 
     def handle(self, *args, **kwargs):
 
+        if kwargs["sqlsnvs"]:
+            sql_query_db()
+
         #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --oncokbcna --geneid=ENSG00000230280 --patientid=1"
-        if kwargs["oncokbcna"]:
+        if kwargs["oncokbcna"] and kwargs["geneid"] and not kwargs["direct"]:
             cna = get_cna(kwargs["patientid"], kwargs["geneid"])
             resp = query_oncokb_cna(cna, "HGSOC")
-            print(resp)
-        #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --oncokbsnv --refid=rs61769312 --patientid=1"
-        if kwargs["oncokbsnv"]:
+            print(resp.text)
+        if kwargs["oncokbcna"] and kwargs["direct"]:
+            resp = query_oncokb_cna_direct(kwargs["geneid"], "AMPLIFICATION","HGSOC", 1)
+            #print(resp.text)
+        if kwargs["oncokbcna"] and kwargs["all"] and kwargs["patientid"]:
+            cnas = get_cnas(kwargs["patientid"])
+            for cna in cnas:
+                resp = query_oncokb_cna(cna, "HGSOC")
+                print(resp.text)
+                time.sleep(1)
+        #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --oncokbsnv=rs61769312 --patientid=1"
+        if kwargs["oncokbsnv"] and kwargs["refid"]:
             snv = get_snv(kwargs["patientid"], kwargs["refid"])
             resp = query_oncokb_somatic_mutation(snv, "HGSOC")
             print(resp)
+        if kwargs["oncokbsnv"] and kwargs["proteinchange"] and kwargs["patientid"]: # Query all exonic mutations for given patient
+            snvs = get_actionable_snvs_by_aaChangeRefGene(kwargs["patientid"])
+            for snv in snvs:
+                if snv:
+                    resp = query_oncokb_somatic_mutation(snv, "HGSOC")
+                    print(resp.text)
+                    time.sleep(1)
+        if kwargs["oncokbsnv"] and kwargs["exonic"] and kwargs["patientid"]: # Query all exonic mutations for given patient
+            snvs = get_all_exonic_snvs_of_patient(kwargs["patientid"])
+            for snv in snvs:
+                if snv:
+                    resp = query_oncokb_somatic_mutation(snv, "HGSOC")
+                    print(resp.text)
+                    time.sleep(1)
         if kwargs["cgijobid"]:
             cgijobid=kwargs["cgijobid"]
             query_cgi_job(kwargs["patientid"], cgijobid)
-        #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --cna --geneid=PTPN14 --patientid=1"
-        if kwargs["cgiquery"] and kwargs["cna"]:
-            ensg = gene_id_convert(kwargs["geneid"], "ENSG")
-            cna = get_cna(kwargs["patientid"], ensg)
-            generate_temp_cgi_query_files([],[cna],[])
-            jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, "FRS", "hg38")
-            while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
-                print("Waiting 120 seconds for the next try...")
-                time.sleep(120)
+
         #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --snv --refid=rs907584225 --patientid=1"
         if kwargs["cgiquery"] and kwargs["snv"]:
             snv = get_snv(kwargs["patientid"], kwargs["refid"])
             generate_temp_cgi_query_files([snv],[],[])
-            jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/snvs.ext", None, None, "FRS", "hg38")
+            jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/snvs.ext", None, None, "OV", "hg38")
+            while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
+                print("Waiting 120 seconds for the next try...")
+                time.sleep(120)
+        if kwargs["cgiquery"] and kwargs["cna"] and kwargs["all"]:
+            cnas = get_cnas(kwargs["patientid"])
+            generate_temp_cgi_query_files([],cnas,[])
+            jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, "OV", "hg38")
+            while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
+                print("Waiting 120 seconds for the next try...")
+                time.sleep(120)
+        if kwargs["cgiquery"] and kwargs["direct"] and kwargs["genelist"]:
+            generate_cgi_cna_file_from_list(kwargs["genelist"].split(','))
+            jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, "OV", "hg38")
+            while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
+                print("Waiting 120 seconds for the next try...")
+                time.sleep(120)
+
+        #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --cna --geneid=PTPN14 --patientid=1"
+        if kwargs["cgiquery"] and kwargs["cna"] and kwargs["geneid"]:
+            ensg = gene_id_convert(kwargs["geneid"], "ENSG")
+            cna = get_cna(kwargs["patientid"], ensg)
+            generate_temp_cgi_query_files([],[cna],[])
+            jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, "OV", "hg38")
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
                 print("Waiting 120 seconds for the next try...")
                 time.sleep(120)
@@ -554,23 +772,22 @@ class Command(BaseCommand):
         if kwargs["cgiquery"] and kwargs["exonic"] and kwargs["patientid"]: # Query all exonic mutations for given patient
             snv = get_all_exonic_snvs_of_patient(kwargs["patientid"])
             generate_temp_cgi_query_files(snv,[],[])
-            jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/snvs.ext", None, None, "FRS", "hg38")
+            jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/snvs.ext", None, None, "OV", "hg38")
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
                 print("Waiting 120 seconds for the next try...")
                 time.sleep(120)
-        #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --proteinchange --patientid=1"
-        if kwargs["cgiquery"] and kwargs["proteinchange"] and kwargs["patientid"]: # Query all protein affecting mutations for given patient
+         #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --proteinchange --patientid=1"
+        if kwargs["cgiquery"] and kwargs["proteinchange"] and kwargs["patientid"]: # Query all protein affecting mutations for all patients
             snvs = get_actionable_snvs_by_aaChangeRefGene(kwargs["patientid"])
             generate_proteinchange_query_file(snvs)
-            jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/prot.ext", None, None, "FRS", "hg38")
+            jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/prot.ext", None, None, "OV", "hg38")
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
                 print("Waiting 120 seconds for the next try...")
                 time.sleep(120)
-        #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --fusgenes BCR__ABL1,PML__PARA --patientid=1"
         if kwargs["cgiquery"] and kwargs["fusgenes"] and kwargs["patientid"]: # Query list of fusion genes for given patient
             fusgenes=kwargs["fusgenes"].split(',')
             generate_temp_cgi_query_files([],[],fusgenes)
-            jobid = launch_cgi_job_with_mulitple_variant_types(None, None, "./tmp/fus.ext", "FRS", "hg38")
+            jobid = launch_cgi_job_with_mulitple_variant_types(None, None, "./tmp/fus.ext", "OV", "hg38")
             time.sleep(90)
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
                 print("Waiting 120 seconds for the next try...")
