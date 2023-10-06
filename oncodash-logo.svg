@@ -33,18 +33,22 @@
      inkscape:guide-bbox="true"
      inkscape:snap-intersection-paths="true"
      inkscape:object-paths="true"
-     inkscape:snap-bbox="false"
+     inkscape:snap-bbox="true"
      inkscape:snap-smooth-nodes="true"
      inkscape:snap-midpoints="true"
-     inkscape:zoom="1.3406969"
-     inkscape:cx="221.15364"
-     inkscape:cy="221.89952"
+     inkscape:zoom="4.6314286"
+     inkscape:cx="256.72424"
+     inkscape:cy="62.723627"
      inkscape:current-layer="layer1"
      inkscape:snap-global="true"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
-     fit-margin-bottom="0">
+     fit-margin-bottom="0"
+     inkscape:snap-center="true"
+     inkscape:snap-object-midpoints="true"
+     inkscape:snap-nodes="false"
+     inkscape:snap-bbox-midpoints="true">
     <sodipodi:guide
        position="70.167951,17.891582"
        orientation="0,-1"
@@ -72,20 +76,33 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-45.004589,-22.862672)">
+    <rect
+       style="fill:#1a2c79;fill-opacity:1;stroke:none;stroke-width:0.10109;stroke-linecap:round"
+       id="rect1195"
+       width="35.07803"
+       height="35.07803"
+       x="95.325203"
+       y="15.046423"
+       inkscape:export-filename="/home/nojhan/code/oncodash/oncodash/oncodash-logo-pill.png"
+       inkscape:export-xdpi="289.63998"
+       inkscape:export-ydpi="289.63998" />
     <text
        xml:space="preserve"
        transform="scale(0.26458333)"
        id="text23492"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:18.6667px;line-height:1.25;font-family:'Nimbus Sans';-inkscape-font-specification:'Nimbus Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;writing-mode:lr-tb;white-space:pre;shape-inside:url(#rect23494);fill:black;stroke:none;stroke-width:5;stroke-linecap:round" />
-    <path
-       style="fill:none;stroke:#1e9dbc;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 108.54288,40.754256 H 104.51683 C 100.35739,40.754256 97.008813,37.405683 97.008813,33.246244 V 31.924632 C 97.008813,27.765193 100.35739,24.416619 104.51683,24.416619 H 108.54288 C 109.63024,24.416619 110.5559,25.397841 110.5559,26.458824 V 28.501028 V 32.585437 V 36.669847 V 38.712051 C 110.58401,39.959282 109.50375,40.754256 108.54288,40.754256 Z"
-       id="path27923"
-       sodipodi:nodetypes="cssssccccccc" />
-    <path
-       style="fill:none;stroke:#46a26e;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 115.17254,24.416619 H 117.18556 H 121.21161 C 125.37105,24.416619 128.71963,27.765193 128.71963,31.924632 V 33.246244 C 128.71963,37.405683 125.37105,40.754256 121.21161,40.754256 H 117.18556 H 115.17254 Z"
-       id="rect27008" />
+    <g
+       id="g1069">
+      <path
+         style="fill:none;stroke:#1e9dbc;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 108.54288,40.754256 H 104.51683 C 100.35739,40.754256 97.008813,37.405683 97.008813,33.246244 V 31.924632 C 97.008813,27.765193 100.35739,24.416619 104.51683,24.416619 H 108.54288 C 109.63024,24.416619 110.5559,25.397841 110.5559,26.458824 V 28.501028 V 32.585437 V 36.669847 V 38.712051 C 110.58401,39.959282 109.50375,40.754256 108.54288,40.754256 Z"
+         id="path27923"
+         sodipodi:nodetypes="cssssccccccc" />
+      <path
+         style="fill:none;stroke:#46a26e;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 115.17254,24.416619 H 117.18556 H 121.21161 C 125.37105,24.416619 128.71963,27.765193 128.71963,31.924632 V 33.246244 C 128.71963,37.405683 125.37105,40.754256 121.21161,40.754256 H 117.18556 H 115.17254 Z"
+         id="rect27008" />
+    </g>
     <path
        style="fill:none;stroke:white;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 94.036108,24.416619 C 93.026594,24.286149 90.010058,24.416619 90.010058,24.416619 C 85.850618,24.416619 82.502038,27.765193 82.502038,31.924632 V 33.246244 C 82.502038,37.405683 85.850618,40.754256 90.010058,40.754256 C 90.010058,40.754256 93.026594,40.884726 94.036108,40.754256"
