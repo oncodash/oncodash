@@ -68,17 +68,17 @@ You will be asked to accept some user contract at first launch.
     - select Software:Nginx System:Your-Host-OS
     - follow the instruction to install certbot and get certificates
 
-1. Build the back-end, front-end and nginx docker-images:
+2. Build the back-end, front-end and nginx docker-images:
     ```sh
     docker-compose build
     ```
-1. Create a development SQLlite database inside the container and add tables to it:
+3. Create a development SQLlite database inside the container and add tables to it:
     ```sh
     docker-compose run --rm backend sh -c "python manage.py makemigrations"
     docker-compose run --rm backend sh -c "python manage.py migrate"
     ```
 
-1. Populate a test database with network data (Explainer-app)
+4. Populate a test database with network data (Explainer-app)
     ```sh
     docker-compose run --rm backend sh -c "python manage.py flush --no-input"
     docker-compose run --rm backend sh -c "python manage.py populate -p /opt/app/path/to/indf.csv"
@@ -86,18 +86,46 @@ You will be asked to accept some user contract at first launch.
     Note: `/opt/app/` points by default to wherever is `oncodash/backend/` on your
     system.
 
-1. Populate a test database with clinical data and real timeline data. "\<clinical filepath\>" is the path of clinical data file and can be downloaded from eduuni. "\<timeline filepath\>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). The import takes several minutes, to shorten it you may reduce the timeline file by removing some lines.
+5. Populate a test database with clinical data and real timeline data. "\<clinical filepath\>" is the path of clinical data file and can be downloaded from eduuni. "\<timeline filepath\>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). The import takes several minutes, to shorten it you may reduce the timeline file by removing some lines.
     ```sh
     docker-compose run --rm backend sh -c "python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline  filepath>"
     ```
     If the import shows some warnings, you may restart it with the `--errors-details` argument, to get which rows are affected.
 
-1. Create an account. Type:
+6. Create an account. Type:
     ```sh
     docker-compose run --rm backend sh -c "python manage.py createsuperuser"
     ```
     and then follow the prompt instruction.
 
+7. Create CGI and OncoKB accounts to get corresponding tokens. Modify login email and tokens (OncoKB requires only token) in backend/backend/settings.py:
+```
+CGI_LOGIN = ""
+CGI_TOKEN = ""
+ONCOKB_TOKEN = ""
+```
+8. Import genomic variants to the database. "\<filepath\>" is the path of file containing annotated variants. **The expected column separator is tabulator**. Optionally, you can filter the data by column and value with --filter \<column name\> --\<filter type\> \<value\>. See --help for different filter types. 
+```sh
+docker-compose run --rm backend sh -c "python manage.py import_genomic_variants --somatic_variants <filepath>"
+```
+```sh
+docker-compose run --rm backend sh -c "python manage.py import_genomic_variants --copy_number_alterations <filepath>"
+```
+```sh
+docker-compose run --rm backend sh -c "python manage.py import_genomic_variants --ascatestimates <filepath>"
+```
+```sh
+docker-compose run --rm backend sh -c "python manage.py import_genomic_variants --oncokb_actionable_targets <filepath>"
+```
+9. Query OncoKB and Cancer Genome Interpreter actionable targets per patient identified by cohortcode.
+```sh
+docker-compose run --rm backend sh -c "python manage.py genomic_db_query_utils --oncokbcna --actionable --cohortcode=<cohortcode>"
+docker-compose run --rm backend sh -c "python manage.py genomic_db_query_utils --oncokbsnv --actionable --cohortcode=<cohortcode>"
+```
+```sh
+docker-compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --cna --actionable --cohortcode=<cohortcode>"
+docker-compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --snv --actionable --cohortcode=<cohortcode>"
+```
 
 ## Development
 
@@ -106,8 +134,8 @@ You will be asked to accept some user contract at first launch.
     ```sh
     docker-compose up -d
     ```
-1. Open up the browser at [localhost](http://localhost).
-1. Browsable API endpoints at [localhost/api/explainer/networks/](http://localhost/api/explainer/networks/).
+2. Open up the browser at [localhost](http://localhost).
+3. Browsable API endpoints at [localhost/api/explainer/networks/](http://localhost/api/explainer/networks/).
 
 
 ## Testing
@@ -173,7 +201,7 @@ python manage.py flush --no-input
 python manage.py populate -p /path/to/indication_table.csv
 ```
 
-6.opulate a test database with clinical data and real timeline data. "\<clinical filepath\>" is the path of clinical data file and can be downloaded from eduuni. "\<timeline filepath\>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). **The expected column separator is ";"**. The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
+6. Populate a test database with clinical data and real timeline data. "\<clinical filepath\>" is the path of clinical data file and can be downloaded from eduuni. "\<timeline filepath\>" is the timeline data file and can be downloaded from the eduuni repository (DECIDER/Clinical Data/timeline.csv). **The expected column separator is ";"**. The uploading takes several minutes, to shorten it you can reduce the timeline file by removing some lines.
 ```sh
 python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical filepath> -timelinepath <timeline filepath>
 ```
@@ -183,6 +211,35 @@ python manage.py import_timelinerecords_and_clinicaldata -clinicalpath <clinical
 python manage.py createsuperuser
 ```
 and then follow the prompt instruction.
+
+8. Create CGI and OncoKB accounts to get corresponding tokens. Modify login email and tokens (OncoKB requires only token) in backend/backend/settings.py:
+```
+CGI_LOGIN = ""
+CGI_TOKEN = ""
+ONCOKB_TOKEN = ""
+```
+9. Import genomic variants to the database. "\<filepath\>" is the path of file containing annotated variants. **The expected column separator is tabulator**. Optionally, you can filter the data by column and value with --filter \<column name\> --\<filter type\> \<value\>. See --help for different filter types. 
+```sh
+python manage.py import_genomic_variants --somatic_variants <filepath>
+```
+```sh
+python manage.py import_genomic_variants --copy_number_alterations <filepath>
+```
+```sh
+python manage.py import_genomic_variants --ascatestimates <filepath>
+```
+```sh
+python manage.py import_genomic_variants --oncokb_actionable_targets <filepath>
+```
+10. Query OncoKB and Cancer Genome Interpreter actionable targets per patient identified by cohortcode.
+```sh
+python manage.py genomic_db_query_utils --oncokbcna --actionable --cohortcode=<cohortcode>
+python manage.py genomic_db_query_utils --oncokbsnv --actionable --cohortcode=<cohortcode>
+```
+```sh
+python manage.py genomic_db_query_utils --cgiquery --cna --actionable --cohortcode=<cohortcode>
+python manage.py genomic_db_query_utils --cgiquery --snv --actionable --cohortcode=<cohortcode>
+```
 
 #### Front-end
 
