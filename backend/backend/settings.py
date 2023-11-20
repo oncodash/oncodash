@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "explainer",
     "clin_overview",
     "side_effects",
+    'genomics',
     # third-party
     "rest_framework",
     "corsheaders",
@@ -225,3 +226,7 @@ LOGGING = {
         },
     },
 }
+
+CGI_LOGIN = ""
+CGI_TOKEN = ""
+ONCOKB_TOKEN = ""

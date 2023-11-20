@@ -27,6 +27,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/explainer/", include("explainer.api.urls")),
     path("api/clinical-overview/", include("clin_overview.api.urls")),
+    path("api/genomic-overview/", include("genomics.api.urls")),
     path('', include(router.urls)),
 ] + staticfiles_urlpatterns()
 
