@@ -10,6 +10,7 @@ import configData from "./conf.json";
  const BASEURL =  PROTOCOL + '://' + HOST + '/api/';
  const CLIN_OVERVIEW = `clinical-overview/data/`;
  const CLIN_OVERVIEW_update = `clinical-overview/update/`;
+ const GENOMIC_OVERVIEW = `genomic-overview/data/`;
 
  
  function getJson(httpResponsePromise) {
@@ -104,7 +105,7 @@ import configData from "./conf.json";
       })
     ).then(patient => {
       // console.log(patient.time_series);
-      return new Patient(                     
+      patient = new Patient(                     
               patient.patient_id,
               patient.cohort_code,
               patient.chronic_illnesses_at_dg,
@@ -146,12 +147,23 @@ import configData from "./conf.json";
               patient.hrd_myriad_status,
               patient.sequencing_available,
               patient.paired_fresh_samples_available, 
-              patient.germline_pathogenic_variant,  
-              JSON.parse(patient.genomics),          
-                        );
+              patient.germline_pathogenic_variant,              
+                        );              
+              return patient;
     });
   
   }  
+
+  async function getGenomic(token, patient_id) {
+    return getJson(
+      fetch(BASEURL + GENOMIC_OVERVIEW + patient_id + `/`, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Token '+token,
+        },
+      })
+    ).then(genomic => genomic);
+}    
 
   async function updatePatients(token, separator, type, file) {
     // call: POST /api/tasks
@@ -229,5 +241,5 @@ import configData from "./conf.json";
     }
   }  
 
-const API = {getPatients, getSelectedPatient, updatePatients, logIn, logOut, getUserInfo};
+const API = {getPatients, getSelectedPatient, getGenomic, updatePatients, logIn, logOut, getUserInfo};
 export default API;

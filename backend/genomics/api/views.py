@@ -306,4 +306,3 @@ class CGIFusionGeneViewSet(viewsets.ModelViewSet):
 #         queryset = Translocation.objects.all()
 #         records = get_object_or_404(queryset, patient_id=patient_id)
 #
-#         return Response(serializer_class(records).data)
