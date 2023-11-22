@@ -67,7 +67,7 @@ class GenomicViewSet(viewsets.GenericViewSet):
                                 "treatment_phase": f"{get_phase(alterations_qs[i].sample_id)}",
                                 "tumor_purity": f"{get_purity(ascat_ests_qs.filter(sample=alterations_qs[i].sample_id))}",
                                 "mutation_affects": f"{get_sample_type(alterations_qs[i].sample_id)}",
-                                "reported_sensitivity": f"{alterations_qs[i].treatments}",
+                                "reported_sensitivity": f"{alterations_qs[i].treatments.replace(' ', '_').replace(';', ' ')}",
                             }
                         ]
                     }

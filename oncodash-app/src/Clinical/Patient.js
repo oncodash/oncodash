@@ -41,6 +41,7 @@ function Patient(
     sequencing_available,
     paired_fresh_samples_available,
     germline_pathogenic_variant,
+    genomic,
 ){
     this.patient_id                                     = patient_id
     this.cohort_code                                    = cohort_code    
@@ -83,7 +84,8 @@ function Patient(
     this.hrd_myriad_status                              = hrd_myriad_status        
     this.sequencing_available                           = sequencing_available            
     this.paired_fresh_samples_available                 = paired_fresh_samples_available      
-    this.germline_pathogenic_variant                    = germline_pathogenic_variant              
+    this.germline_pathogenic_variant                    = germline_pathogenic_variant
+    this.genomic                                        = genomic              
 
 this.toString = ()=>{
 return `id: ${this.patient_id}, age: ${this.age_at_diagnosis}, survival: ${this.survival}, histology: ${this.histology}, stage: ${this.stage}`;

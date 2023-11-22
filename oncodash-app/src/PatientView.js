@@ -28,7 +28,9 @@ function PatientView(props) {
     const getSelectedPatient = async(token, patient_id)=>{
         try{
             setWaitingSelected(true);
-            const patient = await API.getSelectedPatient(token, patient_id);
+            let patient = await API.getSelectedPatient(token, patient_id);
+            const genomic = await API.getGenomic(token, patient_id);
+            patient.genomic = genomic;
             setSelectedPatient(patient);
             setWaitingSelected(false);
         }catch(err){
