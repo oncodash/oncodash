@@ -12,6 +12,8 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
+from rest_framework.renderers import JSONRenderer
+from django.http import JsonResponse
 
 class GenomicViewSet(viewsets.GenericViewSet):
     """
@@ -32,16 +34,16 @@ class GenomicViewSet(viewsets.GenericViewSet):
         other_alterations = oncokb_queryset.filter(Q(highestPrognosticImplicationLevel=None) | Q(highestDiagnosticImplicationLevel=None) | Q(highestFdaLevel=None))
 
         data = {
-            "genomic": {
-                "putative_functionally_relevant_variant": [putative_functionally_relevant_variants.count(), "PUTATIVE FUNCTIONALLY RELEVANT VARIANT"],
-                "variants_of_uknown_functional_significance": [variants_of_uknown_functional_significance.count(), "VARIANTS OF UKNOWN FUNCTIONAL SIGNIFICANCE"],
-                "putative_functionally_neutral_variants": [putative_functionally_neutral_variants.count(), "PUTATIVE FUNCTIONALLY NEUTRAL VARIANTS"],
-                "other_alterations": [other_alterations.count(), "OTHER ALTERATIONS"],
+            'genomic': {
+                'putative_functionally_relevant_variant': [putative_functionally_relevant_variants.count(), 'PUTATIVE FUNCTIONALLY RELEVANT VARIANT'],
+                'variants_of_uknown_functional_significance': [variants_of_uknown_functional_significance.count(), 'VARIANTS OF UKNOWN FUNCTIONAL SIGNIFICANCE'],
+                'putative_functionally_neutral_variants': [putative_functionally_neutral_variants.count(), 'PUTATIVE FUNCTIONALLY NEUTRAL VARIANTS'],
+                'other_alterations': [other_alterations.count(), 'OTHER ALTERATIONS'],
                 },
-            "putative_functionally_relevant_variant": {},
-            "variants_of_uknown_functional_significance": {},
-            "putative_functionally_neutral_variants": {},
-            "other_alterations": {}
+            'putative_functionally_relevant_variant': {},
+            'variants_of_uknown_functional_significance': {},
+            'putative_functionally_neutral_variants': {},
+            'other_alterations': {}
         }
         if putative_functionally_relevant_variants.count() > 0:
             for gene in putative_functionally_relevant_variants.values('hugoSymbol').distinct():
@@ -51,30 +53,30 @@ class GenomicViewSet(viewsets.GenericViewSet):
                 alterations_qs = putative_functionally_relevant_variants.filter(hugoSymbol=gene_name)
 
                 gene_data = {
-                    "description": f"{alterations_qs[0].geneSummary}",
-                    "alterations": []
+                    'description': f'{alterations_qs[0].geneSummary}',
+                    'alterations': []
                 }
                 alt_count = alterations_qs.count()
 
                 alterations = [
                     {
-                        "name": f"{alterations_qs[i].alteration}",
-                        "description": f"{alterations_qs[i].mutationEffectDescription}",
-                        "row": [
+                        'name': f'{alterations_qs[i].alteration}',
+                        'description': f'{alterations_qs[i].mutationEffectDescription}',
+                        'row': [
                             {
-                                "samples_ids": f"{alterations_qs[i].sample_id}",
-                                "samples_info": f"{get_sample_info(alterations_qs[i].sample_id, timeline_qs)}",
-                                "treatment_phase": f"{get_phase(alterations_qs[i].sample_id)}",
-                                "tumor_purity": f"{get_purity(ascat_ests_qs.filter(sample=alterations_qs[i].sample_id))}",
-                                "mutation_affects": f"{get_sample_type(alterations_qs[i].sample_id)}",
-                                "reported_sensitivity": f"{alterations_qs[i].treatments}",
+                                'samples_ids': f'{alterations_qs[i].sample_id}',
+                                'samples_info': f'{get_sample_info(alterations_qs[i].sample_id, timeline_qs)}',
+                                'treatment_phase': f'{get_phase(alterations_qs[i].sample_id)}',
+                                'tumor_purity': f'{get_purity(ascat_ests_qs.filter(sample=alterations_qs[i].sample_id))}',
+                                'mutation_affects': f'{get_sample_type(alterations_qs[i].sample_id)}',
+                                'reported_sensitivity': f'{alterations_qs[i].treatments}',
                             }
                         ]
                     }
                     for i in range(alt_count)
                 ]
-                gene_data["alterations"] = alterations
-                data["putative_functionally_relevant_variant"][gene_name] = gene_data
+                gene_data['alterations'] = alterations
+                data['putative_functionally_relevant_variant'][gene_name] = gene_data
 
         if variants_of_uknown_functional_significance.count() > 0:
             for gene in variants_of_uknown_functional_significance.values('hugoSymbol').distinct():
@@ -84,30 +86,30 @@ class GenomicViewSet(viewsets.GenericViewSet):
                 alterations_qs = variants_of_uknown_functional_significance.filter(hugoSymbol=gene_name)
 
                 gene_data = {
-                    "description": f"{alterations_qs[0].geneSummary}",
-                    "alterations": []
+                    'description': f'{alterations_qs[0].geneSummary}',
+                    'alterations': []
                 }
                 alt_count = alterations_qs.count()
 
                 alterations = [
                     {
-                        "name": f"{alterations_qs[i].alteration}",
-                        "description": f"{alterations_qs[i].mutationEffectDescription}",
-                        "row": [
+                        'name': f'{alterations_qs[i].alteration}',
+                        'description': f'{alterations_qs[i].mutationEffectDescription}',
+                        'row': [
                             {
-                                "samples_ids": f"{alterations_qs[i].sample_id}",
-                                "samples_info": f"{get_sample_info(alterations_qs[i].sample_id, timeline_qs)}",
-                                "treatment_phase": f"{get_phase(alterations_qs[i].sample_id)}",
-                                "tumor_purity": f"{get_purity(ascat_ests_qs.filter(sample=alterations_qs[i].sample_id))}",
-                                "mutation_affects": f"{get_sample_type(alterations_qs[i].sample_id)}",
-                                "reported_sensitivity": f"{alterations_qs[i].treatments}",
+                                'samples_ids': f'{alterations_qs[i].sample_id}',
+                                'samples_info': f'{get_sample_info(alterations_qs[i].sample_id, timeline_qs)}',
+                                'treatment_phase': f'{get_phase(alterations_qs[i].sample_id)}',
+                                'tumor_purity': f'{get_purity(ascat_ests_qs.filter(sample=alterations_qs[i].sample_id))}',
+                                'mutation_affects': f'{get_sample_type(alterations_qs[i].sample_id)}',
+                                'reported_sensitivity': f'{alterations_qs[i].treatments}'.replace(' ', '_').replace(';', ' '),
                             }
                         ]
                     }
                     for i in range(alt_count)
                 ]
-                gene_data["alterations"] = alterations
-                data["variants_of_uknown_functional_significance"][gene_name] = gene_data
+                gene_data['alterations'] = alterations
+                data['variants_of_uknown_functional_significance'][gene_name] = gene_data
 
         if putative_functionally_neutral_variants.count() > 0:
             for gene in putative_functionally_neutral_variants.values('hugoSymbol').distinct():
@@ -117,66 +119,67 @@ class GenomicViewSet(viewsets.GenericViewSet):
                 alterations_qs = putative_functionally_neutral_variants.filter(hugoSymbol=gene_name)
 
                 gene_data = {
-                    "description": f"{alterations_qs[0].geneSummary}",
-                    "alterations": []
+                    'description': f'{alterations_qs[0].geneSummary}',
+                    'alterations': []
                 }
                 alt_count = alterations_qs.count()
 
                 alterations = [
                     {
-                        "name": f"{alterations_qs[i].alteration}",
-                        "description": f"{alterations_qs[i].mutationEffectDescription}",
-                        "row": [
+                        'name': f'{alterations_qs[i].alteration}',
+                        'description': f'{alterations_qs[i].mutationEffectDescription}',
+                        'row': [
                             {
-                                "samples_ids": f"{alterations_qs[i].sample_id}",
-                                "samples_info": f"{get_sample_info(alterations_qs[i].sample_id, timeline_qs)}",
-                                "treatment_phase": f"{get_phase(alterations_qs[i].sample_id)}",
-                                "tumor_purity": f"{get_purity(ascat_ests_qs.filter(sample=alterations_qs[i].sample_id))}",
-                                "mutation_affects": f"{get_sample_type(alterations_qs[i].sample_id)}",
-                                "reported_sensitivity": f"{alterations_qs[i].treatments}",
+                                'samples_ids': f'{alterations_qs[i].sample_id}',
+                                'samples_info': f'{get_sample_info(alterations_qs[i].sample_id, timeline_qs)}',
+                                'treatment_phase': f'{get_phase(alterations_qs[i].sample_id)}',
+                                'tumor_purity': f'{get_purity(ascat_ests_qs.filter(sample=alterations_qs[i].sample_id))}',
+                                'mutation_affects': f'{get_sample_type(alterations_qs[i].sample_id)}',
+                                'reported_sensitivity': f'{alterations_qs[i].treatments}'.replace(' ', '_').replace(';', ' '),
                             }
                         ]
                     }
                     for i in range(alt_count)
                 ]
-                gene_data["alterations"] = alterations
-                data["putative_functionally_neutral_variants"][gene_name] = gene_data
+                gene_data['alterations'] = alterations
+                data['putative_functionally_neutral_variants'][gene_name] = gene_data
 
         if other_alterations.count() > 0:
             for gene in other_alterations.values('hugoSymbol').distinct():
 
-                sample_info = ""
+                sample_info = ''
                 gene_name = gene['hugoSymbol']
 
                 alterations_qs = other_alterations.filter(hugoSymbol=gene_name)
 
                 gene_data = {
-                    "description": f"{alterations_qs[0].geneSummary}",
-                    "alterations": []
+                    'description': f'{alterations_qs[0].geneSummary}',
+                    'alterations': []
                 }
                 alt_count = alterations_qs.count()
 
                 alterations = [
                     {
-                        "name": f"{alterations_qs[i].alteration}",
-                        "description": f"{alterations_qs[i].mutationEffectDescription}",
-                        "row": [
+                        'name': f'{alterations_qs[i].alteration}',
+                        'description': f'{alterations_qs[i].mutationEffectDescription}',
+                        'row': [
                             {
-                                "samples_ids": f"{alterations_qs[i].sample_id}",
-                                "samples_info": f"{get_sample_info(alterations_qs[i].sample_id, timeline_qs)}",
-                                "treatment_phase": f"{get_phase(alterations_qs[i].sample_id)}",
-                                "tumor_purity": f"{get_purity(ascat_ests_qs.filter(sample=alterations_qs[i].sample_id))}",
-                                "mutation_affects": f"{get_sample_type(alterations_qs[i].sample_id)}",
-                                "reported_sensitivity": f"{alterations_qs[i].treatments}",
+                                'samples_ids': f'{alterations_qs[i].sample_id}',
+                                'samples_info': f'{get_sample_info(alterations_qs[i].sample_id, timeline_qs)}',
+                                'treatment_phase': f'{get_phase(alterations_qs[i].sample_id)}',
+                                'tumor_purity': f'{get_purity(ascat_ests_qs.filter(sample=alterations_qs[i].sample_id))}',
+                                'mutation_affects': f'{get_sample_type(alterations_qs[i].sample_id)}',
+                                'reported_sensitivity': f'{alterations_qs[i].treatments}'.replace(' ', '_').replace(';', ' '),
                             }
                         ]
                     }
                     for i in range(alt_count)
                 ]
-                gene_data["alterations"] = alterations
-                data["other_alterations"][gene_name] = gene_data
+                gene_data['alterations'] = alterations
+                data['other_alterations'][gene_name] = gene_data
 
-        return Response(json.dumps(data, indent=4))
+        #return Response(json.dumps(data)) # use a serializer!
+        return JsonResponse(data)
 
 def get_purity(est_objs):
     if est_objs:

@@ -4,6 +4,7 @@ services:
   # nodeserver
   nodeserver:
     image: oncodash/nodeserver
+    restart: always
     user: $UID:$GID
     build:
       context: ./oncodash-app
@@ -29,6 +30,7 @@ services:
   # django backend gunicorn server (communicates with nginx proxy)
   backend:
     image: oncodash/backend
+    restart: always
     user: $UID:$GID
     build:
       context: ./backend

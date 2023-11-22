@@ -227,6 +227,6 @@ LOGGING = {
     },
 }
 
-CGI_LOGIN = ""
-CGI_TOKEN = ""
-ONCOKB_TOKEN = ""
+CGI_LOGIN = "ilari.maarala@helsinki.fi"
+CGI_TOKEN = "f7ab7f3911b1194f4629"
+ONCOKB_TOKEN = "553a8d20-56b1-4754-8a81-6ab0914b78ce"

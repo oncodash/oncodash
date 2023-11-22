@@ -50,8 +50,8 @@ import configData from "./conf.json";
         patient.cohort_code,
         patient.chronic_illnesses_at_dg,
         patient.chronic_illnesses_type,
-        JSON.parse(patient.time_series),
-        JSON.parse(patient.event_series),
+        patient.time_series,
+        patient.event_series,
         patient.histology,
         patient.stage,
         patient.primary_therapy_outcome,
@@ -146,7 +146,8 @@ import configData from "./conf.json";
               patient.hrd_myriad_status,
               patient.sequencing_available,
               patient.paired_fresh_samples_available, 
-              patient.germline_pathogenic_variant,              
+              patient.germline_pathogenic_variant,  
+              JSON.parse(patient.genomics),          
                         );
     });
   

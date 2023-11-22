@@ -49,4 +49,8 @@ nbs
 
 **/*.csv
 
+**/*.tsv
+**/*.sqlite3
+
+
 backend/db.sqlite3-journal
