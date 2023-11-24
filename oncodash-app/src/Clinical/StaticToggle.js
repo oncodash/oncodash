@@ -4,7 +4,7 @@ import {Check, Question, X} from 'react-bootstrap-icons';
 
 function StaticToggle(props) {
     // console.log(props.answer, props.label);
-    const displayOrder = ["patient_id", "age_at_diagnosis", "survival", "histology", "stage"];
+    const displayOrder = ["patient_id", "cohort_code", "age_at_diagnosis", "survival", "histology", "stage"];
 
     function handleAnswer(answer, label){
         if(answer==="Yes"){

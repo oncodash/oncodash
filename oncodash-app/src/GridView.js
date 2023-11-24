@@ -21,6 +21,7 @@ function GridView(props) {
                                 role="button">
                                 {p.survival==="alive"?<img src={alive} alt="alive"/>:<img src={dead} alt="dead"/>}
                                 <div>ID: {p.patient_id}</div>
+                                <div>Cohort Code: {p.cohort_code}</div>
                                 <div>Age: {p.age_at_diagnosis}</div>
                                 <div>Survial: {p.survival}</div>
                                 <div>Stage: {p.stage}</div>

@@ -3,11 +3,12 @@ import { PersonCheck, PersonX } from 'react-bootstrap-icons';
 import StaticToggle from './Clinical/StaticToggle';
 
 function PatientSummary(props) {
-    const displayOrder1 = ["patient_id", "age_at_diagnosis", "stage"];
+    const displayOrder1 = ["patient_id", "cohort_code", "age_at_diagnosis", "stage"];
     const displayOrder2 = ["survival", "current_treatment_phase", "progression"]; 
     const displayOrder3 = ["paired_fresh_samples_available", "platinum_free_interval", "days_to_death", "followup_time"]; 
     const dictionary = {
         "patient_id":"Patient ID",
+        "cohort_code":"Cohort Code",
         "age_at_diagnosis":"Age",
         "stage":"Stage",
         "survival":"Status",
