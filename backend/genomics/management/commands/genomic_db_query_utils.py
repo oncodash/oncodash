@@ -234,7 +234,7 @@ def query_cgi_job(patient_id, jobid):
                         )
                         rec.save()
                     except Exception as e:
-                        #logging.exception(e)
+                        logging.exception(e)
                         pass
 
 
@@ -263,7 +263,7 @@ def query_cgi_job(patient_id, jobid):
                         )
                         rec.save()
                     except Exception as e:
-                        #logging.exception(e)
+                        logging.exception(e)
                         pass
             # Fusion/Transloc Query
             # fus
@@ -289,7 +289,7 @@ def query_cgi_job(patient_id, jobid):
                         )
                         rec.save()
                     except Exception as e:
-                        #logging.exception(e)
+                        logging.exception(e)
                         pass
 
             # Sample ID	Alterations	Biomarker	Drugs	Diseases	Response	Evidence	Match	Source	BioM	Resist.	Tumor type
@@ -314,7 +314,7 @@ def query_cgi_job(patient_id, jobid):
                         )
                         rec.save()
                     except Exception as e:
-                        #logging.exception(e)
+                        logging.exception(e)
                         pass
         return 1
     else:
@@ -447,7 +447,7 @@ def query_oncokb_cna(cna: CopyNumberAlteration, tumorType):
     api_url = "https://www.oncokb.org/api/v1/annotate/copyNumberAlterations?"
 
     request_url = api_url + 'copyNameAlterationType='+AlterationType[cna.CNstatus].value+'&hugoSymbol='+hugosymbol+'&tumorType='+tumorType
-    header = dict(accept="application/json", Authorization='Bearer '+token)
+    header = {"accept":"application/json", 'Content-Type': 'application/json', "Authorization":'Bearer '+token}
 
     print("Request OncoKB API "+request_url)
 
@@ -457,7 +457,7 @@ def query_oncokb_cna(cna: CopyNumberAlteration, tumorType):
     print(response.status)
     print(response.url)
     if (response.status == 200):
-        rjson = response.json()
+        rjson = json.loads(response.data.decode('utf-8'))
         try:
             rec, created = OncoKBAnnotation.objects.get_or_create(
                 patient_id  = handle_int_field(cna.patient_id),
@@ -531,7 +531,7 @@ def query_oncokb_cnas(cnas: [CopyNumberAlteration], tumorType):
 
     api_url = "https://www.oncokb.org/api/v1/annotate/copyNumberAlterations"
     #request_url = api_url + 'copyNameAlterationType='+AlterationType[cna.CNstatus].value+'&hugoSymbol='+hugosymbol+'&tumorType='+tumorType
-    header = dict(accept="application/json", Authorization='Bearer '+token)
+    header = {"accept":"application/json", 'Content-Type': 'application/json', "Authorization":'Bearer '+token}
 
     print("Request OncoKB API "+api_url)
 
@@ -549,14 +549,15 @@ def query_oncokb_cnas(cnas: [CopyNumberAlteration], tumorType):
     ]
 
     # Sending a GET request and getting back response as HTTPResponse object.
-    response = http.request("POST",api_url, json=data, headers=header)
+    response = http.request("POST",api_url, body=json.dumps(data).encode('utf-8'), headers=header)
     #response = http.request("GET",request_url, headers=header)
     print(response.status)
-    print(json.dumps(response.json(), indent=4))
 
     if (response.status == 200):
 
-        for rjson in response.json():
+        respjson = json.loads(response.data.decode('utf-8'))
+        print(respjson)
+        for rjson in respjson:
             #print("OBJ", rjson)
 
             rec, created = OncoKBAnnotation.objects.get_or_create(
@@ -631,14 +632,14 @@ def query_oncokb_cna_direct(geneid, cnatype, tumorType, patient_id, sample_id):
     hugosymbol = gene_id_convert(geneid, "HGNC")
     api_url = "https://www.oncokb.org/api/v1/annotate/copyNumberAlterations?"
     request_url = api_url + 'copyNameAlterationType='+cnatype+'&hugoSymbol='+hugosymbol+'&tumorType='+tumorType
-    header = dict(accept="application/json", Authorization='Bearer '+token)
+    header = {"accept":"application/json", 'Content-Type': 'application/json', "Authorization":'Bearer '+token}
 
     print("Request OncoKB API "+request_url)
     response = http.request("GET",request_url, headers=header)
     print(response.status)
     print(response.url)
     if (response.status == 200):
-        rjson = response.json()
+        rjson = json.loads(response.data.decode('utf-8'))
 
         rec, created = OncoKBAnnotation.objects.get_or_create(
             patient_id  = handle_int_field(patient_id),
@@ -707,7 +708,7 @@ def query_oncokb_somatic_mutation(snv: SomaticVariant , tumorType):
     genomicLocation = snv.chromosome+','+str(snv.position)+','+(str(int(snv.position)+int(altlength)))+','+snv.reference_allele+','+snv.sample_allele
     print(genomicLocation)
     token = settings.ONCOKB_TOKEN
-    header = dict(accept="application/json", Authorization='Bearer '+token)
+    header = {"accept":"application/json", 'Content-Type': 'application/json', "Authorization":'Bearer '+token}
     request_url = "https://www.oncokb.org/api/v1/annotate/mutations/byGenomicChange?"
 
     print("Request OncoKB API "+request_url)
@@ -717,7 +718,7 @@ def query_oncokb_somatic_mutation(snv: SomaticVariant , tumorType):
         headers=header)
 
     if (response.status == 200):
-        rjson = response.json()
+        rjson = json.loads(response.data.decode('utf-8'))
         try:
             sids = snv.samples.split(";")
             for sid in sids:
@@ -788,7 +789,7 @@ def query_oncokb_somatic_mutations(snvs: [SomaticVariant] , tumorType):
     """
 
     token = settings.ONCOKB_TOKEN
-    header = dict(accept="application/json", Authorization='Bearer '+token)
+    header = {"accept":"application/json", 'Content-Type': 'application/json', "Authorization":'Bearer '+token}
     request_url = "https://www.oncokb.org/api/v1/annotate/mutations/byGenomicChange"
 
     data = [
@@ -804,14 +805,15 @@ def query_oncokb_somatic_mutations(snvs: [SomaticVariant] , tumorType):
 
     # Sending a GET request and getting back response as HTTPResponse object.
     print("Request OncoKB API "+request_url)
-    response = http.request("POST", request_url, json=data, headers=header)
+    response = http.request("POST", request_url, body=json.dumps(data).encode('utf-8'), headers=header)
     # response = http.request("GET",request_url, headers=header)
     print(response.status)
     # print(response.json())
 
     if (response.status == 200):
 
-        for rjson in response.json():
+        respjson = json.loads(response.data.decode('utf-8'))
+        for rjson in respjson:
 
             if handle_string_field(rjson["oncogenic"]) != "Unknown":
                 print("OBJ", rjson)
@@ -870,13 +872,15 @@ def gene_id_convert(geneids, target):
     request_url = "https://biit.cs.ut.ee/gprofiler/api/convert/convert/"
     print("Request gProfiler API "+request_url)
     data = '{"organism":"hsapiens", "target":"'+target+'", "query":"'+geneids+'"}'
+    #{"organism":"hsapiens", "target":target, "query":geneids}
     headers = {"Content-Type": "application/json"}
-    response = http.request("POST", url=request_url, json={"organism":"hsapiens", "target":target, "query":geneids}, headers=headers)
+    body = json.dumps(data).encode('utf-8')
+    response = http.request("POST", url=request_url, body=body, headers=headers)
     print("response.status", response.status)
     print(data)
     print(response.json)
     if (response.status == 200):
-        rjson = response.json()
+        rjson = json.loads(response.data.decode('utf-8'))
         print(dict(rjson['result'][0]).get('converted'))
         return dict(rjson['result'][0]).get('converted')
 

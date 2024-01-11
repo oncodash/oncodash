@@ -184,7 +184,7 @@ class GenomicViewSet(viewsets.GenericViewSet):
 def get_purity(est_objs):
     if est_objs:
         if est_objs[0].purity > 0.0:
-            return str('%.2f' % est_objs[0].purity)+"%"
+            return str('%.2f' % (100*float(est_objs[0].purity)))+"%"
         else:
             return "NA"
     else:
