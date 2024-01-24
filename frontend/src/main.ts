@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { createApp } from 'vue'
-import App from './App.vue'
+import App from './components/App.vue'
 import 'modern-normalize'
 import './globals.css'
 
