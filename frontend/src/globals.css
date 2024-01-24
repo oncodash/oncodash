@@ -29,6 +29,15 @@ body {
   flex-flow: column nowrap;
 }
 
+a {
+  color: var(--primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 button {
   background: transparent;
   border-radius: var(--radius);
