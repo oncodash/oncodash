@@ -10,28 +10,17 @@ export default createRouter({
   routes: [
     {
       path: '/',
-      component: async () => await import('./components/404Page.vue'),
-      name: 'HomePage'
+      component: async () => await import('./components/PatientsPage.vue'),
+      name: 'PatientsPage'
     },
     {
       path: '/patients',
-      component: async () => await import('./components/PatientsPage.vue'),
-      name: 'PatientsPage'
+      redirect: { name: 'PatientsPage' }
     },
     {
       path: '/patients/:id',
       component: async () => await import('./components/PatientPage.vue'),
       name: 'PatientPage'
-    },
-    {
-      path: '/contact',
-      component: async () => await import('./components/404Page.vue'),
-      name: 'ContactPage'
-    },
-    {
-      path: '/about',
-      component: async () => await import('./components/404Page.vue'),
-      name: 'AboutPage'
     },
     {
       path: '/:pathMatch(.*)*',

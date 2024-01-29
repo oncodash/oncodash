@@ -2,7 +2,7 @@
   <AppHeader />
 
   <main>
-    <RouterView></RouterView>
+    <RouterView />
   </main>
 
   <AppFooter />

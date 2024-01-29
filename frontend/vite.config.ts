@@ -12,7 +12,11 @@ export default defineConfig({
     emptyOutDir: true
   },
   server: {
-    port: 8080
+    port: 8080,
+    proxy: {
+      // Proxy to the backend API during development
+      '/api/clinical-overview/data/': 'http://127.0.0.1:8888'
+    }
   },
   define: {
     // Bundle feature flags to make the build slightly lighter.
