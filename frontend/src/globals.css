@@ -53,6 +53,8 @@ button {
 }
 
 h1 {
+  color: var(--white);
   font-size: 60px;
   margin-top: 0;
+  text-align: center;
 }

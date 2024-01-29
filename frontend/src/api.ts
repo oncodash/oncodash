@@ -16,5 +16,12 @@ export default {
         Authorization: 'Token d2431e327983108f3385369aa4e72f573263ab9d'
       }
     })
-  }
+  },
+  getPatientClinical: async function (patientID: string) {
+    return await base.get(`/api/clinical-overview/data/${patientID}/`, {
+      headers: {
+        Authorization: 'Token d2431e327983108f3385369aa4e72f573263ab9d'
+      }
+    })
+  },
 }

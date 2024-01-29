@@ -23,11 +23,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-h1 {
-  color: var(--white);
-  text-align: center;
-}
-
 .patients-list {
   background-color: var(--white);
   padding: var(--spacing);

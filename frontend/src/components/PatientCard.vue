@@ -10,13 +10,18 @@
       <span>Stage - {{ patient.stage }}</span>
     </div>
     <div class="footer">
-      <button type="button">Read more</button>
+      <RouterLink
+        :to="{ name: 'PatientPage', params: { id: patient.patient_id } }"
+        v-slot="{ navigate }"
+      >
+        <button type="button" @click="navigate">Read more</button>
+      </RouterLink>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed } from 'vue'
 
 const props = defineProps<{
   patient: any
