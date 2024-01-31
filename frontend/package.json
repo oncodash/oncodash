@@ -10,9 +10,11 @@
     "build": "vue-tsc && vite build"
   },
   "dependencies": {
+    "@vueuse/integrations": "^10.7.2",
     "axios": "^1.6.7",
     "modern-normalize": "^2.0.0",
     "pinia": "^2.1.7",
+    "universal-cookie": "^7.0.2",
     "vue": "^3.4.15",
     "vue-router": "^4.2.5"
   },

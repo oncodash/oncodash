@@ -24,6 +24,11 @@ export default createRouter({
       props: true
     },
     {
+      path: '/login',
+      component: async () => await import('./components/LoginPage.vue'),
+      name: 'LoginPage'
+    },
+    {
       path: '/:pathMatch(.*)*',
       component: async () => await import('./components/404Page.vue'),
       name: '404Page'

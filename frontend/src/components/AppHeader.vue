@@ -4,14 +4,36 @@
       <img
         src="/oncodash-logo.png"
         alt="The logo of Oncodash"
-        height="64"
-      >
+        height="64">
     </a>
-    <button type="button">LOGIN</button>
+    <RouterLink v-if="!isLoggedIn" :to="{ name: 'LoginPage' }" v-slot="{ navigate }">
+      <button type="button" @click="navigate">LOGIN</button>
+    </RouterLink>
+    <button v-else type="button" @click="logout">LOGOUT</button>
   </header>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useCookies } from '@vueuse/integrations/useCookies'
+import router from '../router'
+import { computed } from 'vue'
+import api from '../api'
+
+const cookies = useCookies()
+const isLoggedIn = computed(() => {
+  return cookies.get('token') ? true : false
+})
+
+function logout() {
+  api.logout().then(() => {
+    cookies.remove('token')
+    router.push({ name: 'LoginPage'})
+  }).catch(err => {
+    alert(err.message)
+    console.error(err)
+  })
+}
+</script>
 
 <style scoped>
 header {
