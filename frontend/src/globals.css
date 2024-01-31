@@ -4,8 +4,10 @@
   --red: hsl(0, 69%, 50%);
   --green: hsl(145, 39%, 46%);
   --green-light: hsl(147, 27%, 92%);
+  --grey: hsl(184, 9%, 62%);
+  --grey-light: hsl(184, 9%, 62%, 30%);
   --black: hsl(0, 0%, 15%);
-  --black-translucent: hsla(0, 0%, 15%, 0.5);
+  --black-translucent: hsla(0, 0%, 15%, 50%);
   --white: hsl(0, 0%, 100%);
   --spacing: 20px;
   --radius: 5px;
@@ -50,6 +52,12 @@ button {
   font-weight: normal; /* Needed in Firefox for some reason */
   padding: 0.5em 0.75em;
   transition: background-color 0.1s;
+}
+
+button:disabled {
+  background-color: var(--grey-light);
+  color: var(--grey);
+  cursor: not-allowed;
 }
 
 h1 {

@@ -5,20 +5,34 @@
     </header>
     <label>
       <div>Email</div>
-      <input v-model="email" type="email" name="email" autocomplete="email">
+      <input
+        v-model="email"
+        @keyup.enter="login"
+        type="email"
+        name="email"
+        autocomplete="email">
     </label>
     <label>
       <div>Password</div>
-      <input v-model="password" type="password" name="password">
+      <input
+        v-model="password"
+        @keyup.enter="login"
+        type="password"
+        name="password">
     </label>
     <footer>
-      <button @click="login" type="button">SUBMIT</button>
+      <button
+        @click="login"
+        :disabled="!inputsAreValid"
+        type="button">
+        SUBMIT
+      </button>
     </footer>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useCookies } from '@vueuse/integrations/useCookies'
 import api from '../api'
 import router from '../router'
@@ -27,7 +41,13 @@ const cookies = useCookies()
 const email = ref('')
 const password = ref('')
 
+const inputsAreValid = computed(() => {
+  return email.value && password.value
+})
+
 function login() {
+  if (!inputsAreValid.value) return
+
   api.login(email.value, password.value).then(async response => {
     cookies.set('token', response.data.token)
     router.replace({ name: "PatientsListPage" })
@@ -71,7 +91,7 @@ input {
   transition: outline 0.1s;
 }
 
-input:focus  {
+input:focus {
   outline: 5px solid var(--primary);
 }
 
