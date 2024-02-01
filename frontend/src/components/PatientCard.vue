@@ -4,11 +4,13 @@
       <span class="id">PATIENT {{ patient.patient_id }}</span>
       <span class="cohort">Cohort {{ patient.cohort_code }}</span>
     </div>
+
     <div class="content">
-      <span>Age - {{ patient.age_at_diagnosis }}</span>
-      <span>Status - {{ patientStatus }}</span>
-      <span>Stage - {{ patient.stage }}</span>
+      <PatientField field="Age" :value="patient.age_at_diagnosis" />
+      <PatientField field="Status" :value="patientStatus" />
+      <PatientField field="Stage" :value="patient.stage" />
     </div>
+
     <div class="footer">
       <RouterLink
         :to="{ name: 'PatientPage', params: { id: patient.patient_id } }"
@@ -22,6 +24,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import PatientField from './PatientField.vue';
 
 const props = defineProps<{
   patient: any

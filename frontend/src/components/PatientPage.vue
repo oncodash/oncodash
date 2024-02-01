@@ -5,7 +5,9 @@
 
   <section class="patient-data">
     <AppTabs>
-      <AppTabsPanel name="CLINICAL DATA">{{  patient }}</AppTabsPanel>
+      <AppTabsPanel name="CLINICAL DATA">
+        <PatientClinical :patient="patient"></PatientClinical>
+      </AppTabsPanel>
       <AppTabsPanel name="GENOMIC DATA">GENOMIC</AppTabsPanel>
       <AppTabsPanel name="EXPLAINER">EXPLAINER</AppTabsPanel>
       <AppTabsPanel name="OTHER">OTHER</AppTabsPanel>
@@ -18,7 +20,8 @@ import { onMounted, ref } from 'vue'
 import api from '../api'
 import AppTabs from "./AppTabs.vue"
 import AppTabsPanel from './AppTabsPanel.vue'
-import PatientSummary from "./PatientSummary.vue";
+import PatientSummary from "./PatientSummary.vue"
+import PatientClinical from "./PatientClinical.vue"
 
 const props = defineProps<{
   id: string
@@ -38,6 +41,7 @@ const patient: any = ref({})
 
 <style scoped>
 .patient-data {
+  font-size: 18px;
   margin: var(--spacing);
 }
 </style>
