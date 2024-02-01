@@ -7,16 +7,16 @@ function Genomic(props) {
     const genomic = props.patient.genomic.genomic;
     // const genomic = {
     //     "putative_functionally_relevant_variant": [2, "PUTATIVE FUNCTIONALLY RELEVANT VARIANT"],
-    //     "variants_of_uknown_functional_significance": [1, "VARIANTS OF UKNOWN FUNCTIONAL SIGNIFICANCE"],
+    //     "variants_of_unknown_functional_significance": [1, "VARIANTS OF UNKNOWN FUNCTIONAL SIGNIFICANCE"],
     //     "putative_functionally_neutral_variants": [1, "PUTATIVE FUNCTIONALLY NEUTRAL VARIANTS"],
     //     "other_alterations": [1, "OTHER ALTERATIONS"],
     // };
-    
+
     const genomic_all = props.patient.genomic
-    const displayObjectsKeys = ["putative_functionally_relevant_variant","variants_of_uknown_functional_significance","putative_functionally_neutral_variants","other_alterations"];
+    const displayObjectsKeys = ["putative_functionally_relevant_variant","variants_of_unknown_functional_significance","putative_functionally_neutral_variants","other_alterations"];
     const nameDICT = {
         "putative_functionally_relevant_variant":"PUTATIVE FUNCTIONALLY RELEVANT VARIANT",
-        "variants_of_uknown_functional_significance":"VARIANTS OF UKNOWN FUNCTIONAL SIGNIFICANCE",
+        "variants_of_unknown_functional_significance":"VARIANTS OF UNKNOWN FUNCTIONAL SIGNIFICANCE",
         "putative_functionally_neutral_variants":"PUTATIVE FUNCTIONALLY NEUTRAL VARIANTS",
         "other_alterations":"OTHER ALTERATIONS",
     }
@@ -43,7 +43,7 @@ function Genomic(props) {
     //                     "tumor_purity":"30%",
     //                     "mutation_affects":"RNA",
     //                     "reported_sensitivity":"Bevacizumab",
-    //                 }                    
+    //                 }
     //             ]
     //             },
     //             {
@@ -70,7 +70,7 @@ function Genomic(props) {
     //                 "description": "Alteration information... Lorem ipsum",
     //             }
     //         ]
-    //     }        
+    //     }
     // };
 
     const displayOrder = ["samples_ids", "samples_info", "treatment_phase", "tumor_purity", "mutation_affects", "reported_sensitivity"]
@@ -91,7 +91,7 @@ function Genomic(props) {
                         <OverviewGenomicCard key={k} value={genomic[k][0]} name={genomic[k][1]}/>
                     )
                 }
-                
+
             </Row>
 
             {
@@ -101,7 +101,7 @@ function Genomic(props) {
                             <div className="bg-success pl-5 ml-5 bg-opacity-25 fs-3">
                                 <b>{nameDICT[dob]} - {genomic[dob][0]}</b>
                             </div>
-                        </Row>                    
+                        </Row>
                         {Object.keys(genomic_all[dob]).map(k=>
                         <div key={counter++} className="my-4 px-5 mx-5 bg-opacity-25">
                             <div className="fs-3">
@@ -115,7 +115,7 @@ function Genomic(props) {
                                     <div key={counter++}>
                                         <div key={a.name} className="my-3 fs-3 px-5 bg-opacity-10 bg-success">
                                             <b>Alteration - </b>{a.name}
-                                        </div>  
+                                        </div>
                                         <div className="fs-5 px-5">
                                             {a["description"]}
                                         </div>
@@ -130,10 +130,10 @@ function Genomic(props) {
                                                                 </Col>
                                                             )
                                                         }
-                                                    </Row>                                         
-                                                        { 
+                                                    </Row>
+                                                        {
                                                             a.row.map(r=>
-                                                                <Row key={counter++} className="px-5">  
+                                                                <Row key={counter++} className="px-5">
                                                                     {
                                                                         displayOrder.map(d=>
                                                                             <Col key={counter++} className="text-center" xs={2} sm={2} md={2} lg={2} xl={2} xxl={2}>
@@ -144,15 +144,15 @@ function Genomic(props) {
                                                                 </Row>
                                                             )
                                                         }
-                                                    
+
                                                 </Row>
                                                 :
                                                 ''
-                                        } 
-                                    </div>                               
+                                        }
+                                    </div>
                                 )
                             }
-                        
+
                         </div>
                     )}</div>
                 )
