@@ -16,6 +16,7 @@ export default defineConfig({
     proxy: {
       // Proxy to the backend API during development
       '/api/clinical-overview/data/': 'http://127.0.0.1:8888',
+      '/api/genomic-overview/data/': 'http://127.0.0.1:8888',
       '/api-token-auth/': 'http://127.0.0.1:8888'
     }
   },

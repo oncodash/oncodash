@@ -36,6 +36,13 @@ export default {
       }
     })
   },
+  getPatientGenomic: async function (patientID: string) {
+    return await base.get(`/api/genomic-overview/data/${patientID}/`, {
+      headers: {
+        Authorization: `Token ${cookies.get('token')}`
+      }
+    })
+  },
   login: async function (email: string, password: string) {
     return await base.post('/api-token-auth/', {
       username: email,

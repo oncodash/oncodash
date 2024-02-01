@@ -8,9 +8,18 @@
       <AppTabsPanel name="CLINICAL DATA">
         <PatientClinical :patient="patient"></PatientClinical>
       </AppTabsPanel>
-      <AppTabsPanel name="GENOMIC DATA">GENOMIC</AppTabsPanel>
-      <AppTabsPanel name="EXPLAINER">EXPLAINER</AppTabsPanel>
-      <AppTabsPanel name="OTHER">OTHER</AppTabsPanel>
+
+      <AppTabsPanel name="GENOMIC DATA">
+        <PatientGenomic :patientID="id"></PatientGenomic>
+      </AppTabsPanel>
+
+      <AppTabsPanel name="EXPLAINER">
+        EXPLAINER
+      </AppTabsPanel>
+
+      <AppTabsPanel name="OTHER">
+        OTHER
+      </AppTabsPanel>
     </AppTabs>
   </section>
 </template>
@@ -22,6 +31,7 @@ import AppTabs from "./AppTabs.vue"
 import AppTabsPanel from './AppTabsPanel.vue'
 import PatientSummary from "./PatientSummary.vue"
 import PatientClinical from "./PatientClinical.vue"
+import PatientGenomic from "./PatientGenomic.vue"
 
 const props = defineProps<{
   id: string
