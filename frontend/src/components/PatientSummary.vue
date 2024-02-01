@@ -4,53 +4,61 @@
 
     <div>
       <div>
-        Patient ID -
+        <span class="field">Patient ID : </span>
         <span class="value">{{ patient.patient_id }}</span>
       </div>
       <div>
-        Cohort -
+        <span class="field">Cohort : </span>
         <span class="value">{{ patient.cohort_code }}</span>
       </div>
       <div>
-        Age -
+        <span class="field">Age : </span>
         <span class="value">{{ patient.age_at_diagnosis }}</span>
       </div>
       <div>
-        Stage -
+        <span class="field">Stage : </span>
         <span class="value">{{ patient.stage }}</span>
       </div>
     </div>
 
     <div>
       <div>
-        Status -
-        <span class="value">{{ patientStatus }}</span>
+        <span class="field">Status : </span>
+        <span
+          class="value"
+          :class="{ red: patientStatus === 'Deceased' }">
+          {{ patientStatus }}
+        </span>
       </div>
       <div>
-        Current phase -
+        <span class="field">Current phase : </span>
         <span class="value">{{ patient.current_treatment_phase }}</span>
       </div>
       <div>
-        Progression -
-        <span class="value">{{ patient.progression }}</span>
+        <span class="field">Progression : </span>
+        <span
+          class="value"
+          :class="{ red: patientProgression === 'No' }">
+          {{ patientProgression }}
+        </span>
       </div>
     </div>
 
     <div>
       <div>
-        PFS -
+        <span class="field">PFS : </span>
         <span class="value">{{ patient.paired_fresh_samples_available }}</span>
       </div>
       <div>
-        PFI -
+        <span class="field">PFI : </span>
         <span class="value">{{ patient.platinum_free_interval }}</span>
       </div>
       <div>
-        Days to death -
+        <span class="field">Days to death : </span>
         <span class="value">{{ patient.days_to_death }}</span>
       </div>
       <div>
-        Follow-up time -
+        <span class="field">Follow-up time : </span>
         <span class="value">{{ patient.followup_time }}</span>
       </div>
     </div>
@@ -69,6 +77,12 @@ const patientStatus = computed(() => {
   else if (props.patient.survival === 'False') return 'Deceased'
   else 'Unknown'
 })
+
+const patientProgression = computed(() => {
+  if (props.patient.progression === true) return 'Yes'
+  else if (props.patient.progression === false) return 'No'
+  else props.patient.progression
+})
 </script>
 
 <style scoped>
@@ -83,13 +97,22 @@ const patientStatus = computed(() => {
   width: max(500px, 70%);
 }
 
-.patient-summary > div {
+.patient-summary>div {
   display: flex;
   flex-flow: column wrap;
   gap: 5px;
 }
 
-.patient-summary .value {
+.field,
+.value {
   font-weight: bold;
+}
+
+.value {
+  color: var(--primary);
+}
+
+.value.red {
+  color: var(--red);
 }
 </style>
