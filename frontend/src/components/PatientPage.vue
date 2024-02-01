@@ -55,13 +55,20 @@
   </section>
 
   <section class="patient-data">
-    <pre>{{  patient }}</pre>
+    <AppTabs>
+      <AppTabsPanel name="CLINICAL DATA">{{  patient }}</AppTabsPanel>
+      <AppTabsPanel name="GENOMIC DATA">GENOMIC</AppTabsPanel>
+      <AppTabsPanel name="EXPLAINER">EXPLAINER</AppTabsPanel>
+      <AppTabsPanel name="OTHER">OTHER</AppTabsPanel>
+    </AppTabs>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import api from '../api'
+import AppTabs from "./AppTabs.vue"
+import AppTabsPanel from './AppTabsPanel.vue'
 
 const props = defineProps<{
   id: string
@@ -107,6 +114,6 @@ const patientStatus = computed(() => {
 }
 
 .patient-data {
-  background-color: var(--white);
+  margin: var(--spacing);
 }
 </style>
