@@ -60,6 +60,10 @@ onMounted(() => {
   text-align: center;
 }
 
+.tab:hover {
+  color: var(--primary);
+}
+
 .tab.active {
   background-color: var(--primary-light);
   border-color: var(--primary);
