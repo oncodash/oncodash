@@ -1,6 +1,6 @@
 :root {
   --primary: hsl(199, 93%, 35%);
-  --primary-light: hsl(199, 93%, 92%);
+  --primary-light: #C2DBFE;
   --red: hsl(0, 69%, 46%);
   --green: hsl(145, 39%, 46%);
   --green-light: hsl(147, 27%, 92%);
@@ -65,4 +65,20 @@ h1 {
   font-size: 60px;
   margin-top: 0;
   text-align: center;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"] {
+  border: 1px solid var(--black-translucent);
+  border-radius: var(--radius);
+  height: 42px;
+  padding: 6px;
+  outline: 0px solid var(--primary-light);
+  transition: outline 0.2s;
+
+  &:focus {
+    outline-width: 5px;
+  }
 }

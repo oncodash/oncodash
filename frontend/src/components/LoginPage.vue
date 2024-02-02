@@ -81,18 +81,8 @@ label div {
   margin-bottom: calc(var(--spacing) / 2);
 }
 
-input {
-  border: 1px solid var(--black-translucent);
-  border-radius: var(--radius);
-  height: 42px;
+label input {
   width: 100%;
-  padding: 6px;
-  outline: 0px solid var(--primary);
-  transition: outline 0.1s;
-}
-
-input:focus {
-  outline: 5px solid var(--primary);
 }
 
 footer {
