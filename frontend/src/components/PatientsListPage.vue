@@ -6,7 +6,8 @@
       id="patients-filter"
       v-model="patientsFilter"
       type="search"
-      placeholder="Search by patient ID or stage">
+      placeholder="Search by patient ID or stage"
+      @keyup.enter="goToPatient">
   </section>
 
   <section class="patients-list">
@@ -89,6 +90,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import PatientCard from '../components/PatientCard.vue'
 import api from '../api'
+import router from '../router'
 
 const patientsList = ref<any>([])
 const patientsFilter = ref<string>('')
@@ -142,6 +144,21 @@ function nextPage(): void {
 
 function goToLastPage(): void {
   pageNumber.value = pagesCount.value
+}
+
+/**
+ * When pressing enter, if there is only one patient displayed,
+ * go directly to its page.
+ */
+function goToPatient(): void {
+  if (paginatedPatients.value.length === 1) {
+    router.push({
+      name: 'PatientPage',
+      params: {
+        id: paginatedPatients.value[0].patient_id
+      }
+    })
+  }
 }
 
 onMounted(async () => {
