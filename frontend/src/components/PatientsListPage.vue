@@ -10,21 +10,77 @@
   </section>
 
   <section class="patients-list">
-    <PatientCard v-for="patient in filteredPatients" :patient="patient" />
+    <header>
+      <div class="page-summary">
+        Displaying {{ pageOffset + 1 }} - {{ pageOffset + pageSize }}
+        of {{ patientsList.length }}
+      </div>
+
+      <div class="pagination">
+        <button
+          type="button"
+          @click="goToFirstPage">
+          &#8810;
+        </button>
+        <button
+          type="button"
+          @click="previousPage">
+          &#60;
+        </button>
+        <span>{{ pageNumber }} / {{ pagesCount }}</span>
+        <button
+          type="button"
+          @click="nextPage">
+          &#62;
+        </button>
+        <button
+          type="button"
+          @click="goToLastPage">
+          &#8811;
+        </button>
+      </div>
+
+      <div class="patients-per-page">
+        Patients per page {{ pageSize }}
+      </div>
+    </header>
+
+    <div class="patients-cards">
+      <PatientCard v-for="patient in paginatedPatients" :patient="patient" />
+    </div>
+
+    <footer>
+      <div class="pagination">
+        <button
+          type="button"
+          @click="goToFirstPage">
+          &#8810;
+        </button>
+        <button
+          type="button"
+          @click="previousPage">
+          &#60;
+        </button>
+        <span>{{ pageNumber }} / {{ pagesCount }}</span>
+        <button
+          type="button"
+          @click="nextPage">
+          &#62;
+        </button>
+        <button
+          type="button"
+          @click="goToLastPage">
+          &#8811;
+        </button>
+      </div>
+    </footer>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import PatientCard from "../components/PatientCard.vue"
+import { computed, onMounted, ref, watch } from 'vue'
+import PatientCard from '../components/PatientCard.vue'
 import api from '../api'
-
-/**
- * Add a pagination
- * Fix the cards width
- * Link to get back to the patients lists
- *
- */
 
 const patientsList = ref<any>([])
 const patientsFilter = ref<string>('')
@@ -37,6 +93,48 @@ const filteredPatients = computed(() => {
       || patient.stage?.toString().includes(filter)
   })
 })
+
+const pageNumber = ref<number>(1)
+const pageSize = ref<number>(12)
+const pageOffset = computed<number>(() => {
+  return (pageNumber.value - 1) * pageSize.value
+})
+const pagesCount = computed(() => {
+  return Math.ceil(filteredPatients.value.length / pageSize.value)
+})
+
+/**
+ * Reset pagination when the page count changes
+ * due to filtering.
+ */
+watch(pagesCount, () => {
+  pageNumber.value = 1
+})
+
+const paginatedPatients = computed(() => {
+  return filteredPatients.value.slice(
+    pageOffset.value,
+    pageOffset.value + pageSize.value
+  )
+})
+
+function goToFirstPage (): void {
+  pageNumber.value = 1
+}
+
+function previousPage(): void {
+  if (pageNumber.value <= 1) return
+  pageNumber.value -= 1
+}
+
+function nextPage(): void {
+  if (pageNumber.value >= pagesCount.value) return
+  pageNumber.value += 1
+}
+
+function goToLastPage (): void {
+  pageNumber.value = pagesCount.value
+}
 
 onMounted(async () => {
   api.getPatientsList().then(async response => {
@@ -69,12 +167,37 @@ onMounted(async () => {
   background-color: var(--white);
   padding: var(--spacing);
   display: flex;
+  flex-flow: column wrap;
+  gap: var(--spacing);
+}
+
+.patients-list header,
+.patients-list footer {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--spacing);
+  justify-content: space-around;
+}
+
+.patients-cards {
+  display: flex;
   flex-flow: row wrap;
   gap: var(--spacing);
   justify-content: center;
 }
 
-.patients-list > * {
+.patients-cards>* {
   width: 300px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) / 2);
+}
+
+.pagination button {
+  font-size: 18px;
 }
 </style>
