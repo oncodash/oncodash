@@ -41,7 +41,15 @@
       </div>
 
       <div class="patients-per-page">
-        Patients per page {{ pageSize }}
+        <label>
+          Patients per page
+          <select
+            name="patients-per-page"
+            v-model="pageSize">
+            <option :value="12">12</option>
+            <option :value="24">24</option>
+          </select>
+        </label>
       </div>
     </header>
 
@@ -118,7 +126,7 @@ const paginatedPatients = computed(() => {
   )
 })
 
-function goToFirstPage (): void {
+function goToFirstPage(): void {
   pageNumber.value = 1
 }
 
@@ -132,7 +140,7 @@ function nextPage(): void {
   pageNumber.value += 1
 }
 
-function goToLastPage (): void {
+function goToLastPage(): void {
   pageNumber.value = pagesCount.value
 }
 
