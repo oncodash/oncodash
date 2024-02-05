@@ -46,8 +46,8 @@
           <select
             name="patients-per-page"
             v-model="pageSize">
-            <option :value="12">12</option>
-            <option :value="24">24</option>
+            <option :value="10">10</option>
+            <option :value="20">20</option>
           </select>
         </label>
       </div>
@@ -103,7 +103,7 @@ const filteredPatients = computed(() => {
 })
 
 const pageNumber = ref<number>(1)
-const pageSize = ref<number>(12)
+const pageSize = ref<number>(10)
 const pageOffset = computed<number>(() => {
   return (pageNumber.value - 1) * pageSize.value
 })
