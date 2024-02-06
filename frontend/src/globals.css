@@ -6,8 +6,8 @@
   --green-light: hsl(147, 27%, 92%);
   --grey: hsl(184, 9%, 62%);
   --grey-light: hsl(184, 9%, 62%, 30%);
-  --black: hsl(0, 0%, 15%);
-  --black-translucent: hsla(0, 0%, 15%, 50%);
+  --black: hsl(0, 0%, 20%);
+  --black-translucent: hsla(0, 0%, 20%, 50%);
   --white: hsl(0, 0%, 100%);
   --spacing: 20px;
   --radius: 5px;

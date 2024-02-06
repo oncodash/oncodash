@@ -5,6 +5,54 @@
       <div class="name">{{ genomicNumber[1] }}</div>
     </div>
   </section>
+
+  <section class="genomic-data">
+    <article class="genomic-section" v-for="(data, genomicGroup) in genomicData.genomic">
+      <header class="genomic-header">
+        <h1 class="genomic-title">
+          {{ genomicData.genomic[genomicGroup][1] }} -
+          <span class="number">{{ genomicData.genomic[genomicGroup][0] }}</span>
+        </h1>
+      </header>
+
+      <section class="gene-section" v-for="(geneData, geneName) in genomicData[genomicGroup]">
+        <header>
+          <h2>{{ geneName }}</h2>
+        </header>
+
+        <p>{{ geneData.description }}</p>
+
+        <section class="alteration-section" v-for="alteration in geneData.alterations">
+          <header>
+            <h3 class="alteration-title">
+              Alteration -
+              <span class="alteration-name">{{ alteration.name }}</span>
+            </h3>
+          </header>
+
+          <div class="alteration-data">
+            <p>{{ alteration.description }}</p>
+            <table class="alteration-table">
+              <thead>
+                <tr>
+                  <th v-for="(value, field) in alteration.row[0]">
+                    {{ field }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="row in alteration.row">
+                  <td v-for="(value, field) in row">
+                    {{ value }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </article>
+  </section>
 </template>
 
 <script setup lang="ts">
@@ -48,5 +96,67 @@ onMounted(() => {
 .genomic-number .number {
   color: var(--primary);
   font-size: 50px;
+}
+
+.genomic-section {
+  padding-bottom: var(--spacing);
+}
+
+.genomic-header {
+  background-color: var(--green-light);
+  padding: calc(var(--spacing) / 2) var(--spacing);
+}
+
+.genomic-title {
+  color: var(--black);
+  font-size: 25px;
+  margin: 0;
+  text-align: start;
+}
+
+.genomic-title .number {
+  color: var(--primary);
+}
+
+.genomic-section,
+.gene-section,
+.alteration-section,
+.alteration-data {
+  padding-left: var(--spacing);
+}
+
+.genomic-section {
+  padding-right: var(--spacing);
+}
+
+.alteration-title {
+  background-color: var(--green-light);
+  padding: calc(var(--spacing) / 2) var(--spacing);
+}
+
+.alteration-name {
+  color: var(--primary);
+  font-style: italic;
+}
+
+.alteration-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.alteration-table th {
+  background-color: var(--grey-light);
+  padding: var(--spacing);
+  text-align: start;
+  text-wrap: wrap;
+}
+
+.alteration-table td {
+  padding: var(--spacing);
+  text-wrap: wrap;
+}
+
+.alteration-table tbody tr:hover {
+  background-color: var(--primary-light);
 }
 </style>
