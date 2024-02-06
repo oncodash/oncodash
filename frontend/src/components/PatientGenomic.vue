@@ -35,15 +35,15 @@
             <table class="alteration-table">
               <thead>
                 <tr>
-                  <th v-for="(value, field) in alteration.row[0]">
-                    {{ field }}
+                  <th v-for="[field, header] in alterationHeaders">
+                    {{ header }}
                   </th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="row in alteration.row">
-                  <td v-for="(value, field) in row">
-                    {{ value }}
+                  <td v-for="[field] in alterationHeaders">
+                    {{ row[field] }}
                   </td>
                 </tr>
               </tbody>
@@ -64,6 +64,19 @@ const props = defineProps<{
 }>()
 
 const genomicData: any = ref({})
+const alterationHeaders = ref(new Map([
+  ["samples_ids", "SAMPLES IDS"],
+  ["samples_info", "SAMPLES INFO"],
+  ["treatment_phase", "TREATMENT PHASE"],
+  ["tumor_purity", "TUMOR PURITY"],
+  ["mutation_affects", "MUTATION AFFECTS"],
+  ["reported_sensitivity", "REPORTED SENSITIVITY RESPONSE"]
+]))
+
+
+function displayDrugList (value) {
+  return value.replace(';', ' ')
+}
 
 onMounted(() => {
   api.getPatientGenomic(props.patientID)
