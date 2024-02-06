@@ -8,14 +8,17 @@
 
   <section class="genomic-data">
     <article class="genomic-section" v-for="(data, genomicGroup) in genomicData.genomic">
-      <header class="genomic-header">
+      <header class="genomic-header" @click="togglePanel(genomicGroup)">
         <h1 class="genomic-title">
           {{ genomicData.genomic[genomicGroup][1] }} -
           <span class="number">{{ genomicData.genomic[genomicGroup][0] }}</span>
         </h1>
       </header>
 
-      <section class="gene-section" v-for="(geneData, geneName) in genomicData[genomicGroup]">
+      <section
+        class="gene-section"
+        v-for="(geneData, geneName) in genomicData[genomicGroup]"
+        v-show="isPanelOpen(genomicGroup)">
         <header>
           <h2>{{ geneName }}</h2>
         </header>
@@ -56,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import api from '../api'
 
 const props = defineProps<{
@@ -72,6 +75,21 @@ const alterationHeaders = ref(new Map([
   ["mutation_affects", "MUTATION AFFECTS"],
   ["reported_sensitivity", "REPORTED SENSITIVITY RESPONSE"]
 ]))
+
+const openPanels = reactive({
+  putative_functionally_relevant_variant: false,
+  variants_of_unknown_functional_significance: false,
+  putative_functionally_neutral_variants: false,
+  other_alterations: false
+})
+
+function togglePanel(panel) {
+  openPanels[panel] = !openPanels[panel]
+}
+
+function isPanelOpen(panel: any): any {
+  return openPanels[panel]
+}
 
 onMounted(() => {
   api.getPatientGenomic(props.patientID)
@@ -112,6 +130,7 @@ onMounted(() => {
 
 .genomic-header {
   background-color: var(--green-light);
+  cursor: pointer;
   padding: calc(var(--spacing) / 2) var(--spacing);
 }
 
