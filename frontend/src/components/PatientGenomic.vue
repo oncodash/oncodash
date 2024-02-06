@@ -35,7 +35,7 @@
             <table class="alteration-table">
               <thead>
                 <tr>
-                  <th v-for="[field, header] in alterationHeaders">
+                  <th v-for="[, header] in alterationHeaders">
                     {{ header }}
                   </th>
                 </tr>
@@ -72,11 +72,6 @@ const alterationHeaders = ref(new Map([
   ["mutation_affects", "MUTATION AFFECTS"],
   ["reported_sensitivity", "REPORTED SENSITIVITY RESPONSE"]
 ]))
-
-
-function displayDrugList (value) {
-  return value.replace(';', ' ')
-}
 
 onMounted(() => {
   api.getPatientGenomic(props.patientID)
