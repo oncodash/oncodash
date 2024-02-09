@@ -91,14 +91,15 @@ import { computed, onMounted, ref, watch } from 'vue'
 import PatientCard from '../components/PatientCard.vue'
 import api from '../api'
 import router from '../router'
+import { Patient } from '../models/Patient'
 
-const patientsList = ref<any>([])
+const patientsList = ref<Patient[]>([])
 const patientsFilter = ref<string>('')
 
 const filteredPatients = computed(() => {
   const filter = patientsFilter.value
 
-  return patientsList.value.filter((patient: any) => {
+  return patientsList.value.filter((patient) => {
     return patient.patient_id.toString().includes(filter)
       || patient.stage?.toString().includes(filter)
   })
@@ -109,7 +110,7 @@ const pageSize = ref<number>(10)
 const pageOffset = computed<number>(() => {
   return (pageNumber.value - 1) * pageSize.value
 })
-const pagesCount = computed(() => {
+const pagesCount = computed<number>(() => {
   return Math.ceil(filteredPatients.value.length / pageSize.value)
 })
 
@@ -121,7 +122,7 @@ watch(pagesCount, () => {
   pageNumber.value = 1
 })
 
-const paginatedPatients = computed(() => {
+const paginatedPatients = computed<Patient[]>(() => {
   return filteredPatients.value.slice(
     pageOffset.value,
     pageOffset.value + pageSize.value
@@ -161,9 +162,14 @@ function goToPatient(): void {
   }
 }
 
+/**
+ * Fetch the list of patients when this page is loaded.
+ */
 onMounted(async () => {
-  api.getPatientsList().then(async response => {
-    patientsList.value = response.data
+  api.getPatientsList().then(async (response): Promise<void> => {
+    patientsList.value = response.data.map(patientDTO => {
+      return new Patient(patientDTO)
+    })
   }).catch(err => {
     alert(err.message)
     console.error(err)

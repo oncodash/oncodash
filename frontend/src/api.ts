@@ -1,5 +1,7 @@
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import Cookies from 'universal-cookie'
+import { PatientID } from './models/Patient'
+import { PatientDTO } from './models/PatientDTO'
 
 // Initialize Axios instance
 // =========================================================================
@@ -22,21 +24,21 @@ base.interceptors.response.use(response => {
 // =========================================================================
 
 export default {
-  getPatientsList: async function () {
+  getPatientsList: async function (): Promise<AxiosResponse<Array<PatientDTO>>> {
     return await base.get('/api/clinical-overview/data/', {
       headers: {
         Authorization: `Token ${cookies.get('token')}`
       }
     })
   },
-  getPatientClinical: async function (patientID: string) {
+  getPatientClinical: async function (patientID: PatientID): Promise<AxiosResponse<PatientDTO>> {
     return await base.get(`/api/clinical-overview/data/${patientID}/`, {
       headers: {
         Authorization: `Token ${cookies.get('token')}`
       }
     })
   },
-  getPatientGenomic: async function (patientID: string) {
+  getPatientGenomic: async function (patientID: PatientID) {
     return await base.get(`/api/genomic-overview/data/${patientID}/`, {
       headers: {
         Authorization: `Token ${cookies.get('token')}`

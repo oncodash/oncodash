@@ -32,9 +32,10 @@ import AppTabsPanel from './AppTabsPanel.vue'
 import PatientSummary from "./PatientSummary.vue"
 import PatientClinical from "./PatientClinical.vue"
 import PatientGenomic from "./PatientGenomic.vue"
+import { PatientID } from '../models/Patient'
 
 const props = defineProps<{
-  id: string
+  id: PatientID
 }>()
 
 onMounted(async () => {

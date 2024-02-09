@@ -66,9 +66,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import api from '../api'
+import { PatientID } from '../models/Patient'
 
 const props = defineProps<{
-  patientID: string
+  patientID: PatientID
 }>()
 
 onMounted(() => {
