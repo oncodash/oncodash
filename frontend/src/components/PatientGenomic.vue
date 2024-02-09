@@ -7,18 +7,17 @@
   </section>
 
   <section class="genomic-data">
-    <article class="genomic-section" v-for="(data, genomicGroup) in genomicData.genomic">
-      <header class="genomic-header" @click="togglePanel(genomicGroup)">
+    <details class="genomic-group" v-for="(data, genomicGroup) in genomicData.genomic">
+      <summary class="genomic-header">
         <h1 class="genomic-title">
           {{ genomicData.genomic[genomicGroup][1] }} -
           <span class="number">{{ genomicData.genomic[genomicGroup][0] }}</span>
         </h1>
-      </header>
+      </summary>
 
       <section
         class="gene-section"
-        v-for="(geneData, geneName) in genomicData[genomicGroup]"
-        v-show="isPanelOpen(genomicGroup)">
+        v-for="(geneData, geneName) in genomicData[genomicGroup]">
         <header>
           <h2>{{ geneName }}</h2>
         </header>
@@ -54,42 +53,17 @@
           </div>
         </section>
       </section>
-    </article>
+    </details>
   </section>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import api from '../api'
 
 const props = defineProps<{
   patientID: string
 }>()
-
-const genomicData: any = ref({})
-const alterationHeaders = ref(new Map([
-  ["samples_ids", "SAMPLES IDS"],
-  ["samples_info", "SAMPLES INFO"],
-  ["treatment_phase", "TREATMENT PHASE"],
-  ["tumor_purity", "TUMOR PURITY"],
-  ["mutation_affects", "MUTATION AFFECTS"],
-  ["reported_sensitivity", "REPORTED SENSITIVITY RESPONSE"]
-]))
-
-const openPanels = reactive({
-  putative_functionally_relevant_variant: false,
-  variants_of_unknown_functional_significance: false,
-  putative_functionally_neutral_variants: false,
-  other_alterations: false
-})
-
-function togglePanel(panel) {
-  openPanels[panel] = !openPanels[panel]
-}
-
-function isPanelOpen(panel: any): any {
-  return openPanels[panel]
-}
 
 onMounted(() => {
   api.getPatientGenomic(props.patientID)
@@ -100,6 +74,16 @@ onMounted(() => {
       console.error(err)
     })
 })
+
+const genomicData: any = ref({})
+const alterationHeaders = ref(new Map([
+  ["samples_ids", "SAMPLES IDS"],
+  ["samples_info", "SAMPLES INFO"],
+  ["treatment_phase", "TREATMENT PHASE"],
+  ["tumor_purity", "TUMOR PURITY"],
+  ["mutation_affects", "MUTATION AFFECTS"],
+  ["reported_sensitivity", "REPORTED SENSITIVITY RESPONSE"]
+]))
 </script>
 
 <style scoped>
@@ -124,18 +108,24 @@ onMounted(() => {
   font-size: 50px;
 }
 
-.genomic-section {
+.genomic-group {
   padding-bottom: var(--spacing);
 }
 
 .genomic-header {
   background-color: var(--green-light);
+  color: var(--black);
   cursor: pointer;
   padding: calc(var(--spacing) / 2) var(--spacing);
+
+  &:hover {
+    color: var(--primary);
+  }
 }
 
 .genomic-title {
-  color: var(--black);
+  display: inline;
+  color: inherit;
   font-size: 25px;
   margin: 0;
   text-align: start;
@@ -145,14 +135,14 @@ onMounted(() => {
   color: var(--primary);
 }
 
-.genomic-section,
+.genomic-group,
 .gene-section,
 .alteration-section,
 .alteration-data {
   padding-left: var(--spacing);
 }
 
-.genomic-section {
+.genomic-group {
   padding-right: var(--spacing);
 }
 
