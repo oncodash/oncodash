@@ -37,16 +37,22 @@
             <table class="alteration-table">
               <thead>
                 <tr>
-                  <th v-for="[, header] in alterationHeaders">
-                    {{ header }}
-                  </th>
+                  <th>SAMPLES IDS</th>
+                  <th>SAMPLES INFO</th>
+                  <th>TREATMENT PHASE</th>
+                  <th>TUMOR PURITY</th>
+                  <th>MUTATION AFFECTS</th>
+                  <th>REPORTED SENSITIVITY RESPONSE</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="row in alteration.row">
-                  <td v-for="[field] in alterationHeaders">
-                    {{ row[field] }}
-                  </td>
+                  <td>{{ row.samples_ids }}</td>
+                  <td>{{ row.samples_info }}</td>
+                  <td>{{ row.treatment_phase }}</td>
+                  <td>{{ row.tumor_purity }}</td>
+                  <td>{{ row.mutation_affects }}</td>
+                  <td>{{ displaySensitivity(row.reported_sensitivity) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -76,14 +82,10 @@ onMounted(() => {
 })
 
 const genomicData: any = ref({})
-const alterationHeaders = ref(new Map([
-  ["samples_ids", "SAMPLES IDS"],
-  ["samples_info", "SAMPLES INFO"],
-  ["treatment_phase", "TREATMENT PHASE"],
-  ["tumor_purity", "TUMOR PURITY"],
-  ["mutation_affects", "MUTATION AFFECTS"],
-  ["reported_sensitivity", "REPORTED SENSITIVITY RESPONSE"]
-]))
+
+function displaySensitivity(value: string): string {
+  return value.replaceAll(';', ', ')
+}
 </script>
 
 <style scoped>
