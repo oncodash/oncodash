@@ -1,9 +1,9 @@
 <template>
   <h1>PATIENT {{ id }}</h1>
 
-  <PatientSummary :patient="patient"></PatientSummary>
+  <PatientSummary :patient="patient" v-if="patient"></PatientSummary>
 
-  <section class="patient-data">
+  <section class="patient-data" v-if="patient">
     <AppTabs>
       <AppTabsPanel name="CLINICAL DATA">
         <PatientClinical :patient="patient"></PatientClinical>
@@ -32,22 +32,22 @@ import AppTabsPanel from './AppTabsPanel.vue'
 import PatientSummary from "./PatientSummary.vue"
 import PatientClinical from "./PatientClinical.vue"
 import PatientGenomic from "./PatientGenomic.vue"
-import { PatientID } from '../models/Patient'
+import { Patient, PatientID } from '../models/Patient'
 
 const props = defineProps<{
   id: PatientID
 }>()
 
-onMounted(async () => {
+const patient = ref<Patient>()
+
+onMounted(async (): Promise<void> => {
   api.getPatientClinical(props.id).then(async response => {
-    patient.value = response.data
+    patient.value = new Patient(response.data)
   }).catch(err => {
     alert(err.message)
     console.error(err)
   })
 })
-
-const patient: any = ref({})
 </script>
 
 <style scoped>

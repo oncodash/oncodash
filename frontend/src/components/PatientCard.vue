@@ -7,7 +7,7 @@
 
     <div class="content">
       <PatientField field="Age" :value="patient.age_at_diagnosis" />
-      <PatientField field="Status" :value="patientStatus" />
+      <PatientField field="Status" :value="props.patient.displayStatus()" />
       <PatientField field="Stage" :value="patient.stage" />
     </div>
 
@@ -23,18 +23,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import PatientField from './PatientField.vue';
+import PatientField from './PatientField.vue'
+import { Patient } from '../models/Patient'
 
 const props = defineProps<{
-  patient: any
+  patient: Patient
 }>()
-
-const patientStatus = computed(() => {
-  if (props.patient.survival === 'True') return 'Alive'
-  else if (props.patient.survival === 'False') return 'Deceased'
-  else 'Unknown'
-})
 </script>
 
 <style scoped>

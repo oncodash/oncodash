@@ -21,7 +21,7 @@ export default createRouter({
       path: '/patients/:id',
       component: async () => await import('./components/PatientPage.vue'),
       name: 'PatientPage',
-      props: true
+      props: route => ({ id: parseInt(route.params.id as string) })
     },
     {
       path: '/login',

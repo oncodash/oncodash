@@ -94,4 +94,16 @@ export class Patient {
     this.weight_at_diagnosis = patientDTO.weight_at_diagnosis
     this.wgs_available = patientDTO.wgs_available
   }
+
+  displayStatus(): string | null {
+    if (this.survival === 'True') return 'Alive'
+    else if (this.survival === 'False') return 'Deceased'
+    else return this.survival
+  }
+
+  displayProgression(): string | null {
+    if (this.progression === true) return 'Yes'
+    else if (this.progression === false) return 'No'
+    else return this.progression
+  }
 }
