@@ -38,14 +38,14 @@ import api from '../api'
 import router from '../router'
 
 const cookies = useCookies()
-const email = ref('')
-const password = ref('')
+const email = ref<string>('')
+const password = ref<string>('')
 
-const inputsAreValid = computed(() => {
-  return email.value && password.value
+const inputsAreValid = computed<boolean>(() => {
+  return email.value.length > 0 && password.value.length > 0
 })
 
-function login() {
+function login(): void {
   if (!inputsAreValid.value) return
 
   api.login(email.value, password.value).then(async response => {

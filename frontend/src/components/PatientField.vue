@@ -15,22 +15,22 @@
   </div>
 </template>
 
-<script setup>
-const props = defineProps([
-  'field',
-  'value'
-])
+<script setup lang="ts">
+const props = defineProps<{
+  field: string,
+  value: string | number | boolean | null
+}>()
 
 const importantValues = [
   'No',
   'Deceased'
 ]
 
-function isImportant() {
-  return importantValues.includes(props.value.toString())
+function isImportant(): boolean {
+  return importantValues.includes(String(props.value))
 }
 
-function valueExists() {
+function valueExists(): boolean {
   return props.value !== ''
     && props.value !== null
     && props.value !== undefined

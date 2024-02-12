@@ -20,11 +20,11 @@ import { computed } from 'vue'
 import api from '../api'
 
 const cookies = useCookies()
-const isLoggedIn = computed(() => {
+const isLoggedIn = computed<boolean>(() => {
   return cookies.get('token') ? true : false
 })
 
-function logout() {
+function logout(): void {
   api.logout().then(() => {
     cookies.remove('token')
     router.push({ name: 'LoginPage'})

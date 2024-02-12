@@ -14,5 +14,4 @@ import AppFooter from './AppFooter.vue'
 </script>
 
 <style scoped>
-
 </style>
