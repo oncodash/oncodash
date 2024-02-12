@@ -10,7 +10,8 @@
         @keyup.enter="login"
         type="email"
         name="email"
-        autocomplete="email">
+        autocomplete="email"
+        ref="emailInput">
     </label>
     <label>
       <div>Password</div>
@@ -41,9 +42,12 @@ import router from '../router'
 const cookies = useCookies()
 const email = ref<string>('')
 const password = ref<string>('')
+const emailInput = ref<HTMLInputElement | null>(null)
 
 const inputsAreValid = computed<boolean>(() => {
-  return email.value.length > 0 && password.value.length > 0
+  return email.value.length > 0
+    && emailInput.value?.checkValidity() === true
+    && password.value.length > 0
 })
 
 function login(): void {
@@ -53,8 +57,10 @@ function login(): void {
     cookies.set('token', response.data.token)
     router.replace({ name: "PatientsListPage" })
   }).catch(err => {
-    alert(err.message)
-    console.error(err.message)
+    if (err.response.status === 400) {
+      alert('Wrong credentials, please make sure to use the proper email and password.')
+    }
+    console.error(err)
   })
 }
 </script>

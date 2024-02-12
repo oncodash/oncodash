@@ -76,9 +76,13 @@ input[type="search"] {
   height: 42px;
   padding: 6px;
   outline: 0px solid var(--primary-light);
-  transition: outline 0.2s;
+  transition: outline-width 0.2s;
 
   &:focus {
     outline-width: 5px;
+  }
+
+  &:invalid {
+    border-color: var(--red);
   }
 }
