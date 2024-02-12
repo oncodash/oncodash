@@ -16,7 +16,7 @@
       <PatientField field="IDS" :value="patient.residual_tumor_ids" />
       <PatientField field="Maintenance after 1st line" :value="patient.maintenance_therapy" />
       <PatientField field="Participation in drug trial" :value="patient.drug_trial_name" />
-      <PatientField field="Progression" :value="patientProgression" />
+      <PatientField field="Progression" :value="patient.displayProgression()" />
     </div>
 
     <div>
@@ -33,17 +33,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { Patient } from '../models/Patient'
 import PatientField from './PatientField.vue'
 
-const props = defineProps<{
-  patient: any
+defineProps<{
+  patient: Patient
 }>()
-
-const patientProgression = computed<'Yes' | 'No'>(() => {
-  if (props.patient.progression === true) return 'Yes'
-  else return 'No'
-})
 </script>
 
 <style scoped>
