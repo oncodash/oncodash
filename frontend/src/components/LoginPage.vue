@@ -18,7 +18,8 @@
         v-model="password"
         @keyup.enter="login"
         type="password"
-        name="password">
+        name="password"
+        autocomplete="off">
     </label>
     <footer>
       <button
