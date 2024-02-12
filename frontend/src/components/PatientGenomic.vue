@@ -15,22 +15,22 @@
         </h1>
       </summary>
 
-      <section
+      <details
         class="gene-section"
         v-for="(geneData, geneName) in genomicData[genomicGroup]">
-        <header>
+        <summary class="gene-header">
           <h2>{{ geneName }}</h2>
-        </header>
+        </summary>
 
         <p>{{ geneData.description }}</p>
 
-        <section class="alteration-section" v-for="alteration in geneData.alterations">
-          <header>
-            <h3 class="alteration-title">
+        <details class="alteration-section" v-for="alteration in geneData.alterations">
+          <summary class="alteration-header">
+            <h3>
               Alteration -
               <span class="alteration-name">{{ alteration.name }}</span>
             </h3>
-          </header>
+          </summary>
 
           <div class="alteration-data">
             <p>{{ alteration.description }}</p>
@@ -57,8 +57,8 @@
               </tbody>
             </table>
           </div>
-        </section>
-      </section>
+        </details>
+      </details>
     </details>
   </section>
 </template>
@@ -111,23 +111,28 @@ function displaySensitivity(value: string): string {
   font-size: 50px;
 }
 
-.genomic-group {
-  padding-bottom: var(--spacing);
-}
-
-.genomic-header {
-  background-color: var(--green-light);
-  color: var(--black);
+summary {
   cursor: pointer;
-  padding: calc(var(--spacing) / 2) var(--spacing);
+  margin-bottom: var(--spacing);
 
   &:hover {
     color: var(--primary);
   }
 }
 
-.genomic-title {
+summary h1,
+summary h2,
+summary h3 {
   display: inline;
+}
+
+.genomic-header {
+  background-color: var(--green-light);
+  color: var(--black);
+  padding: calc(var(--spacing) / 2) var(--spacing);
+}
+
+.genomic-title {
   color: inherit;
   font-size: 25px;
   margin: 0;
@@ -149,7 +154,7 @@ function displaySensitivity(value: string): string {
   padding-right: var(--spacing);
 }
 
-.alteration-title {
+.alteration-header {
   background-color: var(--green-light);
   padding: calc(var(--spacing) / 2) var(--spacing);
 }
