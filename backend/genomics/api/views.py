@@ -31,8 +31,7 @@ class GenomicViewSet(viewsets.GenericViewSet):
         putative_functionally_relevant_variants = oncokb_queryset.filter(Q(highestSensitiveLevel=["LEVEL_1","LEVEL_2","LEVEL_3A","LEVEL_3B"]) | Q(highestFdaLevel__in=["LEVEL_Fda1","LEVEL_Fda2","LEVEL_Fda3"]))
         variants_of_uknown_functional_significance = oncokb_queryset.filter(Q(highestPrognosticImplicationLevel__in=["LEVEL_Px1","LEVEL_Px2","LEVEL_Px3"]) | Q(highestDiagnosticImplicationLevel__in=["LEVEL_Dx1","LEVEL_Dx2","LEVEL_Dx3"]) | Q(highestSensitiveLevel=["LEVEL_4"]))
         putative_functionally_neutral_variants = oncokb_queryset.filter(highestResistanceLevel__in=["LEVEL_R1","LEVEL_R2"])
-        other_alterations = oncokb_queryset.filter(Q(highestPrognosticImplicationLevel=None) | Q(highestDiagnosticImplicationLevel=None) | Q(highestFdaLevel=None))
-
+        other_alterations = oncokb_queryset.filter(Q(highestPrognosticImplicationLevel=None) | Q(highestDiagnosticImplicationLevel=None) | Q(highestFdaLevel=None)).exclude(oncogenic="Unknown")
         data = {
             'genomic': {
                 'putative_functionally_relevant_variant': [putative_functionally_relevant_variants.count(), 'PUTATIVE FUNCTIONALLY RELEVANT VARIANT'],
