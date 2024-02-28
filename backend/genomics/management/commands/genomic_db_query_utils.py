@@ -12,11 +12,10 @@ from clin_overview.models import ClinicalData
 from genomics.models import SomaticVariant, CopyNumberAlteration, CGIMutation, CGICopyNumberAlteration, CGIFusionGene, \
     CGIDrugPrescriptions, OncoKBAnnotation, AlterationType, ActionableTarget, CNAscatEstimate
 from django.db.models import Field, TextChoices
-from django.db.models import Lookup,  Q
+from django.db.models import Lookup, Q, F
 from datetime import datetime
 from genomics.management.commands.import_genomic_variants import map_cohort_code_to_patient_id
 import json
-
 
 http = urllib3.PoolManager()
 
@@ -104,6 +103,29 @@ def get_snvs_by_gene_list(patient_id, targets):
 def get_cnas(patient_id):
     try:
         return CopyNumberAlteration.objects.filter(patient_id=patient_id)
+
+    except Exception as e:
+        logging.exception(e)
+        print("No CNAs for patient", patient_id, "available in the database")
+
+def get_cnas_by_cn_and_ploidy(patient_id, targets=None):
+    try:
+
+        # Filter significant CNAs by purifiedLogR >= 1.5 (median 9 copies) or nMajor+nMinor >= 2.5*ploidy == Amplification,  nMajor+nMinor=0 == Deletion
+        dels = CopyNumberAlteration.objects.filter(patient_id=patient_id).annotate(cn=F('nMinor') + F('nMajor')).filter(cn=0)
+        for d in dels:
+            d.CNstatus="DEL"
+            d.save()
+        cnthreshold = 2.5*(2**1.5)
+        amps = CopyNumberAlteration.objects.filter(patient_id=patient_id).annotate(cn=F('nMinor') + F('nMajor')).filter(Q(cn__gte=cnthreshold) | Q(purifiedLogR__gte=1.5))
+        for a in amps:
+            a.CNstatus="AMP"
+            a.save()
+        # Filter by gene target list
+        if targets:
+            return dels.filter(gene__in=targets).union(amps.filter(gene__in=targets))
+        else:
+            return dels.union(amps)
 
     except Exception as e:
         logging.exception(e)
@@ -509,6 +531,12 @@ def query_oncokb_cna(cna: CopyNumberAlteration, tumorType):
     else:
         print("[ERROR] Unable to request. Response: ", print(response.data))
         exit()
+def getAlterationType(cna):
+    print(cna.CNstatus)
+    if cna.CNstatus == "AMP" or cna.CNstatus == "DEL":
+        return AlterationType[cna.CNstatus]
+    else:
+        return AlterationType["UNK"]
 
 def query_oncokb_cnas(cnas: [CopyNumberAlteration], tumorType):
 
@@ -539,7 +567,7 @@ def query_oncokb_cnas(cnas: [CopyNumberAlteration], tumorType):
         {
             "id": f"{str(cnas[i].patient_id)+':'+cnas[i].sample_id}",
             "sample_id": f"{cnas[i].sample_id}",
-            "copyNameAlterationType": f"{AlterationType[cnas[i].CNstatus]}",
+            "copyNameAlterationType": f"{getAlterationType(cnas[i])}",
             "gene": {
                 "hugoSymbol": f"{cnas[i].gene}"
             },
@@ -949,6 +977,7 @@ class Command(BaseCommand):
         parser.add_argument('--refid', type=str,  help='Give reference id (in dbSNP format eg. rs61769312)')
         parser.add_argument('--cna',  action='store_true', help='')
         parser.add_argument('--cnatype', type=str, help='AMP,DEL')
+        parser.add_argument('--targetall', action='store_true', help='Query all targetable variants from OncoKB actionable target list')
         parser.add_argument('--fusgenes', type=str,  help='Give a list of fusion genes eg. BCR__ABL1,PML__PARA')
         parser.add_argument('--cgijobid', type=str, help='Download results from CGI by jobid')
         parser.add_argument('--cgiquery',  action='store_true', help='Download results from CGI by jobid')
@@ -956,7 +985,7 @@ class Command(BaseCommand):
         parser.add_argument('--oncokbsnv', action='store_true',  help='Query OncoKB by genomic location parsed patient SNV. Input parameter: ref id')
         parser.add_argument('--sqlsnvs',  action='store_true', help='')
         parser.add_argument('--exonic',  action='store_true', help='')
-        parser.add_argument('--actionable', action='store_true', help='')
+        parser.add_argument('--actionable', action='store_true', help='Query by significant copy number threshold. Default is minimum of 8 copies for AMP or minimum ploidy 2, and 0 for DEL. For somatic mutations OncoKB actionable target list is used as reference.')
         parser.add_argument('--proteinchange',  action='store_true', help='')
         parser.add_argument('--genelist', type=str, help='')
         parser.add_argument('--single', action='store_true', help='')
@@ -1011,10 +1040,15 @@ class Command(BaseCommand):
             for c in chunks:
                 query_oncokb_somatic_mutations(c, "HGSOC")
                 time.sleep(1)
-        if kwargs["oncokbcna"] and kwargs["actionable"] and kwargs["cohortcode"]:
+        if kwargs["oncokbcna"] and kwargs["targetall"] and kwargs["cohortcode"]:
             targets = ActionableTarget.objects.all()
             pid = map_cohort_code_to_patient_id(kwargs["cohortcode"])
             cnas = get_cnas_by_gene_list(pid, targets)
+            query_oncokb_cnas(cnas, "HGSOC")
+
+        if kwargs["oncokbcna"] and kwargs["actionable"] and kwargs["cohortcode"]:
+            pid = map_cohort_code_to_patient_id(kwargs["cohortcode"])
+            cnas = get_cnas_by_cn_and_ploidy(pid)
             query_oncokb_cnas(cnas, "HGSOC")
 
         if kwargs["oncokbsnv"] and kwargs["actionable"] and kwargs["cohortcode"] and not kwargs["single"]:
@@ -1034,12 +1068,21 @@ class Command(BaseCommand):
                 query_oncokb_somatic_mutation(snv, "HGSOC")
                 #time.sleep(1)
 
-        if kwargs["oncokbcna"] and kwargs["actionable"] and kwargs["all"]:
+        if kwargs["oncokbcna"] and kwargs["targetall"] and kwargs["all"]:
             targets = ActionableTarget.objects.all()
             for pid in ClinicalData.objects.order_by().values('patient_id').distinct():
                 cnas = get_cnas_by_gene_list(pid['patient_id'], targets)
-                query_oncokb_cnas(cnas, "HGSOC")
-                time.sleep(1)
+                if cnas:
+                    query_oncokb_cnas(cnas, "HGSOC")
+                    time.sleep(1)
+
+        if kwargs["oncokbcna"] and kwargs["actionable"] and kwargs["all"]:
+            for pid in ClinicalData.objects.order_by().values('patient_id').distinct():
+                cnas = get_cnas_by_cn_and_ploidy(pid['patient_id'])
+                if cnas:
+                    query_oncokb_cnas(cnas, "HGSOC")
+                    time.sleep(1)
+
         if kwargs["oncokbsnv"] and kwargs["actionable"] and kwargs["all"]:
             targets = ActionableTarget.objects.all()
             for pid in ClinicalData.objects.order_by().values('patient_id').distinct():
@@ -1109,10 +1152,21 @@ class Command(BaseCommand):
                 time.sleep(120)
 
         # May be impossible to query every patient at once from cgi, could be done if distinct genes of every patient mapped to same query file
-        if kwargs["cgiquery"] and kwargs["cna"] and kwargs["actionable"] and kwargs["cohortcode"]:
+        if kwargs["cgiquery"] and kwargs["cna"] and kwargs["targetall"] and kwargs["cohortcode"]:
             targets = ActionableTarget.objects.all()
             pid = map_cohort_code_to_patient_id(kwargs["cohortcode"])
             cnas = get_cnas_by_gene_list(pid, targets)
+            if cnas:
+                generate_temp_cgi_query_files([], cnas, [])
+                jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, "OV", "hg38")
+                time.sleep(10)
+                while query_cgi_job(pid, jobid.replace('"', '')) == 0:
+                    print("Waiting 120 seconds for the next try...")
+                    #time.sleep(30)
+
+        if kwargs["cgiquery"] and kwargs["cna"] and kwargs["actionable"] and kwargs["cohortcode"]:
+            pid = map_cohort_code_to_patient_id(kwargs["cohortcode"])
+            cnas = get_cnas_by_cn_and_ploidy(pid)
             if cnas:
                 generate_temp_cgi_query_files([], cnas, [])
                 jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, "OV", "hg38")
