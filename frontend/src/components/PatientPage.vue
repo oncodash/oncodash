@@ -12,14 +12,6 @@
       <AppTabsPanel name="GENOMIC DATA">
         <PatientGenomic :patientID="id"></PatientGenomic>
       </AppTabsPanel>
-
-      <AppTabsPanel name="EXPLAINER">
-        EXPLAINER
-      </AppTabsPanel>
-
-      <AppTabsPanel name="OTHER">
-        OTHER
-      </AppTabsPanel>
     </AppTabs>
   </section>
 </template>
