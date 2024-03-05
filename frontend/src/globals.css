@@ -70,7 +70,9 @@ h1 {
 input[type="text"],
 input[type="email"],
 input[type="password"],
-input[type="search"] {
+input[type="search"],
+select {
+  background-color: var(--white);
   border: 1px solid var(--black-translucent);
   border-radius: var(--radius);
   height: 42px;

@@ -8,6 +8,16 @@
       type="search"
       placeholder="Search by patient ID or stage"
       @keyup.enter="goToPatient">
+
+    <select
+      id="patients-filter-status"
+      v-model="patientsStatus"
+      placeholder="Status"
+    >
+      <option value="">Patient status</option>
+      <option value="True">Alive</option>
+      <option value="False">Deceased</option>
+    </select>
   </section>
 
   <section class="patients-list">
@@ -95,14 +105,20 @@ import { Patient } from '../models/Patient'
 
 const patientsList = ref<Patient[]>([])
 const patientsFilter = ref<string>('')
+const patientsStatus = ref<string>('')
 
 const filteredPatients = computed(() => {
   const filter = patientsFilter.value
 
-  return patientsList.value.filter((patient) => {
-    return patient.patient_id.toString().includes(filter)
-      || patient.stage?.toString().includes(filter)
-  })
+  return patientsList.value
+    .filter((patient) => {
+      return patient.patient_id.toString().includes(filter)
+        || patient.stage?.toString().includes(filter)
+    })
+    .filter((patient) => {
+      if (!patientsStatus.value) return true
+      return patient.survival === patientsStatus.value
+    })
 })
 
 const pageNumber = ref<number>(1)
@@ -181,6 +197,7 @@ onMounted(async () => {
 .patients-search {
   display: flex;
   justify-content: center;
+  gap: var(--spacing);
   align-items: center;
   margin: var(--spacing);
 
