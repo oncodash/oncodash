@@ -85,7 +85,7 @@ onMounted(() => {
 const genomicData: any = ref({})
 
 function displaySensitivity(value: string): string {
-  return value.replaceAll(';', ', ')
+  return value.replaceAll(/[;\s]/g, ', ')
 }
 </script>
 
