@@ -33,7 +33,7 @@
           </summary>
 
           <div class="alteration-data">
-            <p>{{ alteration.description }}</p>
+            <p v-html="linkifyText(alteration.description)"></p>
             <table class="alteration-table">
               <thead>
                 <tr>
@@ -67,6 +67,7 @@
 import { onMounted, ref } from 'vue'
 import api from '../api'
 import { PatientID } from '../models/Patient'
+import linkifyHtml from "linkify-html"
 
 const props = defineProps<{
   patientID: PatientID
@@ -83,6 +84,33 @@ onMounted(() => {
 })
 
 const genomicData: any = ref({})
+
+function linkifyText(text: string): string {
+  // Special process for linkifying PMIDs
+  const linkifiedPmids = text.replace(/\(PMID:([\s\d,]+)\)/gm, function (match, group) {
+    let linkifiedMatch: string = match
+
+    group
+      .trim()
+      .split(',')
+      .map((pmid: string) => pmid.trim())
+      .filter((pmid, i, self) => { return i == self.indexOf(pmid) }) // filter duplicates if there is some to avoid issues with the next foreach
+      .forEach((pmid: string) => {
+        linkifiedMatch = linkifiedMatch.replaceAll(pmid, buildPubmedLink(pmid))
+      })
+
+    return linkifiedMatch
+  })
+
+  // Use linkifyHtml for handling normal urls
+  return linkifyHtml(linkifiedPmids, {
+    target: '_blank'
+  })
+}
+
+function buildPubmedLink(pmid: string) {
+  return `<a href="https://pubmed.ncbi.nlm.nih.gov/${pmid}" target="_blank">${pmid}</a>`
+}
 
 function displaySensitivity(value: string): string {
   return value.replaceAll(/[;\s]/g, ', ')
