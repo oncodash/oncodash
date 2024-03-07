@@ -7,11 +7,11 @@
   </section>
 
   <section class="genomic-data">
-    <details class="genomic-group" v-for="(data, genomicGroup) in genomicData.genomic">
+    <details class="genomic-group" v-for="(metadata, genomicGroup) in genomicData.genomic">
       <summary class="genomic-header">
         <h1 class="genomic-title">
-          {{ genomicData.genomic[genomicGroup][1] }} -
-          <span class="number">{{ genomicData.genomic[genomicGroup][0] }}</span>
+          {{ metadata[1] }} -
+          <span class="number">{{ metadata[0] }}</span>
         </h1>
       </summary>
 
@@ -87,7 +87,7 @@ const genomicData: any = ref({})
 
 function linkifyText(text: string): string {
   // Special process for linkifying PMIDs
-  const linkifiedPmids = text.replace(/\(PMID:([\s\d,]+)\)/gm, function (match, group) {
+  const linkifiedPmids = text.replace(/\(PMID:([\s\d,]+)\)/gm, function (match: string, group: string) {
     let linkifiedMatch: string = match
 
     group
