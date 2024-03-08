@@ -32,7 +32,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - ONCODASH_API_URL=https://oncodash.ing.unimore.it/
+        - ONCODASH_API_URL=https://backend:8888/
     ports:
       - "3001:3001"
 
