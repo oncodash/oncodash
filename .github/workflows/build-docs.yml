@@ -32,7 +32,7 @@ jobs:
           touch build/html/.nojekyll
 
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@4.5.0
+        uses: JamesIves/github-pages-deploy-action@4
         with:
           token: ${{ secrets.ACCESS_TOKEN }}
           branch: gh-pages
