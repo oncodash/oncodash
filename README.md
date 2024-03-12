@@ -2,7 +2,7 @@
 
 # Oncodash
 
-Oncodash is decision support system that help tumour boards to come to the best decision for their patients.
+Oncodash is a decision support system that help tumour boards to come up with to the best decisions for their patients.
 Oncodash is currently developed within the DECIDER project and targets high-grade serous ovarian cancer.
 For more information, see the [public website](https://oncodash.github.io/oncodash/).
 
