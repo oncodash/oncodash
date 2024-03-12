@@ -29,18 +29,18 @@ class GenomicViewSet(viewsets.GenericViewSet):
         timeline_qs = TimelineRecord.objects.all()
         # Evidence levels https://www.oncokb.org/api/v1/info
         putative_functionally_relevant_variants = oncokb_queryset.filter(Q(highestSensitiveLevel=["LEVEL_1","LEVEL_2","LEVEL_3A","LEVEL_3B"]) | Q(highestFdaLevel__in=["LEVEL_Fda1","LEVEL_Fda2","LEVEL_Fda3"]))
-        variants_of_uknown_functional_significance = oncokb_queryset.filter(Q(highestPrognosticImplicationLevel__in=["LEVEL_Px1","LEVEL_Px2","LEVEL_Px3"]) | Q(highestDiagnosticImplicationLevel__in=["LEVEL_Dx1","LEVEL_Dx2","LEVEL_Dx3"]) | Q(highestSensitiveLevel=["LEVEL_4"]))
+        variants_of_unknown_functional_significance = oncokb_queryset.filter(Q(highestPrognosticImplicationLevel__in=["LEVEL_Px1","LEVEL_Px2","LEVEL_Px3"]) | Q(highestDiagnosticImplicationLevel__in=["LEVEL_Dx1","LEVEL_Dx2","LEVEL_Dx3"]) | Q(highestSensitiveLevel=["LEVEL_4"]))
         putative_functionally_neutral_variants = oncokb_queryset.filter(highestResistanceLevel__in=["LEVEL_R1","LEVEL_R2"])
         other_alterations = oncokb_queryset.filter(Q(highestPrognosticImplicationLevel=None) | Q(highestDiagnosticImplicationLevel=None) | Q(highestFdaLevel=None)).exclude(oncogenic="Unknown")
         data = {
             'genomic': {
                 'putative_functionally_relevant_variant': [putative_functionally_relevant_variants.count(), 'PUTATIVE FUNCTIONALLY RELEVANT VARIANT'],
-                'variants_of_uknown_functional_significance': [variants_of_uknown_functional_significance.count(), 'VARIANTS OF UKNOWN FUNCTIONAL SIGNIFICANCE'],
+                'variants_of_unknown_functional_significance': [variants_of_unknown_functional_significance.count(), 'VARIANTS OF UNKNOWN FUNCTIONAL SIGNIFICANCE'],
                 'putative_functionally_neutral_variants': [putative_functionally_neutral_variants.count(), 'PUTATIVE FUNCTIONALLY NEUTRAL VARIANTS'],
                 'other_alterations': [other_alterations.count(), 'OTHER ALTERATIONS'],
                 },
             'putative_functionally_relevant_variant': {},
-            'variants_of_uknown_functional_significance': {},
+            'variants_of_unknown_functional_significance': {},
             'putative_functionally_neutral_variants': {},
             'other_alterations': {}
         }
@@ -77,12 +77,12 @@ class GenomicViewSet(viewsets.GenericViewSet):
                 gene_data['alterations'] = alterations
                 data['putative_functionally_relevant_variant'][gene_name] = gene_data
 
-        if variants_of_uknown_functional_significance.count() > 0:
-            for gene in variants_of_uknown_functional_significance.values('hugoSymbol').distinct():
+        if variants_of_unknown_functional_significance.count() > 0:
+            for gene in variants_of_unknown_functional_significance.values('hugoSymbol').distinct():
 
                 gene_name = gene['hugoSymbol']
 
-                alterations_qs = variants_of_uknown_functional_significance.filter(hugoSymbol=gene_name)
+                alterations_qs = variants_of_unknown_functional_significance.filter(hugoSymbol=gene_name)
 
                 gene_data = {
                     'description': f'{alterations_qs[0].geneSummary}',
@@ -108,7 +108,7 @@ class GenomicViewSet(viewsets.GenericViewSet):
                     for i in range(alt_count)
                 ]
                 gene_data['alterations'] = alterations
-                data['variants_of_uknown_functional_significance'][gene_name] = gene_data
+                data['variants_of_unknown_functional_significance'][gene_name] = gene_data
 
         if putative_functionally_neutral_variants.count() > 0:
             for gene in putative_functionally_neutral_variants.values('hugoSymbol').distinct():

@@ -10,7 +10,7 @@ Those instructions will build and run the backend and frontend webservers
 from within containers, not touching anything on your operating system.
 
 The composed container runs an nginx proxy server that passes requests to backend and
-frontends containers.
+frontend containers.
 
 
 ## Requirements
@@ -63,7 +63,7 @@ You will be asked to accept some user contract at first launch.
 
 ## Installation
 
-1. Let's Encrypt installation: 
+1. Let's Encrypt installation:
     - go to https://certbot.eff.org/
     - select Software:Nginx System:Your-Host-OS
     - follow the instruction to install certbot and get certificates
@@ -104,7 +104,7 @@ CGI_LOGIN = ""
 CGI_TOKEN = ""
 ONCOKB_TOKEN = ""
 ```
-8. Import genomic variants to the database. "\<filepath\>" is the path of file containing annotated variants. **The expected column separator is tabulator**. Optionally, you can filter the data by column and value with --filter \<column name\> --\<filter type\> \<value\>. See --help for different filter types. 
+8. Import genomic variants to the database. "\<filepath\>" is the path of file containing annotated variants. **The expected column separator is tabulator**. Optionally, you can filter the data by column and value with --filter \<column name\> --\<filter type\> \<value\>. See --help for different filter types.
 ```sh
 docker-compose run --rm backend sh -c "python manage.py import_genomic_variants --somatic_variants <filepath>"
 ```
@@ -218,7 +218,7 @@ CGI_LOGIN = ""
 CGI_TOKEN = ""
 ONCOKB_TOKEN = ""
 ```
-9. Import genomic variants to the database. "\<filepath\>" is the path of file containing annotated variants. **The expected column separator is tabulator**. Optionally, you can filter the data by column and value with --filter \<column name\> --\<filter type\> \<value\>. See --help for different filter types. 
+9. Import genomic variants to the database. "\<filepath\>" is the path of file containing annotated variants. **The expected column separator is tabulator**. Optionally, you can filter the data by column and value with --filter \<column name\> --\<filter type\> \<value\>. See --help for different filter types.
 ```sh
 python manage.py import_genomic_variants --somatic_variants <filepath>
 ```

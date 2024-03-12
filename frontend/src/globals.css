@@ -1,0 +1,90 @@
+:root {
+  --primary: hsl(199, 93%, 35%);
+  --primary-light: #C2DBFE;
+  --red: hsl(0, 69%, 46%);
+  --green: hsl(145, 39%, 46%);
+  --green-light: hsl(147, 27%, 92%);
+  --grey: hsl(184, 9%, 62%);
+  --grey-light: hsl(184, 9%, 62%, 30%);
+  --black: hsl(0, 0%, 20%);
+  --black-translucent: hsla(0, 0%, 20%, 50%);
+  --white: hsl(0, 0%, 100%);
+  --spacing: 20px;
+  --radius: 5px;
+
+  accent-color: var(--primary);
+  line-height: 1.3;
+}
+
+html,
+body,
+#app {
+  color: var(--black);
+  min-height: 100vh;
+}
+
+body {
+  background: linear-gradient(180deg,
+    #172876 0%,
+    #5980C1 60%);
+}
+
+#app {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+button {
+  background-color: var(--green);
+  border-radius: var(--radius);
+  border: none;
+  color: var(--white);
+  cursor: pointer;
+  font-weight: normal; /* Needed in Firefox for some reason */
+  padding: 0.5em 0.75em;
+  transition: background-color 0.1s;
+}
+
+button:disabled {
+  background-color: var(--grey-light);
+  color: var(--grey);
+  cursor: not-allowed;
+}
+
+h1 {
+  color: var(--white);
+  font-size: 60px;
+  margin-top: 0;
+  text-align: center;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+select {
+  background-color: var(--white);
+  border: 1px solid var(--black-translucent);
+  border-radius: var(--radius);
+  height: 42px;
+  padding: 6px;
+  outline: 0px solid var(--primary-light);
+  transition: outline-width 0.2s;
+
+  &:focus {
+    outline-width: 5px;
+  }
+
+  &:invalid {
+    border-color: var(--red);
+  }
+}

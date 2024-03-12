@@ -27,6 +27,15 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - ONCODASH_API_URL=https://backend:8888/
+    ports:
+      - "3001:3001"
+
   # django backend gunicorn server (communicates with nginx proxy)
   backend:
     image: oncodash/backend
@@ -51,11 +60,11 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - "80:80"
-      - "443:443" 
+      - "443:443"
     volumes:
       - type: bind
         source: ./data/letsencrypt
-        target: /etc/letsencrypt              
+        target: /etc/letsencrypt
     depends_on:
       - nodeserver
       - backend
@@ -63,11 +72,11 @@ services:
     # volumes:
     #   - type: bind
     #     source: ./data/nginx
-    #     target: /etc/nginx/conf.d 
+    #     target: /etc/nginx/conf.d
 
   # certbot:
   #   image: certbot/certbot
-  #   restart: always    
+  #   restart: always
   #   volumes:
   #     - type: bind
   #       source: ./data/certbot/conf
@@ -75,8 +84,8 @@ services:
   #   volumes:
   #     - type: bind
   #       source: ./data/certbot/www
-  #       target: /var/www/certbot     
-        
+  #       target: /var/www/certbot
+
 
 
 volumes:
