@@ -12,5 +12,5 @@ Docker images are available on [docker hub](https://hub.docker.com/r/oncodash/no
 
 You can find more information in the following files:
 
-- [how to build, run and install](https://github.com/oncodash/oncodash/blob/main/INSTALL.md).
+- [how to build, run and install](https://github.com/oncodash/oncodash/blob/main/INSTALL.md)
 - [how to contribute](https://github.com/oncodash/oncodash/blob/main/CONTRIBUTING.md)
