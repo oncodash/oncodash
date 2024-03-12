@@ -13,7 +13,7 @@ To help oncologists to explore the data involved with these questions,
 we designed a diagram that reads from left to right, showing at least:
 
 1. the existing samples,
-2. the detected alterations, 
+2. the detected alterations,
 3. the actionable drugs,
 4. the foreseen side-effects.
 
@@ -72,9 +72,9 @@ Explainer's *Views*
 The main entry point to Explainer is the :mod:`network <explainer.urls>` URL.
 It serves the :class:`NetworkViewSet <explainer.views.NetworkViewSet>` functor:
 
-.. autosummary::
-    
-    explainer.views.NetworkViewSet
+.. .. autosummary::
+
+..     explainer.views.NetworkViewSet
 
 See the full module documentation: :mod:`explainer`.
 
