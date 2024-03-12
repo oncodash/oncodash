@@ -41,7 +41,6 @@ nbs
 **/env/
 
 **/django.log
-**/package-lock.json
 
 **/backendEnv/
 
