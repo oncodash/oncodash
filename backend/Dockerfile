@@ -1,29 +1,21 @@
-FROM python:3.7-alpine
+FROM python:3.8-slim-bookworm
 
 # ERROR logs are sent to terminal
 ENV PYTHONUNBUFFERED=1
 
 # no __pycache__ written by container root in the bindmount
-# Would end up in permission errors when building 
-ENV PYTHONDONTWRITEBYTECODE=1 
+# Would end up in permission errors when building
+ENV PYTHONDONTWRITEBYTECODE=1
 
-# Add non-privliged user that will be used when running the container
+# Add non-privileged user that will be used when running the container
 ARG UNAME=djangouser
-RUN adduser -D $UNAME
+RUN adduser --disabled-login $UNAME
 
 # Update apk and install python3 headers for numpy
-RUN apk update
-RUN apk add python3-dev
+RUN apt-get update
+RUN apt-get install -y python3-dev
 
-# install c++ compilers for pandas & numpy installations
-RUN apk add --no-cache --virtual .build-deps \
-    make \
-    automake \
-    gcc \
-    g++ \
-    subversion
-
-# Copy in source code and set up rights 
+# Copy in source code and set up rights
 RUN mkdir /opt/app/ && chown $UNAME:$UNAME /opt/app/
 WORKDIR /opt/app
 COPY --chown=$UNAME:$UNAME ./requirements.txt ./requirements.txt
@@ -33,9 +25,6 @@ ENV PATH /home/$UNAME/.local/bin:$PATH
 RUN pip install -U pip \
     && pip install -U setuptools \
     && pip install -r requirements.txt
-
-# remove build-deps
-RUN apk del .build-deps
 
 # copy in the source code
 COPY --chown=$UNAME:$UNAME . .
