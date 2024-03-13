@@ -67,29 +67,8 @@ services:
         target: /etc/letsencrypt
     depends_on:
       - nodeserver
+      - frontend
       - backend
-
-    # volumes:
-    #   - type: bind
-    #     source: ./data/nginx
-    #     target: /etc/nginx/conf.d
-
-  # certbot:
-  #   image: certbot/certbot
-  #   restart: always
-  #   volumes:
-  #     - type: bind
-  #       source: ./data/certbot/conf
-  #       target: /etc/letsencrypt
-  #   volumes:
-  #     - type: bind
-  #       source: ./data/certbot/www
-  #       target: /var/www/certbot
-
-
 
 volumes:
   notused:
-
-
-
