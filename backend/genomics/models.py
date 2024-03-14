@@ -46,6 +46,9 @@ class CopyNumberAlteration(models.Model):
     maxPurifiedLogR = models.DecimalField(blank=True, null=True, max_digits=8, decimal_places=6)
     breaksInGene = models.IntegerField(blank=True, null=True)
 
+    class Meta:
+        unique_together = ['sample_id', 'gene_id']
+
 class Translocation(models.Model):
     patient_id = models.IntegerField()
     sample = models.CharField(max_length=64, default=None, blank=True, null=True)
@@ -116,6 +119,9 @@ class SomaticVariant(models.Model):
     readCounts	 = models.CharField(max_length=15, default=None, blank=True, null=True)
     samples = models.CharField(max_length=15, default=None, blank=True, null=True)
 
+    class Meta:
+        unique_together = ['patient_id', 'chromosome', 'position']
+
 class CGIMutation(models.Model):
 
     patient_id = models.IntegerField()
@@ -130,6 +136,9 @@ class CGIMutation(models.Model):
     transcript = models.CharField(max_length=64, default=None, blank=True, null=True)
     strand = models.CharField(max_length=2, default=None, blank=True, null=True)
     type = models.CharField(max_length=16, default=None, blank=True, null=True)
+
+    class Meta:
+        unique_together = ['patient_id', 'mutation']
 
 class CGICopyNumberAlteration(models.Model):
 
@@ -146,6 +155,8 @@ class CGICopyNumberAlteration(models.Model):
     predicted_match = models.CharField(max_length=128, default=None, blank=True, null=True)
     known_match = models.CharField(max_length=128, default=None, blank=True, null=True)
 
+    class Meta:
+        unique_together = ['sample', 'gene', 'cnatype']
 
 class CGIFusionGene(models.Model):
 
@@ -217,3 +228,6 @@ class OncoKBAnnotation(models.Model):
     dataVersion = models.CharField(max_length=16, default=None, blank=True, null=True)
     lastUpdate = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
     vus = models.BooleanField(default=False, blank=True, null=True)
+
+    class Meta:
+        unique_together = ['sample_id', 'entrezGeneId', 'alteration']

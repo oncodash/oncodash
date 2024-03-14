@@ -16,6 +16,7 @@ from django.db.models import Lookup, Q, F
 from datetime import datetime
 from genomics.management.commands.import_genomic_variants import map_cohort_code_to_patient_id
 import json
+import cryptocode
 
 http = urllib3.PoolManager()
 
@@ -190,7 +191,6 @@ def get_all_exonic_snvs():
 
 
 def query_cgi_job(patient_id, jobid):
-    # TODO: handle sample id
     """
       Query the CGI API with a job id and save the results to the database.
 
@@ -205,7 +205,6 @@ def query_cgi_job(patient_id, jobid):
     cgilogin = settings.CGI_LOGIN
     cgitoken = settings.CGI_TOKEN
 
-    print("Request CGI job by id")
     headers = {
         'Authorization': cgilogin + ' ' + cgitoken
     }
@@ -222,7 +221,7 @@ def query_cgi_job(patient_id, jobid):
             z.extract(fn)
             df = pd.read_csv(fn, sep="\t")
             print(fn)
-            print(df.columns)
+            print(df)
 
             #Response filenames
             #alterations.tsv
@@ -238,11 +237,12 @@ def query_cgi_job(patient_id, jobid):
             #['Input ID', 'CHROMOSOME', 'POSITION', 'REF', 'ALT', 'chr', 'pos', 'ref','alt', 'ALT_TYPE', 'STRAND', 'CGI-Sample ID', 'CGI-Gene', 'CGI-Protein Change', 'CGI-Oncogenic Summary', 'CGI-Oncogenic Prediction', 'CGI-External oncogenic annotation','CGI-Mutation', 'CGI-Consequence', 'CGI-Transcript', 'CGI-STRAND', 'CGI-Type', 'CGI-HGVS', 'CGI-HGVSc', 'CGI-HGVSp']
 
             if fn == "alterations.tsv":
-                for index, row in df.iterrows():
+                alts = df.loc[~(df['CGI-Oncogenic Summary'] == 'non-protein affecting')]
+                for index, row in alts.iterrows():
                     try:
                         rec, created = CGIMutation.objects.get_or_create(
                             patient_id      = int(patient_id),
-                            sample = handle_string_field(row["CGI-Sample ID"]),
+                            sample = handle_string_field(cryptocode.decrypt(row["CGI-Sample ID"], settings.CRYPTOCODE)),
                             gene  = handle_string_field(row["CGI-Gene"]),
                             protein_change   = handle_string_field(row["CGI-Protein Change"]),
                             oncogenic_summary    = handle_string_field(row["CGI-Oncogenic Summary"]),
@@ -267,11 +267,12 @@ def query_cgi_job(patient_id, jobid):
             # sample	gene	cna	predicted_in_tumors	known_in_tumors	gene_role	cancer	internal_id	driver	driver_statement	predicted_match	known_match
             # single_sample	ERBB2	AMP	CESC;ESCA;HNSC;LUAD;PAAD;STAD;UCEC	BRCA;OV;CANCER;NSCLC;ST;BT;COREAD;BLCA;GEJA;HNC;ED	Act	OVE	0	known	known in: BRCA;OV;CANCER;NSCLC;ST;BT;COREAD;BLCA;GEJA;HNC;ED
             if fn == "cna_analysis.tsv":
-                for index, row in df.iterrows():
+                cnas = df.loc[~(df['gene_role'] == 'ambiguous')]
+                for index, row in cnas.iterrows():
                     try:
                         rec, created = CGICopyNumberAlteration.objects.get_or_create(
                             patient_id   = int(patient_id),
-                            sample = handle_string_field(row["sample"]),
+                            sample = handle_string_field(cryptocode.decrypt(row["sample"], settings.CRYPTOCODE)),
                             gene = handle_string_field(row["gene"]),
                             cnatype = handle_string_field(row["cna"]),
                             predicted_in_tumors = handle_string_field(row["predicted_in_tumors"]),
@@ -299,7 +300,7 @@ def query_cgi_job(patient_id, jobid):
                     try:
                         rec, created = CGIFusionGene.objects.get_or_create(
                             patient_id   = int(patient_id),
-                            sample = handle_string_field(row["sample"]),
+                            sample = handle_string_field(cryptocode.decrypt(row["sample"], settings.CRYPTOCODE)),
                             fusiongene = handle_string_field(row["fus"]),
                             effector_gene = handle_string_field(row["effector_gene"]),
                             gene_role = handle_string_field(row["gene_role"]),
@@ -317,11 +318,12 @@ def query_cgi_job(patient_id, jobid):
             # Sample ID	Alterations	Biomarker	Drugs	Diseases	Response	Evidence	Match	Source	BioM	Resist.	Tumor type
             # single_sample	ABL1__BCR 	ABL1 (T315I,V299L,G250E,F317L)	Bosutinib (BCR-ABL inhibitor 3rd gen)	Acute lymphoblastic leukemia, Chronic myeloid leukemia	Resistant	A	NO	cgi	only gene		ALL, CML
             if fn == "biomarkers.tsv":
-                for index, row in df.iterrows():
+                bioms = df.loc[df['Match'] == 'YES']
+                for index, row in bioms.iterrows():
                     try:
                         rec, created = CGIDrugPrescriptions.objects.get_or_create(
                             patient_id  = int(patient_id),
-                            sample = handle_string_field(row["Sample ID"]),
+                            sample = handle_string_field(cryptocode.decrypt(row["Sample ID"], settings.CRYPTOCODE)),
                             alterations = handle_string_field(row["Alterations"]),
                             biomarker = handle_string_field(row["Biomarker"]),
                             drugs = handle_string_field(row["Drugs"]),
@@ -346,28 +348,27 @@ def query_cgi_job(patient_id, jobid):
 
 def generate_temp_cgi_query_files(snvs: [SomaticVariant], cnas: [CopyNumberAlteration], translocs: [str]):
 
-    header = "chr\tpos\tref\talt\n"
+    header = "chr\tpos\tref\talt\tsample\n"
     with open("./tmp/snvs.ext", "w") as file1:
         file1.write(header)
         for snv in snvs:
-            row = snv.chromosome+'\t'+str(snv.position)+'\t'+snv.reference_allele+'\t'+snv.sample_allele+'\n'
+            row = snv.chromosome+'\t'+str(snv.position)+'\t'+snv.reference_allele+'\t'+snv.sample_allele+'\t'+cryptocode.encrypt(snv.samples, settings.CRYPTOCODE)+'\n'
             file1.write(row)
         file1.close()
 
-    header = "gene\tcna\n"
+    header = "gene\tcna\tsample\n"
     with open("./tmp/cnas.ext", "w") as file2:
         file2.write(header)
         for cna in cnas:
-            row = cna.gene+'\t'+cna.CNstatus+'\n'
-            print(row)
+            row = cna.gene+'\t'+cna.CNstatus+'\t'+cryptocode.encrypt(cna.sample_id, settings.CRYPTOCODE)+'\n'
             file2.write(row)
         file2.close()
 
-    header = "fus\n"
+    header = "fus\tsample\n"
     with open("./tmp/fus.ext", "w") as file3:
         file3.write(header)
         for transloc in translocs:
-            row = transloc+'\n'
+            row = transloc+'\t'+cryptocode.encrypt(transloc.sample, settings.CRYPTOCODE)+'\n'
             file3.write(row)
         file3.close()
 
@@ -532,7 +533,6 @@ def query_oncokb_cna(cna: CopyNumberAlteration, tumorType):
         print("[ERROR] Unable to request. Response: ", print(response.data))
         exit()
 def getAlterationType(cna):
-    print(cna.CNstatus)
     if cna.CNstatus == "AMP" or cna.CNstatus == "DEL":
         return AlterationType[cna.CNstatus]
     else:
@@ -565,8 +565,8 @@ def query_oncokb_cnas(cnas: [CopyNumberAlteration], tumorType):
 
     data = [
         {
-            "id": f"{str(cnas[i].patient_id)+':'+cnas[i].sample_id}",
-            "sample_id": f"{cnas[i].sample_id}",
+            "id": f"{cryptocode.encrypt(str(cnas[i].patient_id)+':'+cnas[i].sample_id, settings.CRYPTOCODE)}",
+            "sample_id": f"{cryptocode.encrypt(cnas[i].sample_id, settings.CRYPTOCODE)}",
             "copyNameAlterationType": f"{getAlterationType(cnas[i])}",
             "gene": {
                 "hugoSymbol": f"{cnas[i].gene}"
@@ -589,8 +589,8 @@ def query_oncokb_cnas(cnas: [CopyNumberAlteration], tumorType):
             #print("OBJ", rjson)
 
             rec, created = OncoKBAnnotation.objects.get_or_create(
-                patient_id  = str((rjson["query"]["id"])).split(":")[0],
-                sample_id = str((rjson["query"]["id"])).split(":")[1],
+                patient_id  = str(cryptocode.decrypt(rjson["query"]["id"], settings.CRYPTOCODE)).split(":")[0],
+                sample_id = str(cryptocode.decrypt(rjson["query"]["id"], settings.CRYPTOCODE)).split(":")[1],
                 hugoSymbol = handle_string_field(rjson["query"]["hugoSymbol"]),
                 entrezGeneId = handle_string_field(rjson["query"]["entrezGeneId"]),
                 alteration = handle_string_field(rjson["query"]["alteration"]),
@@ -822,7 +822,7 @@ def query_oncokb_somatic_mutations(snvs: [SomaticVariant] , tumorType):
 
     data = [
         {
-            "id": f"{str(snvs[i].patient_id) + ':' + snvs[i].samples+':'+str(i)}",
+            "id": f"{cryptocode.encrypt(str(snvs[i].patient_id) + ':' + snvs[i].samples+':'+str(i), settings.CRYPTOCODE)}",
             "genomicLocation": f"{snvs[i].chromosome+','+str(snvs[i].position)+','+(str(int(snvs[i].position)+len(snvs[i].sample_allele)))+','+snvs[i].reference_allele+','+snvs[i].sample_allele}",
             "tumorType": f"{tumorType}",
             "referenceGenome": "GRCh38"
@@ -834,10 +834,11 @@ def query_oncokb_somatic_mutations(snvs: [SomaticVariant] , tumorType):
     # Sending a GET request and getting back response as HTTPResponse object.
     print("Request OncoKB API "+request_url)
     response = http.request("POST", request_url, body=json.dumps(data).encode('utf-8'), headers=header)
+    print(data)
     # response = http.request("GET",request_url, headers=header)
     print(response.status)
     # print(response.json())
-
+    #TODO: check why EGFR chr7,55181426,55181427,A,C  is not found but is found from web api (and also from CGI)
     if (response.status == 200):
 
         respjson = json.loads(response.data.decode('utf-8'))
@@ -845,7 +846,7 @@ def query_oncokb_somatic_mutations(snvs: [SomaticVariant] , tumorType):
 
             if handle_string_field(rjson["oncogenic"]) != "Unknown":
                 print("OBJ", rjson)
-                sids = str((rjson["query"]["id"])).split(":")[1].split(";")
+                sids = str(cryptocode.decrypt((rjson["query"]["id"]), settings.CRYPTOCODE)).split(":")[1].split(";") #TODO: encrypt ids also in oncokb
                 pid = str((rjson["query"]["id"])).split(":")[0]
                 for sid in sids:
                     rec, created = OncoKBAnnotation.objects.get_or_create(
@@ -954,6 +955,37 @@ def generate_cgi_cna_file_from_list(genelist):
         file2.close()
 
 def sql_query_db():
+
+    # Examples for checking duplicates
+    """SELECT * FROM genomics_oncokbannotation
+        WHERE id NOT IN
+        (SELECT MIN(id)
+        FROM genomics_oncokbannotation
+        GROUP BY patient_id, hugoSymbol, alteration)
+
+        SELECT * FROM genomics_cgicopynumberalteration
+        WHERE id NOT IN
+        (SELECT MIN(id)
+        FROM genomics_cgicopynumberalteration
+        GROUP BY patient_id, gene, cnatype)
+
+        SELECT * FROM genomics_cgimutation
+        WHERE id NOT IN
+        (SELECT MIN(id)
+        FROM genomics_cgimutation
+        GROUP BY patient_id, mutation)
+
+        SELECT * FROM genomics_copynumberalteration
+        WHERE id NOT IN
+        (SELECT MIN(id)
+        FROM genomics_copynumberalteration
+        GROUP BY sample_id, gene_id)
+
+        SELECT * FROM genomics_somaticvariant
+        WHERE id NOT IN
+        (SELECT MIN(id)
+        FROM genomics_somaticvariant
+        GROUP BY patient_id, chromosome, position)"""
 
     try:
         for rec in SomaticVariant.objects.raw("SELECT * FROM genomics_somaticvariant"):
@@ -1146,10 +1178,10 @@ class Command(BaseCommand):
             fusgenes=kwargs["fusgenes"].split(',')
             generate_temp_cgi_query_files([],[],fusgenes)
             jobid = launch_cgi_job_with_mulitple_variant_types(None, None, "./tmp/fus.ext", "OV", "hg38")
-            time.sleep(90)
+            time.sleep(10)
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
-                print("Waiting 120 seconds for the next try...")
-                time.sleep(120)
+                print("Waiting 30 seconds for the next try...")
+                time.sleep(30)
 
         # May be impossible to query every patient at once from cgi, could be done if distinct genes of every patient mapped to same query file
         if kwargs["cgiquery"] and kwargs["cna"] and kwargs["targetall"] and kwargs["cohortcode"]:
@@ -1161,8 +1193,8 @@ class Command(BaseCommand):
                 jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, "OV", "hg38")
                 time.sleep(10)
                 while query_cgi_job(pid, jobid.replace('"', '')) == 0:
-                    print("Waiting 120 seconds for the next try...")
-                    #time.sleep(30)
+                    print("Waiting 30 seconds for the next try...")
+                    time.sleep(30)
 
         if kwargs["cgiquery"] and kwargs["cna"] and kwargs["actionable"] and kwargs["cohortcode"]:
             pid = map_cohort_code_to_patient_id(kwargs["cohortcode"])
@@ -1172,8 +1204,8 @@ class Command(BaseCommand):
                 jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, "OV", "hg38")
                 time.sleep(10)
                 while query_cgi_job(pid, jobid.replace('"', '')) == 0:
-                    print("Waiting 120 seconds for the next try...")
-                    #time.sleep(30)
+                    print("Waiting 30 seconds for the next try...")
+                    time.sleep(30)
 
         if kwargs["cgiquery"] and kwargs["snv"] and kwargs["actionable"] and kwargs["cohortcode"]:
             targets = ActionableTarget.objects.all()
@@ -1184,5 +1216,5 @@ class Command(BaseCommand):
                 jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/snvs.ext", None, None, "OV", "hg38")
                 time.sleep(10)
                 while query_cgi_job(pid, jobid.replace('"', '')) == 0:
-                        print("Waiting 120 seconds for the next try...")
+                        print("Waiting 30 seconds for the next try...")
                         time.sleep(30)

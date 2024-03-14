@@ -11,3 +11,4 @@ python-decouple>=3.5.0,<3.6.0
 requests==2.7.0
 simplejson==3.17.6
 urllib3>=1.26.5,<1.26.18
+cryptocode

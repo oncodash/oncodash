@@ -112,12 +112,13 @@ You will be asked to accept some user contract at first launch.
 
     and then follow the prompt instruction.
 
-7. Create CGI and OncoKB accounts to get corresponding tokens. Modify login email and tokens (OncoKB requires only token) in backend/backend/settings.py:
+7. Create CGI and OncoKB accounts to get corresponding tokens. Modify login email and tokens (OncoKB requires only token) in backend/backend/settings.py. Set also CRYPTOCODE password for encrypting the data.:
 
     ```python
     CGI_LOGIN = ""
     CGI_TOKEN = ""
     ONCOKB_TOKEN = ""
+    CRYPTOCODE = ""
     ```
 
 8. Import genomic variants to the database. "\<filepath\>" is the path of file containing annotated variants. **The expected column separator is tabulator**. Optionally, you can filter the data by column and value with --filter \<column name\> --\<filter type\> \<value\>. See --help for different filter types.
