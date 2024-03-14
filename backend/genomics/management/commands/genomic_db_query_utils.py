@@ -847,7 +847,7 @@ def query_oncokb_somatic_mutations(snvs: [SomaticVariant] , tumorType):
             if handle_string_field(rjson["oncogenic"]) != "Unknown":
                 print("OBJ", rjson)
                 sids = str(cryptocode.decrypt((rjson["query"]["id"]), settings.CRYPTOCODE)).split(":")[1].split(";") #TODO: encrypt ids also in oncokb
-                pid = str((rjson["query"]["id"])).split(":")[0]
+                pid = str(cryptocode.decrypt((rjson["query"]["id"]), settings.CRYPTOCODE)).split(":")[0]
                 for sid in sids:
                     rec, created = OncoKBAnnotation.objects.get_or_create(
                     patient_id=pid,
