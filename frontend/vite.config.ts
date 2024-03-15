@@ -23,6 +23,9 @@ export default defineConfig({
 
     // URL of the backend
     // https://vitejs.dev/config/shared-options.html#envprefix
-    'import.meta.env.ONCODASH_API_URL': JSON.stringify(process.env.ONCODASH_API_URL) || "'http://127.0.0.1:8888'"
+    'import.meta.env.ONCODASH_API_URL': JSON.stringify(process.env.ONCODASH_API_URL) || "'http://127.0.0.1:8888'",
+
+    // Public URL in case of proxy rewrites to handle
+    'import.meta.env.ONCODASH_PUBLIC_PATH': JSON.stringify(process.env.ONCODASH_PUBLIC_PATH) || "'/'"
   }
 })

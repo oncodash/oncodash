@@ -2,9 +2,12 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 // =========================================================================
 
+const base = import.meta.env.ONCODASH_PUBLIC_PATH
+
 export default createRouter({
+
   // Use the History API of the browser
-  history: createWebHistory(),
+  history: createWebHistory(base),
 
   // Routes of the application
   routes: [
