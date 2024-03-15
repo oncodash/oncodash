@@ -32,6 +32,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
+        - ONCODASH_PUBLIC_PATH=/next
         - ONCODASH_API_URL=https://backend:8888/
     ports:
       - "3001:3001"

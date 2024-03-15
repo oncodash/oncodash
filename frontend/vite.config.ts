@@ -7,6 +7,7 @@ export default defineConfig({
     vue()
   ],
   root: 'src',
+  base: process.env.ONCODASH_PUBLIC_PATH || '/',
   build: {
     outDir: '../dist',
     emptyOutDir: true

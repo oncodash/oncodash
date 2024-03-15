@@ -9,13 +9,16 @@ COPY ./package-lock.json ./package-lock.json
 COPY ./tsconfig.json ./tsconfig.json
 COPY ./vite.config.ts ./vite.config.ts
 
-# Allow to setup this env variable for the docker build
+# Setup env variables for build
 ARG ONCODASH_API_URL
+ARG ONCODASH_PUBLIC_PATH
 
 # Install all dependencies
 RUN npm ci
 
-# Switch to production mode for the build
+# Setup env variables for build
+ENV ONCODASH_API_URL = ${ONCODASH_API_URL}
+ENV ONCODASH_PUBLIC_PATH = ${ONCODASH_PUBLIC_PATH}
 ENV NODE_ENV="production"
 RUN npm run build
 
