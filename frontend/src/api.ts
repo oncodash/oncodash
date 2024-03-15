@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from 'axios'
 import Cookies from 'universal-cookie'
 import { PatientID } from './models/Patient'
 import { PatientDTO } from './models/PatientDTO'
+import router from './router'
 
 // Initialize Axios instance
 // =========================================================================
@@ -16,7 +17,7 @@ const cookies = new Cookies()
 api.interceptors.response.use(response => {
   return response
 }, (error) => {
-  if (error.response.status === 401) window.location.assign('/login')
+  if (error.response.status === 401) router.push({ name: "LoginPage" })
   else return Promise.reject(error)
 })
 
