@@ -33,7 +33,7 @@ services:
       dockerfile: Dockerfile
       args:
         - ONCODASH_PUBLIC_PATH=/next
-        - ONCODASH_API_URL=https://backend:8888/
+        - ONCODASH_API_URL=https://oncodash.ing.unimore.it
     ports:
       - "3001:3001"
 
