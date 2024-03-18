@@ -39,6 +39,14 @@ import { useCookies } from '@vueuse/integrations/useCookies'
 import api from '../api'
 import router from '../router'
 
+/**
+ * Props that contain an optionnal route to redirect to
+ * after the login.
+ */
+const props = defineProps<{
+  to?: string
+}>()
+
 const cookies = useCookies()
 const email = ref<string>('')
 const password = ref<string>('')
@@ -55,7 +63,12 @@ function login(): void {
 
   api.login(email.value, password.value).then(async response => {
     cookies.set('token', response.data.token)
-    router.replace({ name: "PatientsListPage" })
+
+    if (props.to) {
+      router.replace({ path: props.to })
+    } else {
+      router.replace({ name: "PatientsListPage" })
+    }
   }).catch(err => {
     if (err.response.status === 400) {
       alert('Wrong credentials, please make sure to use the proper email and password.')
