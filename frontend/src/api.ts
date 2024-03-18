@@ -53,7 +53,7 @@ export default {
     })
   },
   logout: async function () {
-    return await api.get('/token/', {
+    return await api.get('/logout/', {
       headers: {
         'Authorization': `Token ${cookies.get('token')}`
       }

@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import Cookies from 'universal-cookie'
 
 // =========================================================================
 
 const base = import.meta.env.ONCODASH_PUBLIC_PATH
+const cookies = new Cookies()
 
-export default createRouter({
+const router = createRouter({
 
   // Use the History API of the browser
   history: createWebHistory(base),
@@ -36,5 +38,19 @@ export default createRouter({
       component: async () => await import('./components/404Page.vue'),
       name: '404Page'
     }
-  ]
+  ],
 })
+
+// Navigation guard to redirect to the login page
+// if no cookies are detected.
+router.beforeEach((to) => {
+  if (!cookies.get('token') && to.name !== 'LoginPage') {
+    return { name: 'LoginPage' }
+  }
+
+  return true
+})
+
+// =========================================================================
+
+export default router
