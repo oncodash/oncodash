@@ -1,11 +1,12 @@
 <template>
   <header>
-    <a href="/">
+    <RouterLink :to="{ name: 'PatientsListPage' }" v-slot="{ navigate }">
       <img
         src="/oncodash-logo.png"
         alt="The logo of Oncodash"
-        height="64">
-    </a>
+        height="64"
+        @click="navigate">
+    </RouterLink>
     <RouterLink v-if="!isLoggedIn" :to="{ name: 'LoginPage' }" v-slot="{ navigate }">
       <button type="button" @click="navigate">LOGIN</button>
     </RouterLink>
