@@ -72,9 +72,11 @@ Explainer's *Views*
 The main entry point to Explainer is the :mod:`network <explainer.urls>` URL.
 It serves the :class:`NetworkViewSet <explainer.views.NetworkViewSet>` functor:
 
-.. .. autosummary::
+TODO
 
-..     explainer.views.NetworkViewSet
+.. autosummary
+
+.. explainer.views.NetworkViewSet
 
 See the full module documentation: :mod:`explainer`.
 
