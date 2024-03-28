@@ -107,6 +107,20 @@ const patientsList = ref<Patient[]>([])
 const patientsFilter = ref<string>('')
 const patientsStatus = ref<string>('')
 
+/**
+ * Fetch the list of patients when this page is loaded.
+ */
+ onMounted(async () => {
+  api.getPatientsList().then(async (response): Promise<void> => {
+    patientsList.value = response.data.map(patientDTO => {
+      return new Patient(patientDTO)
+    })
+  }).then().catch(err => {
+    alert(err.message)
+    console.error(err)
+  })
+})
+
 const filteredPatients = computed(() => {
   const filter = patientsFilter.value
 
@@ -177,20 +191,6 @@ function goToPatient(): void {
     })
   }
 }
-
-/**
- * Fetch the list of patients when this page is loaded.
- */
-onMounted(async () => {
-  api.getPatientsList().then(async (response): Promise<void> => {
-    patientsList.value = response.data.map(patientDTO => {
-      return new Patient(patientDTO)
-    })
-  }).catch(err => {
-    alert(err.message)
-    console.error(err)
-  })
-})
 </script>
 
 <style scoped>

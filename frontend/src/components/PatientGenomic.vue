@@ -1,12 +1,12 @@
 <template>
-  <section class="genomic-numbers">
+  <section class="genomic-numbers" v-if="genomicData">
     <div class="genomic-number" v-for="genomicNumber in genomicData.genomic">
       <div class="number">{{ genomicNumber[0] }}</div>
       <div class="name">{{ genomicNumber[1] }}</div>
     </div>
   </section>
 
-  <section class="genomic-data">
+  <section class="genomic-data" v-if="genomicData">
     <details class="genomic-group" v-for="(metadata, genomicGroup) in genomicData.genomic">
       <summary class="genomic-header">
         <h1 class="genomic-title">
@@ -66,15 +66,21 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import api from '../api'
-import { PatientID } from '../models/Patient'
+import { Patient } from '../models/Patient'
 import linkifyHtml from "linkify-html"
+import { GenomicData } from '../models/GenomicData'
 
 const props = defineProps<{
-  patientID: PatientID
+  patient: Patient
 }>()
 
+const genomicData = ref<GenomicData>()
+
+/**
+ * Fetch the genomic data of the patient on component start.
+ */
 onMounted(() => {
-  api.getPatientGenomic(props.patientID)
+  api.getPatientGenomic(props.patient.patient_id)
     .then(async response => {
       genomicData.value = response.data
     }).catch(err => {
@@ -83,8 +89,12 @@ onMounted(() => {
     })
 })
 
-const genomicData: any = ref({})
-
+/**
+ * Transforms PMIDS and url in a text into html a tags
+ * for proper linking.
+ * @param text - The text to linkify
+ * @returns The linkified text
+ */
 function linkifyText(text: string): string {
   // Special process for linkifying PMIDs
   const linkifiedPmids = text.replace(/\(PMID:([\s\d,]+)\)/gm, function (match: string, group: string) {
@@ -108,10 +118,21 @@ function linkifyText(text: string): string {
   })
 }
 
-function buildPubmedLink(pmid: string) {
+/**
+ * Transform a PMID into an html a tag for linking.
+ * @param pmid - The PMID to link
+ * @returns The html a tag containing the link, as a string
+ */
+function buildPubmedLink(pmid: string): string {
   return `<a href="https://pubmed.ncbi.nlm.nih.gov/${pmid}" target="_blank">${pmid}</a>`
 }
 
+/**
+ * Display the list of elements of the "reported sensitivity response"
+ * as a comma-separated list.
+ * @param value - The initial string
+ * @returns The comma-separated string
+ */
 function displaySensitivity(value: string): string {
   return value.replaceAll(/[;\s]/g, ', ')
 }

@@ -1,7 +1,8 @@
+import { GenomicData } from './models/GenomicData'
+import { PatientDTO } from './models/PatientDTO'
+import { PatientID } from './models/Patient'
 import axios, { AxiosResponse } from 'axios'
 import Cookies from 'universal-cookie'
-import { PatientID } from './models/Patient'
-import { PatientDTO } from './models/PatientDTO'
 import router from './router'
 
 // Initialize Axios instance
@@ -39,7 +40,7 @@ export default {
       }
     })
   },
-  getPatientGenomic: async function (patientID: PatientID) {
+  getPatientGenomic: async function (patientID: PatientID): Promise<AxiosResponse<GenomicData>> {
     return await api.get(`/api/genomic-overview/data/${patientID}/`, {
       headers: {
         Authorization: `Token ${cookies.get('token')}`
