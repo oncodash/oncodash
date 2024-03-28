@@ -7,7 +7,7 @@
   </section>
 
   <section class="genomic-data" v-if="genomicData">
-    <details class="genomic-group" v-for="(metadata, genomicGroup) in genomicData.genomic">
+    <details open class="genomic-group" v-for="(metadata, genomicGroup) in genomicData.genomic">
       <summary class="genomic-header">
         <h1 class="genomic-title">
           {{ metadata[1] }} -
@@ -16,6 +16,7 @@
       </summary>
 
       <details
+        open
         class="gene-section"
         v-for="(geneData, geneName) in genomicData[genomicGroup]">
         <summary class="gene-header">
@@ -24,7 +25,7 @@
 
         <p>{{ geneData.description }}</p>
 
-        <details class="alteration-section" v-for="alteration in geneData.alterations">
+        <details open class="alteration-section" v-for="alteration in geneData.alterations">
           <summary class="alteration-header">
             <h3>
               Alteration -
