@@ -6,6 +6,20 @@
     </div>
   </section>
 
+  <section class="genomic-summaries">
+    <div class="genes-summary">
+      <span class="summary-label">Genes involved:</span>
+      <a v-if="aggregateGenes().length" class="gene-link" v-for="gene in aggregateGenes()" :href="'#' + gene">{{ gene }}</a>
+      <span v-else>None</span>
+    </div>
+
+    <div class="drugs-summary">
+      <span class="summary-label">Drugs involved:</span>
+      <span v-if="aggregateDrugs().length" class="drug" v-for="gene in aggregateDrugs()">{{ gene }}</span>
+      <span v-else>None</span>
+    </div>
+  </section>
+
   <section class="genomic-data" v-if="genomicData">
     <details open class="genomic-group" v-for="(metadata, genomicGroup) in genomicData.genomic">
       <summary class="genomic-header">
@@ -20,7 +34,7 @@
         class="gene-section"
         v-for="(geneData, geneName) in genomicData[genomicGroup]">
         <summary class="gene-header">
-          <h2>{{ geneName }}</h2>
+          <h2 :id="geneName">{{ geneName }}</h2>
         </summary>
 
         <p>{{ geneData.description }}</p>
@@ -53,7 +67,7 @@
                   <td>{{ row.treatment_phase }}</td>
                   <td>{{ row.tumor_purity }}</td>
                   <td>{{ row.mutation_affects }}</td>
-                  <td>{{ displaySensitivity(row.reported_sensitivity) }}</td>
+                  <td>{{ displayDrugs(row.reported_sensitivity) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -65,10 +79,11 @@
 </template>
 
 <script setup lang="ts">
+import linkifyHtml from "linkify-html"
 import { onMounted, ref } from 'vue'
+import { computed } from '@vue/reactivity'
 import api from '../api'
 import { Patient } from '../models/Patient'
-import linkifyHtml from "linkify-html"
 import { GenomicData } from '../models/GenomicData'
 
 const props = defineProps<{
@@ -76,6 +91,9 @@ const props = defineProps<{
 }>()
 
 const genomicData = ref<GenomicData>()
+const genomicGroups = computed(() => {
+  return Object.keys(genomicData.value?.genomic || {}) as Array<keyof GenomicData['genomic']>
+})
 
 /**
  * Fetch the genomic data of the patient on component start.
@@ -89,6 +107,46 @@ onMounted(() => {
       console.error(err)
     })
 })
+
+/**
+ * Lists all the genes involved in the current genomic data.
+ * @returns The list of genes
+ */
+function aggregateGenes(): string[] {
+  return genomicGroups.value.reduce<string[]>((list, group) => {
+    const genes = Object.keys(genomicData.value?.[group] || {})
+    return list.concat(genes)
+  }, [])
+}
+
+/**
+ * Lists all the drugs involved in the current genomic data.
+ * @returns The list of drugs
+ */
+function aggregateDrugs(): string[] {
+  const allDrugs = genomicGroups.value.reduce<string[]>((list, group) => {
+    if (!genomicData.value?.[group]) return list
+
+    let drugs: string[] = []
+
+    Object.values(genomicData.value?.[group]).forEach(geneData => {
+      geneData.alterations.forEach(alteration => {
+        alteration.row.forEach((sample) => {
+          drugs = drugs.concat(displayDrugs(sample.reported_sensitivity).split(', '))
+        })
+      })
+    })
+
+    return list.concat(drugs)
+  }, [])
+    .filter(drug => {
+      return drug !== "None"
+    })
+
+  // Make all drugs unique by using a set and
+  // turning it back to an array
+  return Array.from(new Set(allDrugs)).sort()
+}
 
 /**
  * Transforms PMIDS and url in a text into html a tags
@@ -129,12 +187,12 @@ function buildPubmedLink(pmid: string): string {
 }
 
 /**
- * Display the list of elements of the "reported sensitivity response"
+ * Display the list of drugs in the "reported sensitivity response"
  * as a comma-separated list.
  * @param value - The initial string
  * @returns The comma-separated string
  */
-function displaySensitivity(value: string): string {
+function displayDrugs(value: string): string {
   return value.replaceAll(/[;\s]/g, ', ')
 }
 </script>
@@ -159,6 +217,26 @@ function displaySensitivity(value: string): string {
 .genomic-number .number {
   color: var(--primary);
   font-size: 50px;
+}
+
+.genomic-summaries {
+  padding: var(--spacing);
+  display: flex;
+  flex-flow: column wrap;
+  gap: var(--spacing);
+  align-items: center;
+}
+
+.genes-summary,
+.drugs-summary {
+  display: flex;
+  flex-flow: row wrap;
+  gap: calc(var(--spacing) / 2);
+  justify-content: center;
+}
+
+.summary-label {
+  font-weight: bold;
 }
 
 summary {
