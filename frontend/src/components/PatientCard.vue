@@ -9,6 +9,7 @@
       <PatientField field="Age" :value="patient.age_at_diagnosis" />
       <PatientField field="Status" :value="props.patient.displayStatus()" />
       <PatientField field="Stage" :value="patient.stage" />
+      <PatientField field="Genomics data" :value="patient.displayHasGenomics()" />
     </div>
 
     <div class="footer">

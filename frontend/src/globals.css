@@ -14,6 +14,11 @@
 
   accent-color: var(--primary);
   line-height: 1.3;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  scroll-behavior: auto;
 }
 
 html,
@@ -25,8 +30,8 @@ body,
 
 body {
   background: linear-gradient(180deg,
-    #172876 0%,
-    #5980C1 60%);
+      #172876 0%,
+      #5980C1 60%);
 }
 
 #app {
@@ -36,6 +41,7 @@ body {
 
 a {
   color: var(--primary);
+  cursor: pointer;
   text-decoration: none;
 
   &:hover {
@@ -49,7 +55,8 @@ button {
   border: none;
   color: var(--white);
   cursor: pointer;
-  font-weight: normal; /* Needed in Firefox for some reason */
+  font-weight: normal;
+  /* Needed in Firefox for some reason */
   padding: 0.5em 0.75em;
   transition: background-color 0.1s;
 }

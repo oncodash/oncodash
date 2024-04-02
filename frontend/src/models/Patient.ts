@@ -1,3 +1,4 @@
+import { GenomicData } from "./GenomicData"
 import { PatientDTO } from "./PatientDTO"
 
 export type PatientID = number
@@ -49,6 +50,9 @@ export class Patient {
   treatment_strategy: string | null
   weight_at_diagnosis: number | null
   wgs_available: boolean | null
+
+  // Field added and used in the PatientsListPage component
+  hasGenomics?: boolean
 
   constructor(patientDTO: PatientDTO) {
     this.age_at_diagnosis = patientDTO.age_at_diagnosis
@@ -105,5 +109,19 @@ export class Patient {
     if (this.progression === true) return 'Yes'
     else if (this.progression === false) return 'No'
     else return this.progression
+  }
+
+  displayHasGenomics(): string {
+    if (this.hasGenomics) return 'Yes'
+    return 'None'
+  }
+
+  static hasGenomics(genomicData: GenomicData): boolean {
+    const noData = genomicData.genomic.putative_functionally_relevant_variant[0] === 0
+      && genomicData.genomic.putative_functionally_neutral_variants[0] === 0
+      && genomicData.genomic.variants_of_unknown_functional_significance[0] === 0
+      && genomicData.genomic.other_alterations[0] === 0
+
+    return !noData
   }
 }
