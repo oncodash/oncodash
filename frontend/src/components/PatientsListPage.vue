@@ -12,8 +12,7 @@
     <select
       id="patients-filter-status"
       v-model="patientsStatus"
-      placeholder="Status"
-    >
+      placeholder="Status">
       <option value="">Patient status</option>
       <option value="True">Alive</option>
       <option value="False">Deceased</option>
@@ -101,16 +100,17 @@ import { computed, onMounted, ref, watch } from 'vue'
 import PatientCard from '../components/PatientCard.vue'
 import api from '../api'
 import router from '../router'
-import { Patient } from '../models/Patient'
+import { Patient, PatientID } from '../models/Patient'
 
 const patientsList = ref<Patient[]>([])
 const patientsFilter = ref<string>('')
 const patientsStatus = ref<string>('')
+const patientsWithGenomics: Record<PatientID, boolean> = {}
 
 /**
  * Fetch the list of patients when this page is loaded.
  */
- onMounted(async () => {
+onMounted(async () => {
   api.getPatientsList().then(async (response): Promise<void> => {
     patientsList.value = response.data.map(patientDTO => {
       return new Patient(patientDTO)
@@ -143,6 +143,12 @@ const pageOffset = computed<number>(() => {
 const pagesCount = computed<number>(() => {
   return Math.ceil(filteredPatients.value.length / pageSize.value)
 })
+const paginatedPatients = computed<Patient[]>(() => {
+  return filteredPatients.value.slice(
+    pageOffset.value,
+    pageOffset.value + pageSize.value
+  )
+})
 
 /**
  * Reset pagination when the page count changes
@@ -152,11 +158,24 @@ watch(pagesCount, () => {
   pageNumber.value = 1
 })
 
-const paginatedPatients = computed<Patient[]>(() => {
-  return filteredPatients.value.slice(
-    pageOffset.value,
-    pageOffset.value + pageSize.value
-  )
+/**
+ * Get the genomic data for each displayed patient in order to show
+ * a marker on the interface.
+ * @remarks
+ * It should not be implemented, but currently address the lack of data
+ * and api endpoint for this feature.
+ */
+watch(paginatedPatients, () => {
+  for (const patient of paginatedPatients.value) {
+    if (patientsWithGenomics[patient.patient_id] === undefined) {
+      api.getPatientGenomic(patient.patient_id).then((response) => {
+        patient.hasGenomics = Patient.hasGenomics(response.data)
+        patientsWithGenomics[patient.patient_id] = Patient.hasGenomics(response.data)
+      }).catch(err => {
+        console.log(err)
+      })
+    }
+  }
 })
 
 function goToFirstPage(): void {
