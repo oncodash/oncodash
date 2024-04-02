@@ -5,12 +5,12 @@
 
   <section class="patient-data" v-if="patient">
     <AppTabs>
-      <AppTabsPanel name="GENOMIC DATA">
-        <PatientGenomic :patient="patient"></PatientGenomic>
-      </AppTabsPanel>
-
       <AppTabsPanel name="CLINICAL DATA">
         <PatientClinical :patient="patient"></PatientClinical>
+      </AppTabsPanel>
+
+      <AppTabsPanel name="GENOMIC DATA">
+        <PatientGenomic :patient="patient"></PatientGenomic>
       </AppTabsPanel>
     </AppTabs>
   </section>
