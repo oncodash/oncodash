@@ -22,7 +22,7 @@ export class Patient {
   debulking_surgery_ids: boolean | null
   drug_trial_name: string | null
   drug_trial_unblinded: boolean | null
-  event_series: string | null
+  event_series: Record<string, any> | null
   followup_time: number | null
   germline_pathogenic_variant: string | null
   height_at_diagnosis: number | null
@@ -46,7 +46,7 @@ export class Patient {
   sequencing_available: boolean | null
   stage: string | null
   survival: string | null
-  time_series: string | null
+  time_series: Record<string, any> | null
   treatment_strategy: string | null
   weight_at_diagnosis: number | null
   wgs_available: boolean | null
@@ -69,7 +69,7 @@ export class Patient {
     this.debulking_surgery_ids = patientDTO.debulking_surgery_ids
     this.drug_trial_name = patientDTO.drug_trial_name
     this.drug_trial_unblinded = patientDTO.drug_trial_unblinded
-    this.event_series = patientDTO.event_series
+    this.event_series = patientDTO.event_series ? JSON.parse(patientDTO.event_series) : null
     this.followup_time = patientDTO.followup_time
     this.germline_pathogenic_variant = patientDTO.germline_pathogenic_variant
     this.height_at_diagnosis = patientDTO.height_at_diagnosis
@@ -93,7 +93,7 @@ export class Patient {
     this.sequencing_available = patientDTO.sequencing_available
     this.stage = patientDTO.stage
     this.survival = patientDTO.survival
-    this.time_series = patientDTO.time_series
+    this.time_series = patientDTO.time_series ? JSON.parse(patientDTO.time_series) : null
     this.treatment_strategy = patientDTO.treatment_strategy
     this.weight_at_diagnosis = patientDTO.weight_at_diagnosis
     this.wgs_available = patientDTO.wgs_available

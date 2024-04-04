@@ -18,7 +18,7 @@ export default defineConfig({
   define: {
     // Bundle feature flags to make the build slightly lighter.
     // https://github.com/vuejs/core/tree/main/packages/vue#bundler-build-feature-flags
-    __VUE_OPTIONS_API__: false,
+    __VUE_OPTIONS_API__: true,
     __VUE_PROD_DEVTOOLS__: false,
 
     // URL of the backend

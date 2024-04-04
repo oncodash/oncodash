@@ -11,6 +11,7 @@
     "build": "vue-tsc && vite build"
   },
   "dependencies": {
+    "@canvasjs/vue-stockcharts": "^1.0.4",
     "@vueuse/integrations": "^10.7.2",
     "axios": "^1.6.7",
     "linkify-html": "^4.1.3",

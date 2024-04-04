@@ -28,13 +28,15 @@
   </section>
 
   <section class="timelines">
-    <div>No time series data available for this patient</div>
+    <PatientTimelines v-if="patient.time_series" :patient="patient"/>
+    <div v-else class="no-data">No time series available for this patient</div>
   </section>
 </template>
 
 <script setup lang="ts">
 import { Patient } from '../models/Patient'
 import PatientField from './PatientField.vue'
+import PatientTimelines from './PatientTimelines.vue'
 
 defineProps<{
   patient: Patient
@@ -42,7 +44,8 @@ defineProps<{
 </script>
 
 <style scoped>
-.clinical-data {
+.clinical-data,
+.timelines {
   display: flex;
   flex-flow: row wrap;
   gap: var(--spacing);
@@ -60,7 +63,7 @@ defineProps<{
   text-align: center;
 }
 
-.timelines {
+.timelines .no-data {
   text-align: center;
   padding: var(--spacing);
   font-style: italic;
