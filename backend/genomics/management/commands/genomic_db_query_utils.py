@@ -18,7 +18,7 @@ from genomics.management.commands.import_genomic_variants import map_cohort_code
 import json
 import cryptocode
 
-from backend.genomics.models import AlterationTypeLCase
+from genomics.models import AlterationTypeLCase
 
 http = urllib3.PoolManager()
 
