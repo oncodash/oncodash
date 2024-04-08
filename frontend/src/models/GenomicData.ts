@@ -3,15 +3,13 @@
  */
 export interface GenomicData {
   genomic: {
-    putative_functionally_relevant_variant: [number, string]
-    variants_of_unknown_functional_significance: [number, string]
-    putative_functionally_neutral_variants: [number, string]
-    other_alterations: [number, string]
+    actionable_relevant_targets: [number, string]
+    putative_functionally_relevant_variants: [number, string]
+    other_variants: [number, string]
   }
-  putative_functionally_relevant_variant: Record<string, GeneData>
-  variants_of_unknown_functional_significance: Record<string, GeneData>
-  putative_functionally_neutral_variants: Record<string, GeneData>
-  other_alterations: Record<string, GeneData>
+  actionable_relevant_targets: Record<string, GeneData>
+  putative_functionally_relevant_variants: Record<string, GeneData>
+  other_variants: Record<string, GeneData>
 }
 
 export interface GeneData {
