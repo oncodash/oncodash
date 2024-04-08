@@ -14,6 +14,13 @@ class AlterationType(Enum):
     def __str__(self):
         return str(self.value)
 
+class AlterationTypeLCase(Enum):
+    AMP = "Amplification"
+    DEL = "Deletion"
+    UNK = "Unknown"
+    def __str__(self):
+        return str(self.value)
+
 class ActionableTarget(models.Model):
 
     gene = models.CharField(max_length=15, primary_key=True, default=None, blank=False, null=False)
@@ -186,6 +193,9 @@ class CGIDrugPrescriptions(models.Model):
     resistance = models.CharField(max_length=128, default=None, blank=True, null=True) # co-occurring alteration
     tumor_type = models.CharField(max_length=32, default=None, blank=True, null=True)
 
+    class Meta:
+        unique_together = ['patient_id', 'sample', 'alterations', 'biomarker', 'evidence']
+
 class OncoKBAnnotation(models.Model):
 
     patient_id = models.IntegerField()
@@ -230,4 +240,4 @@ class OncoKBAnnotation(models.Model):
     vus = models.BooleanField(default=False, blank=True, null=True)
 
     class Meta:
-        unique_together = ['sample_id', 'entrezGeneId', 'alteration']
+        unique_together = ['sample_id', 'hugoSymbol', 'alteration']

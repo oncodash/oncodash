@@ -18,6 +18,8 @@ from genomics.management.commands.import_genomic_variants import map_cohort_code
 import json
 import cryptocode
 
+from backend.genomics.models import AlterationTypeLCase
+
 http = urllib3.PoolManager()
 
 class NotEqual(Lookup):
@@ -109,21 +111,27 @@ def get_cnas(patient_id):
         logging.exception(e)
         print("No CNAs for patient", patient_id, "available in the database")
 
-def get_cnas_by_cn_and_ploidy(patient_id, targets=None):
+def get_cnas_by_cn_and_ploidy(patient_id, logr_threshold=1.5, cnthreshold = 9, targets=None):
     try:
-
+        
         # Filter significant CNAs by purifiedLogR >= 1.5 (median 9 copies) or nMajor+nMinor >= 2.5*ploidy == Amplification,  nMajor+nMinor=0 == Deletion
         dels = CopyNumberAlteration.objects.filter(patient_id=patient_id).annotate(cn=F('nMinor') + F('nMajor')).filter(cn=0)
         for d in dels:
+            print("q: ",d.gene)
             d.CNstatus="DEL"
             d.save()
-        cnthreshold = 2.5*(2**1.5)
-        amps = CopyNumberAlteration.objects.filter(patient_id=patient_id).annotate(cn=F('nMinor') + F('nMajor')).filter(Q(cn__gte=cnthreshold) | Q(purifiedLogR__gte=1.5))
+        #cnthreshold = 2.5*(2**1.5)
+
+        amps = CopyNumberAlteration.objects.filter(patient_id=patient_id).annotate(cn=F('nMinor') + F('nMajor')).filter(Q(cn__gte=cnthreshold) | Q(purifiedLogR__gte=logr_threshold))
         for a in amps:
+            print("q: ",a.gene)
             a.CNstatus="AMP"
             a.save()
         # Filter by gene target list
         if targets:
+            ap = amps.filter(gene__in=targets)
+            for a in ap:
+                print(a.gene)
             return dels.filter(gene__in=targets).union(amps.filter(gene__in=targets))
         else:
             return dels.union(amps)
@@ -173,9 +181,16 @@ def get_all_actionable_snvs_by_aaChangeRefGene():
         logging.exception(e)
         print("No actionable SNVs available in the database")
 
-def get_all_exonic_snvs_of_patient(patient_id):
+def get_all_exonic_snvs_of_patient(patient_id, targets=None):
     try:
-        return SomaticVariant.objects.filter(patient_id=patient_id, funcRefGene="exonic")
+        if targets:
+            actionable = []
+            for gene in targets:
+                actionable.append(SomaticVariant.objects.filter(patient_id=patient_id, funcRefGene="exonic").filter(Q(geneMANE__contains=str(gene.gene)) | Q(geneRefGene__contains=str(gene.gene))))
+            joined = list(chain(*actionable))
+            return joined
+        else:
+            return SomaticVariant.objects.filter(patient_id=patient_id, funcRefGene="exonic")
 
     except Exception as e:
         logging.exception(e)
@@ -237,9 +252,12 @@ def query_cgi_job(patient_id, jobid):
             #['Input ID', 'CHROMOSOME', 'POSITION', 'REF', 'ALT', 'chr', 'pos', 'ref','alt', 'ALT_TYPE', 'STRAND', 'CGI-Sample ID', 'CGI-Gene', 'CGI-Protein Change', 'CGI-Oncogenic Summary', 'CGI-Oncogenic Prediction', 'CGI-External oncogenic annotation','CGI-Mutation', 'CGI-Consequence', 'CGI-Transcript', 'CGI-STRAND', 'CGI-Type', 'CGI-HGVS', 'CGI-HGVSc', 'CGI-HGVSp']
 
             if fn == "alterations.tsv":
-                alts = df.loc[~(df['CGI-Oncogenic Summary'] == 'non-protein affecting')]
-                for index, row in alts.iterrows():
+                for index, row in df.iterrows():
+                    #if handle_string_field(row["CGI-Oncogenic Prediction"]) != None and handle_string_field(row["CGI-Oncogenic Prediction"]).find("driver") <= 0:
+                    #    continue
                     try:
+                        print("alterations: ", row.keys)
+                        print("Alterations: ", row.values)
                         rec, created = CGIMutation.objects.get_or_create(
                             patient_id      = int(patient_id),
                             sample = handle_string_field(cryptocode.decrypt(row["CGI-Sample ID"], settings.CRYPTOCODE)),
@@ -267,9 +285,12 @@ def query_cgi_job(patient_id, jobid):
             # sample	gene	cna	predicted_in_tumors	known_in_tumors	gene_role	cancer	internal_id	driver	driver_statement	predicted_match	known_match
             # single_sample	ERBB2	AMP	CESC;ESCA;HNSC;LUAD;PAAD;STAD;UCEC	BRCA;OV;CANCER;NSCLC;ST;BT;COREAD;BLCA;GEJA;HNC;ED	Act	OVE	0	known	known in: BRCA;OV;CANCER;NSCLC;ST;BT;COREAD;BLCA;GEJA;HNC;ED
             if fn == "cna_analysis.tsv":
-                cnas = df.loc[~(df['gene_role'] == 'ambiguous')]
+                cnas = df.loc[~(df['driver_statement'] == 'known')]
                 for index, row in cnas.iterrows():
                     try:
+                        print("cna_analysis: ", row.keys)
+                        print("cna_analysis: ", row.values)
+
                         rec, created = CGICopyNumberAlteration.objects.get_or_create(
                             patient_id   = int(patient_id),
                             sample = handle_string_field(cryptocode.decrypt(row["sample"], settings.CRYPTOCODE)),
@@ -321,6 +342,8 @@ def query_cgi_job(patient_id, jobid):
                 bioms = df.loc[df['Match'] == 'YES']
                 for index, row in bioms.iterrows():
                     try:
+
+                        print("biomarkers: : ", row.keys)
                         rec, created = CGIDrugPrescriptions.objects.get_or_create(
                             patient_id  = int(patient_id),
                             sample = handle_string_field(cryptocode.decrypt(row["Sample ID"], settings.CRYPTOCODE)),
@@ -345,6 +368,263 @@ def query_cgi_job(patient_id, jobid):
         print(response.status)
         print("No CGI results available for job id: "+str(jobid))
         return 0
+
+def query_cgi_job_merge_db(patient_id, jobid):
+    """
+      Query the CGI API with a job id and save the results to the database.
+
+      Parameters:
+          patient_id (int): The ID of the patient for whom the job was run.
+          jobid (str): The job ID for the CGI job to query.
+
+    """
+    request_url = "https://www.cancergenomeinterpreter.org/api/v1/"
+    print("Request CGI job by id")
+
+    cgilogin = settings.CGI_LOGIN
+    cgitoken = settings.CGI_TOKEN
+
+    headers = {
+        'Authorization': cgilogin + ' ' + cgitoken
+    }
+    payload = {'action':'download'}
+    response = http.request("GET",request_url+jobid, headers=headers, fields=payload)
+
+    if response.status == 200:
+        z = zipfile.ZipFile(io.BytesIO(response.data))
+        fnames=z.namelist()
+        for fn in fnames:
+            # reader = z.open(f)
+            # for row in reader.readlines():
+            #    print(row)
+            z.extract(fn)
+            df = pd.read_csv(fn, sep="\t")
+            print(fn)
+            print(df)
+
+            #Response filenames
+            #alterations.tsv
+            #drug_prescription.tsv
+            #fusion_analysis.tsv
+            #biomarkers.tsv
+
+            if fn == "biomarkers.tsv":
+                bioms = df.loc[df['Match'] == 'YES']
+                for index, row in bioms.iterrows():
+                    try:
+                        rec, created = CGIDrugPrescriptions.objects.get_or_create(
+                            patient_id  = int(patient_id),
+                            sample = handle_string_field(cryptocode.decrypt(row["Sample ID"], settings.CRYPTOCODE)),
+                            alterations = handle_string_field(row["Alterations"]),
+                            biomarker = handle_string_field(row["Biomarker"]),
+                            drugs = handle_string_field(row["Drugs"]),
+                            diseases = handle_string_field(row["Diseases"]),
+                            response = handle_string_field(row["Response"]),
+                            evidence = handle_string_field(row["Evidence"]),
+                            match = handle_boolean_field(row["Match"]),
+                            source = handle_string_field(row["Source"]),
+                            biom = handle_string_field(row["BioM"]),
+                            resistance = handle_int_field(row["Resist."]),
+                            tumor_type = handle_string_field(row["Tumor type"])
+                        )
+                        rec.save()
+                    except Exception as e:
+                        logging.exception(e)
+                        pass
+
+            # Mutation Query
+            # chr	pos	ref	alt
+            # chr3	178936091	G	A
+
+            # Mutation response
+            #['Input ID', 'CHROMOSOME', 'POSITION', 'REF', 'ALT', 'chr', 'pos', 'ref','alt', 'ALT_TYPE', 'STRAND', 'CGI-Sample ID', 'CGI-Gene', 'CGI-Protein Change', 'CGI-Oncogenic Summary', 'CGI-Oncogenic Prediction', 'CGI-External oncogenic annotation','CGI-Mutation', 'CGI-Consequence', 'CGI-Transcript', 'CGI-STRAND', 'CGI-Type', 'CGI-HGVS', 'CGI-HGVSc', 'CGI-HGVSp']
+
+            if fn == "alterations.tsv":
+                for index, row in df.iterrows():
+                    #if handle_string_field(row["CGI-Oncogenic Prediction"]) != None and handle_string_field(row["CGI-Oncogenic Prediction"]).find("driver") <= 0:
+                    #    continue
+
+                    try:
+                        rec, created = CGIMutation.objects.get_or_create(
+                            patient_id      = int(patient_id),
+                            sample = handle_string_field(cryptocode.decrypt(row["CGI-Sample ID"], settings.CRYPTOCODE)),
+                            gene  = handle_string_field(row["CGI-Gene"]),
+                            protein_change   = handle_string_field(row["CGI-Protein Change"]),
+                            oncogenic_summary    = handle_string_field(row["CGI-Oncogenic Summary"]),
+                            oncogenic_prediction      = handle_string_field(row["CGI-Oncogenic Prediction"]),
+                            ext_oncogenic_annotation  = handle_string_field(row["CGI-External oncogenic annotation"]),
+                            mutation = handle_string_field(row["CGI-Mutation"]),
+                            consequence = handle_string_field(row["CGI-Consequence"]),
+                            transcript = handle_string_field(row["CGI-Transcript"]),
+                            strand = handle_string_field(row["CGI-STRAND"]),
+                            type = handle_string_field(row["CGI-Type"])
+                        )
+                        rec, created = OncoKBAnnotation.objects.get_or_create(
+                            patient_id=int(patient_id),
+                            sample_id=handle_string_field(cryptocode.decrypt(row["CGI-Sample ID"], settings.CRYPTOCODE)),
+                            hugoSymbol=handle_string_field(row["CGI-Gene"]),
+                            #entrezGeneId=handle_string_field(rjson["query"]["entrezGeneId"]),
+                            alteration=handle_string_field(rjson["query"]["alteration"]),
+                            #alterationType=handle_string_field(rjson["query"]["alterationType"]),
+                            svType=handle_string_field(rjson["query"]["svType"]),
+                            tumorType=handle_string_field(rjson["query"]["tumorType"]),
+                            consequence=handle_string_field(rjson["query"]["consequence"]),
+                            proteinStart=handle_int_field(rjson["query"]["proteinStart"]),
+                            proteinEnd=handle_int_field(rjson["query"]["proteinEnd"]),
+                            hgvs=handle_string_field(rjson["query"]["hgvs"]),
+                            geneExist=handle_boolean_field(rjson["geneExist"]),
+                            variantExist=handle_boolean_field(rjson["variantExist"]),
+                            alleleExist=handle_boolean_field(rjson["alleleExist"]),
+                            oncogenic=handle_string_field(rjson["oncogenic"]),
+                            mutationEffectDescription=handle_string_field(rjson["mutationEffect"]["description"]),
+                            knownEffect=handle_string_field(rjson["mutationEffect"]["knownEffect"]),
+                            citationPMids=handle_string_field(",".join(rjson["mutationEffect"]["citations"]["pmids"])),
+                            citationAbstracts=handle_string_field(
+                                str(rjson["mutationEffect"]["citations"]["abstracts"])),
+                            highestSensitiveLevel=handle_string_field(rjson["highestSensitiveLevel"]),
+                            highestResistanceLevel=handle_string_field(rjson["highestResistanceLevel"]),
+                            highestDiagnosticImplicationLevel=handle_string_field(
+                                rjson["highestDiagnosticImplicationLevel"]),
+                            highestPrognosticImplicationLevel=handle_string_field(
+                                rjson["highestPrognosticImplicationLevel"]),
+                            highestFdaLevel=handle_string_field(rjson["highestFdaLevel"]),
+                            otherSignificantSensitiveLevels=handle_string_field(
+                                rjson["otherSignificantSensitiveLevels"]),
+                            otherSignificantResistanceLevels=handle_string_field(
+                                rjson["otherSignificantResistanceLevels"]),
+                            hotspot=handle_boolean_field(rjson["hotspot"]),
+                            geneSummary=handle_string_field(rjson["geneSummary"]),
+                            variantSummary=handle_string_field(rjson["variantSummary"]),
+                            tumorTypeSummary=handle_string_field(rjson["tumorTypeSummary"]),
+                            prognosticSummary=handle_string_field(rjson["prognosticSummary"]),
+                            diagnosticSummary=handle_string_field(rjson["diagnosticSummary"]),
+                            diagnosticImplications=handle_string_field(rjson["diagnosticImplications"]),
+                            prognosticImplications=handle_string_field(rjson["prognosticImplications"]),
+                            treatments=handle_treatments_field(rjson["treatments"]),
+                            dataVersion=handle_string_field(rjson["dataVersion"]),
+                            lastUpdate=handle_date_field(rjson["lastUpdate"]),
+                            vus=handle_boolean_field(rjson["vus"])
+                        )
+
+                        rec.save()
+                    except Exception as e:
+                        logging.exception(e)
+                        pass
+
+
+            # CNA Query
+            # gene	cna
+            # ERBB2	AMP
+            # CNA response
+            # sample	gene	cna	predicted_in_tumors	known_in_tumors	gene_role	cancer	internal_id	driver	driver_statement	predicted_match	known_match
+            # single_sample	ERBB2	AMP	CESC;ESCA;HNSC;LUAD;PAAD;STAD;UCEC	BRCA;OV;CANCER;NSCLC;ST;BT;COREAD;BLCA;GEJA;HNC;ED	Act	OVE	0	known	known in: BRCA;OV;CANCER;NSCLC;ST;BT;COREAD;BLCA;GEJA;HNC;ED
+            if fn == "cna_analysis.tsv":
+                cnas = df.loc[~(df['driver_statement'] == 'known')]
+                for index, row in cnas.iterrows():
+                    try:
+                        # TODO: get matches from biomarkers CGIDrugPrescriptions.objects.filter
+                        cgi_biomarkers = CGIDrugPrescriptions.objects.all().filter(patient_id=patient_id)
+                        cgi_biomarkers.filter(alterations=handle_string_field(row["gene"])+":"+handle_string_field(row["cna"]).lower())
+                        rec, created = CGICopyNumberAlteration.objects.get_or_create(
+                            patient_id   = int(patient_id),
+                            sample = handle_string_field(cryptocode.decrypt(row["sample"], settings.CRYPTOCODE)),
+                            gene = handle_string_field(row["gene"]),
+                            cnatype = handle_string_field(row["cna"]),
+                            predicted_in_tumors = handle_string_field(row["predicted_in_tumors"]),
+                            known_in_tumors = handle_string_field(row["known_in_tumors"]),
+                            gene_role = handle_string_field(row["gene_role"]),
+                            cancer = handle_string_field(row["cancer"]),
+                            driver = handle_string_field(row["driver"]),
+                            driver_statement = handle_string_field(row["driver_statement"]),
+                            predicted_match = handle_string_field(row["predicted_match"]),
+                            known_match = handle_string_field(row["known_match"])
+                        )
+                        rec, created = OncoKBAnnotation.objects.get_or_create(
+                            patient_id=int(patient_id),
+                            sample_id=handle_string_field(cryptocode.decrypt(row["sample"], settings.CRYPTOCODE)),
+                            hugoSymbol=handle_string_field(row["gene"]),
+                            # entrezGeneId=handle_string_field(rjson["query"]["entrezGeneId"]),
+                            alteration=handle_string_field(AlterationTypeLCase[row["cna"]].value),
+                            # alterationType=handle_string_field(rjson["query"]["alterationType"]),
+                            # svType=handle_string_field(rjson["query"]["svType"]),
+                            tumorType=handle_string_field(row["cancer"]),
+                            #consequence=handle_string_field(rjson["query"]["consequence"]),
+                            #proteinStart=handle_int_field(rjson["query"]["proteinStart"]),
+                            #proteinEnd=handle_int_field(rjson["query"]["proteinEnd"]),
+                            #hgvs=handle_string_field(rjson["query"]["hgvs"]),
+                            #geneExist=handle_boolean_field(rjson["geneExist"]),
+                            #variantExist=handle_boolean_field(rjson["variantExist"]),
+                            #alleleExist=handle_boolean_field(rjson["alleleExist"]),
+                            oncogenic=handle_string_field(row["driver"]),
+                            #mutationEffectDescription=handle_string_field(rjson["mutationEffect"]["description"]),
+                            knownEffect=handle_string_field(row["gene_role"]),
+                            citationPMids=handle_string_field(",".join(rjson["mutationEffect"]["citations"]["pmids"])),
+                            citationAbstracts=handle_string_field(
+                                str(rjson["mutationEffect"]["citations"]["abstracts"])),
+                            highestSensitiveLevel=handle_string_field(rjson["highestSensitiveLevel"]),
+                            highestResistanceLevel=handle_string_field(rjson["highestResistanceLevel"]),
+                            highestDiagnosticImplicationLevel=handle_string_field(
+                                rjson["highestDiagnosticImplicationLevel"]),
+                            highestPrognosticImplicationLevel=handle_string_field(
+                                rjson["highestPrognosticImplicationLevel"]),
+                            highestFdaLevel=handle_string_field(rjson["highestFdaLevel"]),
+                            otherSignificantSensitiveLevels=handle_string_field(
+                                rjson["otherSignificantSensitiveLevels"]),
+                            otherSignificantResistanceLevels=handle_string_field(
+                                rjson["otherSignificantResistanceLevels"]),
+                            hotspot=handle_boolean_field(rjson["hotspot"]),
+                            geneSummary=handle_string_field(rjson["geneSummary"]),
+                            variantSummary=handle_string_field(rjson["variantSummary"]),
+                            tumorTypeSummary=handle_string_field(rjson["tumorTypeSummary"]),
+                            prognosticSummary=handle_string_field(rjson["prognosticSummary"]),
+                            diagnosticSummary=handle_string_field(rjson["diagnosticSummary"]),
+                            diagnosticImplications=handle_string_field(rjson["diagnosticImplications"]),
+                            prognosticImplications=handle_string_field(rjson["prognosticImplications"]),
+                            treatments=handle_treatments_field(rjson["treatments"]),
+                            dataVersion=handle_string_field(rjson["dataVersion"]),
+                            lastUpdate=handle_date_field(rjson["lastUpdate"]),
+                            vus=handle_boolean_field(rjson["vus"])
+                        )
+                        rec.save()
+                    except Exception as e:
+                        logging.exception(e)
+                        pass
+            # Fusion/Transloc Query
+            # fus
+            # BCR__ABL1
+            # Fusion/Transloc response
+            # sample	fus	effector_gene	gene_role	known_in_tumors	internal_id	cancer	driver	driver_statement	known_match
+            # single_sample	ABL1__BCR	ABL1	Act	ALL;CML;CLL;AML;TCALL	0	OVE	known	known in: ALL;CML;CLL;AML;TCALL
+
+            if fn == "fusion_analysis.tsv":
+                for index, row in df.iterrows():
+                    try:
+                        rec, created = CGIFusionGene.objects.get_or_create(
+                            patient_id   = int(patient_id),
+                            sample = handle_string_field(cryptocode.decrypt(row["sample"], settings.CRYPTOCODE)),
+                            fusiongene = handle_string_field(row["fus"]),
+                            effector_gene = handle_string_field(row["effector_gene"]),
+                            gene_role = handle_string_field(row["gene_role"]),
+                            known_in_tumors = handle_string_field(row["known_in_tumors"]),
+                            cancer = handle_string_field(row["cancer"]),
+                            driver = handle_string_field(row["driver"]),
+                            driver_statement = handle_string_field(row["driver_statement"]),
+                            known_match = handle_string_field(row["known_match"])
+                        )
+                        rec.save()
+                    except Exception as e:
+                        logging.exception(e)
+                        pass
+
+            # Sample ID	Alterations	Biomarker	Drugs	Diseases	Response	Evidence	Match	Source	BioM	Resist.	Tumor type
+            # single_sample	ABL1__BCR 	ABL1 (T315I,V299L,G250E,F317L)	Bosutinib (BCR-ABL inhibitor 3rd gen)	Acute lymphoblastic leukemia, Chronic myeloid leukemia	Resistant	A	NO	cgi	only gene		ALL, CML
+
+        return 1
+    else:
+        print(response.status)
+        print("No CGI results available for job id: "+str(jobid))
+        return 0
+
 
 def generate_temp_cgi_query_files(snvs: [SomaticVariant], cnas: [CopyNumberAlteration], translocs: [str]):
 
@@ -405,14 +685,14 @@ def launch_cgi_job_with_mulitple_variant_types(mutations_file, cnas_file, transl
 
     if cnas_file:
         payload = {
-            'cancer_type': cancer_type,
+            'cancer_type': "CANCER",
             'title': 'Title',
             'reference': reference,
             'cnas': ('cnas.ext', open(cnas_file, 'rb').read(), 'application/octet-stream')
         }
     if mutations_file:
         payload = {
-            'cancer_type': cancer_type,
+            'cancer_type': "CANCER",
             'title': 'Title',
             'reference': reference,
             'mutations': ('snvs.ext', open(mutations_file, 'rb').read(), 'application/octet-stream'),
@@ -584,9 +864,10 @@ def query_oncokb_cnas(cnas: [CopyNumberAlteration], tumorType):
     if (response.status == 200):
 
         respjson = json.loads(response.data.decode('utf-8'))
-        print(respjson)
+        #print(data)
+        #print(respjson)
         for rjson in respjson:
-            #print("OBJ", rjson)
+            print(handle_string_field(rjson["query"]["hugoSymbol"]))
 
             rec, created = OncoKBAnnotation.objects.get_or_create(
                 patient_id  = str(cryptocode.decrypt(rjson["query"]["id"], settings.CRYPTOCODE)).split(":")[0],
@@ -665,7 +946,7 @@ def query_oncokb_cna_direct(geneid, cnatype, tumorType, patient_id, sample_id):
     print("Request OncoKB API "+request_url)
     response = http.request("GET",request_url, headers=header)
     print(response.status)
-    print(response.url)
+    #print(response.url)
     if (response.status == 200):
         rjson = json.loads(response.data.decode('utf-8'))
 
@@ -819,6 +1100,17 @@ def query_oncokb_somatic_mutations(snvs: [SomaticVariant] , tumorType):
     token = settings.ONCOKB_TOKEN
     header = {"accept":"application/json", 'Content-Type': 'application/json', "Authorization":'Bearer '+token}
     request_url = "https://www.oncokb.org/api/v1/annotate/mutations/byGenomicChange"
+    #request_url = "https://www.oncokb.org/api/v1/annotate/mutations/byHGVSg"
+
+    # data = [
+    #     {
+    #         "id": f"{cryptocode.encrypt(str(snvs[i].patient_id) + ':' + snvs[i].samples + ':' + str(i), settings.CRYPTOCODE)}",
+    #         "hgvsg": f"{snvs[i].chromosome + ':g.' + str(snvs[i].position) + snvs[i].reference_allele + '>' + snvs[i].sample_allele}",
+    #         "tumorType": f"{tumorType}",
+    #         "referenceGenome": "GRCh38"
+    #     }
+    #     for i in range(len(snvs))
+    # ]
 
     data = [
         {
@@ -829,26 +1121,30 @@ def query_oncokb_somatic_mutations(snvs: [SomaticVariant] , tumorType):
         }
         for i in range(len(snvs))
     ]
-    #print(json.dumps(data, indent=4))
+
+    print(json.dumps(data, indent=4))
 
     # Sending a GET request and getting back response as HTTPResponse object.
     print("Request OncoKB API "+request_url)
     response = http.request("POST", request_url, body=json.dumps(data).encode('utf-8'), headers=header)
-    print(data)
+
     # response = http.request("GET",request_url, headers=header)
     print(response.status)
-    # print(response.json())
+
     #TODO: check why EGFR chr7,55181426,55181427,A,C  is not found but is found from web api (and also from CGI)
     if (response.status == 200):
 
         respjson = json.loads(response.data.decode('utf-8'))
+        print(json.dumps(respjson, indent=4))
         for rjson in respjson:
 
-            if handle_string_field(rjson["oncogenic"]) != "Unknown":
-                print("OBJ", rjson)
+            if handle_string_field(rjson["query"]["hugoSymbol"]) is not None and len(rjson["query"]["alteration"]) > 0 and handle_string_field(rjson["query"]["consequence"]) is not "synonymous_variant":
+                #print("OBJ", rjson)
+                
                 sids = str(cryptocode.decrypt((rjson["query"]["id"]), settings.CRYPTOCODE)).split(":")[1].split(";") #TODO: encrypt ids also in oncokb
                 pid = str(cryptocode.decrypt((rjson["query"]["id"]), settings.CRYPTOCODE)).split(":")[0]
                 for sid in sids:
+                    print(handle_string_field(rjson["query"]["hugoSymbol"]))
                     rec, created = OncoKBAnnotation.objects.get_or_create(
                     patient_id=pid,
                     sample_id=sid,
@@ -1008,6 +1304,7 @@ class Command(BaseCommand):
         parser.add_argument('--gene', type=str, help='Give gene name (in format eg. BRCA1)')
         parser.add_argument('--refid', type=str,  help='Give reference id (in dbSNP format eg. rs61769312)')
         parser.add_argument('--cna',  action='store_true', help='')
+        parser.add_argument('--cancer', type=str, default='HGSOC', help='HGSOC, OV, CANCER')
         parser.add_argument('--cnatype', type=str, help='AMP,DEL')
         parser.add_argument('--targetall', action='store_true', help='Query all targetable variants from OncoKB actionable target list')
         parser.add_argument('--fusgenes', type=str,  help='Give a list of fusion genes eg. BCR__ABL1,PML__PARA')
@@ -1020,6 +1317,8 @@ class Command(BaseCommand):
         parser.add_argument('--actionable', action='store_true', help='Query by significant copy number threshold. Default is minimum of 8 copies for AMP or minimum ploidy 2, and 0 for DEL. For somatic mutations OncoKB actionable target list is used as reference.')
         parser.add_argument('--proteinchange',  action='store_true', help='')
         parser.add_argument('--genelist', type=str, help='')
+        parser.add_argument('--logrthr', type=float, default=1.5, help='logr threshold for filtering by ploidy')
+        parser.add_argument('--cnthr', type=int, default=9, help='Copy number threshold')
         parser.add_argument('--single', action='store_true', help='')
         parser.add_argument('--all', action='store_true', help='')
         parser.add_argument('--direct', action='store_true', help='')
@@ -1034,54 +1333,59 @@ class Command(BaseCommand):
         #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --oncokbcna --geneid=ENSG00000230280 --patientid=1"
         if kwargs["oncokbcna"] and kwargs["geneid"] and not kwargs["direct"]:
             cna = get_cna(kwargs["patientid"], kwargs["geneid"])
-            resp = query_oncokb_cna(cna, "HGSOC")
+            resp = query_oncokb_cna(cna, kwargs["cancer"])
             print(json.dumps(resp.json(), indent=4))
         if kwargs["oncokbcna"] and kwargs["gene"] and not kwargs["direct"] and not kwargs["cnatype"]:
             cna = get_cna_by_gene(kwargs["patientid"], kwargs["gene"])
-            resp = query_oncokb_cna(cna, "HGSOC")
+            resp = query_oncokb_cna(cna, kwargs["cancer"])
             print(json.dumps(resp.json(), indent=4))
         if kwargs["oncokbcna"] and kwargs["direct"]:
-            resp = query_oncokb_cna_direct(kwargs["geneid"], kwargs["cnatype"],"HGSOC", kwargs["patientid"], kwargs["cohortcode"])
+            resp = query_oncokb_cna_direct(kwargs["geneid"], kwargs["cnatype"],kwargs["cancer"], kwargs["patientid"], kwargs["cohortcode"])
             print(json.dumps(resp.json(), indent=4))
         if kwargs["oncokbcna"] and kwargs["all"] and kwargs["patientid"]:
             cnas = get_cnas(kwargs["patientid"])
-            query_oncokb_cnas(cnas, "HGSOC")
+            query_oncokb_cnas(cnas, kwargs["cancer"])
         if kwargs["oncokbcna"] and kwargs["all"] and kwargs["cnatype"]:
             for pid in ClinicalData.objects.order_by().values('patient_id').distinct():
                 cnas = get_cnas_by_type(pid['patient_id'], kwargs["cnatype"])
-                query_oncokb_cnas(cnas, "HGSOC")
+                query_oncokb_cnas(cnas, kwargs["cancer"])
                 time.sleep(1)
         if kwargs["oncokbcna"] and kwargs["cnatype"] and kwargs["patientid"] and not kwargs["gene"]:
             cnas = get_cnas_by_type(kwargs["patientid"], kwargs["cnatype"])
-            query_oncokb_cnas(cnas, "HGSOC")
+            query_oncokb_cnas(cnas, kwargs["cancer"])
         if kwargs["oncokbcna"] and kwargs["cnatype"] and kwargs["gene"] and kwargs["patientid"]:
             cnas = get_cnas_by_type_and_gene(kwargs["patientid"], kwargs["cnatype"], kwargs["gene"])
-            query_oncokb_cnas(cnas, "HGSOC")
+            query_oncokb_cnas(cnas, kwargs["cancer"])
 
         #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --oncokbsnv=rs61769312 --patientid=1"
         if kwargs["oncokbsnv"] and kwargs["refid"]:
             snv = get_snv(kwargs["patientid"], kwargs["refid"])
-            resp = query_oncokb_somatic_mutation(snv, "HGSOC")
+            resp = query_oncokb_somatic_mutation(snv, kwargs["cancer"])
             print(json.dumps(resp.json(), indent=4))
-        if kwargs["oncokbsnv"] and kwargs["proteinchange"] and kwargs["patientid"]: # Query all exonic mutations for given patient
-            snvs = get_actionable_snvs_by_aaChangeRefGene(kwargs["patientid"])
-            query_oncokb_somatic_mutations(snvs, "HGSOC")
-        if kwargs["oncokbsnv"] and kwargs["exonic"] and kwargs["patientid"]: # Query all exonic mutations for given patient
-            snvs = get_all_exonic_snvs_of_patient(kwargs["patientid"])
-            chunks = [snvs[x:x+10] for x in range(0, len(snvs), 10)]
-            for c in chunks:
-                query_oncokb_somatic_mutations(c, "HGSOC")
-                time.sleep(1)
+        if kwargs["oncokbsnv"] and kwargs["proteinchange"] and kwargs["cohortcode"]: # Query all exonic mutations for given patient
+            pid = map_cohort_code_to_patient_id(kwargs["cohortcode"])
+            snvs = get_actionable_snvs_by_aaChangeRefGene(pid)
+            query_oncokb_somatic_mutations(snvs, kwargs["cancer"])
+        if kwargs["oncokbsnv"] and kwargs["exonic"] and kwargs["cohortcode"]: # Query all exonic mutations for given patient
+            targets = ActionableTarget.objects.all()
+            pid = map_cohort_code_to_patient_id(kwargs["cohortcode"])
+            snvs = get_all_exonic_snvs_of_patient(pid, targets)
+            query_oncokb_somatic_mutations(snvs, kwargs["cancer"])
+            #chunks = [snvs[x:x+10] for x in range(0, len(snvs), 10)]
+            #for c in chunks:
+            #    query_oncokb_somatic_mutations(c, kwargs["cancer"])
+            #    time.sleep(1)
         if kwargs["oncokbcna"] and kwargs["targetall"] and kwargs["cohortcode"]:
             targets = ActionableTarget.objects.all()
             pid = map_cohort_code_to_patient_id(kwargs["cohortcode"])
             cnas = get_cnas_by_gene_list(pid, targets)
-            query_oncokb_cnas(cnas, "HGSOC")
+            query_oncokb_cnas(cnas, kwargs["cancer"])
 
         if kwargs["oncokbcna"] and kwargs["actionable"] and kwargs["cohortcode"]:
             pid = map_cohort_code_to_patient_id(kwargs["cohortcode"])
-            cnas = get_cnas_by_cn_and_ploidy(pid)
-            query_oncokb_cnas(cnas, "HGSOC")
+            targets = ActionableTarget.objects.all()
+            cnas = get_cnas_by_cn_and_ploidy(pid, kwargs["logrthr"], kwargs["cnthr"], targets)
+            query_oncokb_cnas(cnas, kwargs["cancer"])
 
         if kwargs["oncokbsnv"] and kwargs["actionable"] and kwargs["cohortcode"] and not kwargs["single"]:
             targets = ActionableTarget.objects.all()
@@ -1089,15 +1393,14 @@ class Command(BaseCommand):
             snvs = get_snvs_by_gene_list(pid, targets)
             #chunks = [snvs[x:x + 30] for x in range(0, len(snvs), 30)]
             #for c in chunks:
-            query_oncokb_somatic_mutations(snvs, "HGSOC")
-            time.sleep(1)
+            query_oncokb_somatic_mutations(snvs, kwargs["cancer"])
 
         if kwargs["oncokbsnv"] and kwargs["actionable"] and kwargs["cohortcode"] and kwargs["single"]:
             targets = ActionableTarget.objects.all()
             pid = map_cohort_code_to_patient_id(kwargs["cohortcode"])
             snvs = get_snvs_by_gene_list(pid, targets)
             for snv in snvs:
-                query_oncokb_somatic_mutation(snv, "HGSOC")
+                query_oncokb_somatic_mutation(snv, kwargs["cancer"])
                 #time.sleep(1)
 
         if kwargs["oncokbcna"] and kwargs["targetall"] and kwargs["all"]:
@@ -1105,21 +1408,21 @@ class Command(BaseCommand):
             for pid in ClinicalData.objects.order_by().values('patient_id').distinct():
                 cnas = get_cnas_by_gene_list(pid['patient_id'], targets)
                 if cnas:
-                    query_oncokb_cnas(cnas, "HGSOC")
+                    query_oncokb_cnas(cnas, kwargs["cancer"])
                     time.sleep(1)
 
         if kwargs["oncokbcna"] and kwargs["actionable"] and kwargs["all"]:
             for pid in ClinicalData.objects.order_by().values('patient_id').distinct():
-                cnas = get_cnas_by_cn_and_ploidy(pid['patient_id'])
+                cnas = get_cnas_by_cn_and_ploidy(pid)
                 if cnas:
-                    query_oncokb_cnas(cnas, "HGSOC")
+                    query_oncokb_cnas(cnas, kwargs["cancer"])
                     time.sleep(1)
 
         if kwargs["oncokbsnv"] and kwargs["actionable"] and kwargs["all"]:
             targets = ActionableTarget.objects.all()
             for pid in ClinicalData.objects.order_by().values('patient_id').distinct():
                 snvs = get_snvs_by_gene_list(pid['patient_id'], targets)
-                query_oncokb_somatic_mutations(snvs, "HGSOC")
+                query_oncokb_somatic_mutations(snvs, kwargs["cancer"])
                 time.sleep(1)
 
     # CGI queries
@@ -1131,53 +1434,56 @@ class Command(BaseCommand):
         if kwargs["cgiquery"] and kwargs["snv"] and kwargs["refid"]:
             snv = get_snv(kwargs["patientid"], kwargs["refid"])
             generate_temp_cgi_query_files(snv,[],[])
-            jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/snvs.ext", None, None, "OV", "hg38")
+            jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/snvs.ext", None, None, kwargs["cancer"], "hg38")
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
                 print("Waiting 120 seconds for the next try...")
-                time.sleep(120)
+                time.sleep(30)
         if kwargs["cgiquery"] and kwargs["cna"] and kwargs["all"]:
             cnas = get_cnas(kwargs["patientid"])
             generate_temp_cgi_query_files([],cnas,[])
-            jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, "OV", "hg38")
+            jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, kwargs["cancer"], "hg38")
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
                 print("Waiting 120 seconds for the next try...")
-                time.sleep(120)
+                time.sleep(30)
         if kwargs["cgiquery"] and kwargs["direct"] and kwargs["genelist"]:
             generate_cgi_cna_file_from_list(kwargs["genelist"].split(','))
-            jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, "OV", "hg38")
+            jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, kwargs["cancer"], "hg38")
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
                 print("Waiting 120 seconds for the next try...")
-                time.sleep(120)
+                time.sleep(30)
 
         #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --cna --geneid=PTPN14 --patientid=1"
         if kwargs["cgiquery"] and kwargs["cna"] and kwargs["geneid"]:
             ensg = gene_id_convert(kwargs["geneid"], "ENSG")
             cna = get_cna(kwargs["patientid"], ensg)
             generate_temp_cgi_query_files([],[cna],[])
-            jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, "OV", "hg38")
+            jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, kwargs["cancer"], "hg38")
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
                 print("Waiting 120 seconds for the next try...")
-                time.sleep(120)
+                time.sleep(30)
         #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --exonic --patientid=1"
-        if kwargs["cgiquery"] and kwargs["exonic"] and kwargs["patientid"]: # Query all exonic mutations for given patient
-            snv = get_all_exonic_snvs_of_patient(kwargs["patientid"])
+        if kwargs["cgiquery"] and kwargs["exonic"] and kwargs["snv"] and kwargs["cohortcode"]: # Query all exonic mutations for given patient
+            pid = map_cohort_code_to_patient_id(kwargs["cohortcode"])
+            snv = get_all_exonic_snvs_of_patient(pid)
             generate_temp_cgi_query_files(snv,[],[])
-            jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/snvs.ext", None, None, "OV", "hg38")
-            while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
-                print("Waiting 120 seconds for the next try...")
-                time.sleep(120)
+            jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/snvs.ext", None, None, kwargs["cancer"], "hg38")
+            if jobid != 0:
+                while query_cgi_job(pid, jobid.replace('"', '')) == 0:
+                    print("Waiting 120 seconds for the next try...")
+                    time.sleep(30)
          #USAGE: docker compose run --rm backend sh -c "python manage.py genomic_db_query_utils --cgiquery --proteinchange --patientid=1"
-        if kwargs["cgiquery"] and kwargs["proteinchange"] and kwargs["patientid"]: # Query all protein affecting mutations for all patients
+        if kwargs["cgiquery"] and kwargs["proteinchange"] and kwargs["snv"] and kwargs["cohortcode"]: # Query all protein affecting mutations for all patients
+            pid = map_cohort_code_to_patient_id(kwargs["cohortcode"])
             snvs = get_actionable_snvs_by_aaChangeRefGene(kwargs["patientid"])
             generate_proteinchange_query_file(snvs)
-            jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/prot.ext", None, None, "OV", "hg38")
-            while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
+            jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/prot.ext", None, None, kwargs["cancer"], "hg38")
+            while query_cgi_job(pid, jobid.replace('"', '')) == 0:
                 print("Waiting 120 seconds for the next try...")
                 time.sleep(120)
         if kwargs["cgiquery"] and kwargs["fusgenes"] and kwargs["patientid"]: # Query list of fusion genes for given patient
             fusgenes=kwargs["fusgenes"].split(',')
             generate_temp_cgi_query_files([],[],fusgenes)
-            jobid = launch_cgi_job_with_mulitple_variant_types(None, None, "./tmp/fus.ext", "OV", "hg38")
+            jobid = launch_cgi_job_with_mulitple_variant_types(None, None, "./tmp/fus.ext", kwargs["cancer"], "hg38")
             time.sleep(10)
             while query_cgi_job(kwargs["patientid"], jobid.replace('"', '')) == 0:
                 print("Waiting 30 seconds for the next try...")
@@ -1190,7 +1496,7 @@ class Command(BaseCommand):
             cnas = get_cnas_by_gene_list(pid, targets)
             if cnas:
                 generate_temp_cgi_query_files([], cnas, [])
-                jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, "OV", "hg38")
+                jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, kwargs["cancer"], "hg38")
                 time.sleep(10)
                 while query_cgi_job(pid, jobid.replace('"', '')) == 0:
                     print("Waiting 30 seconds for the next try...")
@@ -1198,14 +1504,16 @@ class Command(BaseCommand):
 
         if kwargs["cgiquery"] and kwargs["cna"] and kwargs["actionable"] and kwargs["cohortcode"]:
             pid = map_cohort_code_to_patient_id(kwargs["cohortcode"])
-            cnas = get_cnas_by_cn_and_ploidy(pid)
+            targets = ActionableTarget.objects.all()
+            cnas = get_cnas_by_cn_and_ploidy(pid, kwargs["logrthr"], kwargs["cnthr"], targets)
             if cnas:
                 generate_temp_cgi_query_files([], cnas, [])
-                jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, "OV", "hg38")
+                jobid = launch_cgi_job_with_mulitple_variant_types(None, "./tmp/cnas.ext", None, kwargs["cancer"], "hg38")
                 time.sleep(10)
-                while query_cgi_job(pid, jobid.replace('"', '')) == 0:
-                    print("Waiting 30 seconds for the next try...")
-                    time.sleep(30)
+                if jobid != 0: 
+                    while query_cgi_job(pid, jobid.replace('"', '')) == 0:
+                        print("Waiting 30 seconds for the next try...")
+                        time.sleep(30)
 
         if kwargs["cgiquery"] and kwargs["snv"] and kwargs["actionable"] and kwargs["cohortcode"]:
             targets = ActionableTarget.objects.all()
@@ -1213,7 +1521,7 @@ class Command(BaseCommand):
             snvs = get_snvs_by_gene_list(pid, targets)
             if snvs:
                 generate_temp_cgi_query_files(snvs, [], [])
-                jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/snvs.ext", None, None, "OV", "hg38")
+                jobid = launch_cgi_job_with_mulitple_variant_types("./tmp/snvs.ext", None, None, kwargs["cancer"], "hg38")
                 time.sleep(10)
                 while query_cgi_job(pid, jobid.replace('"', '')) == 0:
                         print("Waiting 30 seconds for the next try...")
