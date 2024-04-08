@@ -33,8 +33,6 @@ class GenomicViewSet(viewsets.GenericViewSet):
         relevant_by_oncokb = actionable_relevant_targets | putative_functionally_relevant_variants
         rel = relevant_by_oncokb.values('hugoSymbol').distinct()
         other_variants = oncokb_queryset.exclude(hugoSymbol__in=rel).exclude(consequence="synonymous_variant").exclude(consequence="synonymous_variant").exclude(oncogenic="Unknown")
-        #other_variants = oncokb_queryset.filter((Q(highestResistanceLevel=None) & Q(highestSensitiveLevel=None) & (Q(alteration="Amplification") | Q(alteration="Deletion")))
-        #                                        | (Q(highestResistanceLevel=None) & Q(highestSensitiveLevel=None) & ~ (Q(alteration="Amplification") & ~ Q(alteration="Deletion")) & ~ Q(oncogenic="Unknown"))).exclude(consequence="synonymous_variant")
 
         data = {
             'genomic': {
@@ -46,11 +44,7 @@ class GenomicViewSet(viewsets.GenericViewSet):
             'putative_functionally_relevant_variants': {},
             'other_variants': {},
         }
-        #cgi_genes = []
-        #for alt in cgi_biomarkers_queryset.values('alterations').distinct():
-        #    cgi_genes.append(alt.split(':')[0])
 
-        #oncokb_missing = cgi_genes not in all_oncokb_variants.values('hugoSymbol').distinct()
         if actionable_relevant_targets.count() > 0:
             for gene in actionable_relevant_targets.values('hugoSymbol').distinct():
 
@@ -163,79 +157,7 @@ class GenomicViewSet(viewsets.GenericViewSet):
                     gene_data['alterations'].append(alteration_data)
                 data['other_variants'][gene_name] = gene_data
 
-        # for gene in cgi_genes:
-        #     gene_qs = cgi_biomarkers_queryset.filter(Q(alterations__contains=gene) and (Q(tumor_type="OV") or Q(tumor_type="OVSE")))
-        #     if len(gene_qs) == 0:
-        #         gene_qs = cgi_biomarkers_queryset.filter(Q(alterations__contains=gene) and Q(tumor_type="CANCER"))
-        #     drugs = ""
-        #     for row in gene_qs:
-        #         drugs = drugs+" "+row.drugs
-        #     # TODO: if CGICopyNumber.objects.all().filter(patient_id=pk)
-        #     gene_data = {
-        #         'description': f'{gene}', #TODO: get gene description from ? perhaps store from oncokb
-        #         'alterations': []
-        #     }
-        #     alteration_data = {
-        #         'name': f'{gene_qs[0].alterations.replace(gene,"").replace(":","")}',
-        #         'description': f'{gene_qs[0].source}',
-        #         'row': []
-        #     }
-        #
-        #     samples = gene_qs.values('sample').distinct()
-        #     alts_count = len(samples)
-        #
-        #     alteration_rows = [
-        #         {
-        #             'samples_ids': f'{samples[i]}',
-        #             'samples_info': f'{get_sample_info(samples[i], timeline_qs)}',
-        #             'treatment_phase': f'{get_phase(samples[i])}',
-        #             'tumor_purity': f'{get_purity(ascat_ests_qs.filter(sample=samples[i]))}',
-        #             'mutation_affects': f'{get_sample_type(samples[i])}',
-        #             'reported_sensitivity': f'{get_sensitivity(grouped_alterations_qs[i])}',
-        #         }
-        #         for i in range(alts_count)
-        #     ]
-        #         alteration_data['row'] = alteration_rows
-        #
-        #         gene_data['alterations'].append(alteration_data)
-        #     data['other_variants'][gene_name] = gene_data
-
-        # if other_alterations.count() > 0:
-        #     for gene in other_alterations.values('hugoSymbol').distinct():
-        #
-        #         sample_info = ''
-        #         gene_name = gene['hugoSymbol']
-        #
-        #         alterations_qs = other_alterations.filter(hugoSymbol=gene_name)
-        #
-        #         gene_data = {
-        #             'description': f'{alterations_qs[0].geneSummary}',
-        #             'alterations': []
-        #         }
-        #         alt_count = alterations_qs.count()
-        #
-        #         alterations = [
-        #             {
-        #                 'name': f'{alterations_qs[i].alteration}',
-        #                 'description': f'{alterations_qs[i].mutationEffectDescription}',
-        #                 'row': [
-        #                     {
-        #                         'samples_ids': f'{alterations_qs[i].sample_id}',
-        #                         'samples_info': f'{get_sample_info(alterations_qs[i].sample_id, timeline_qs)}',
-        #                         'treatment_phase': f'{get_phase(alterations_qs[i].sample_id)}',
-        #                         'tumor_purity': f'{get_purity(ascat_ests_qs.filter(sample=alterations_qs[i].sample_id))}',
-        #                         'mutation_affects': f'{get_sample_type(alterations_qs[i].sample_id)}',
-        #                         'reported_sensitivity': f'{alterations_qs[i].treatments}'.replace(' ', '_').replace(';', ' '),
-        #                     }
-        #                 ]
-        #             }
-        #             for i in range(alt_count)
-        #         ]
-        #         gene_data['alterations'] = alterations
-        #         data['other_alterations'][gene_name] = gene_data
-
-        return Response(json.dumps(data, indent=4)) # use a serializer!
-        #return JsonResponse(data)
+        return JsonResponse(data)
 
 def get_purity(est_objs):
     if est_objs:
