@@ -459,52 +459,52 @@ def query_cgi_job_merge_db(patient_id, jobid):
                             strand = handle_string_field(row["CGI-STRAND"]),
                             type = handle_string_field(row["CGI-Type"])
                         )
-                        rec, created = OncoKBAnnotation.objects.get_or_create(
-                            patient_id=int(patient_id),
-                            sample_id=handle_string_field(cryptocode.decrypt(row["CGI-Sample ID"], settings.CRYPTOCODE)),
-                            hugoSymbol=handle_string_field(row["CGI-Gene"]),
-                            #entrezGeneId=handle_string_field(rjson["query"]["entrezGeneId"]),
-                            alteration=handle_string_field(rjson["query"]["alteration"]),
-                            #alterationType=handle_string_field(rjson["query"]["alterationType"]),
-                            svType=handle_string_field(rjson["query"]["svType"]),
-                            tumorType=handle_string_field(rjson["query"]["tumorType"]),
-                            consequence=handle_string_field(rjson["query"]["consequence"]),
-                            proteinStart=handle_int_field(rjson["query"]["proteinStart"]),
-                            proteinEnd=handle_int_field(rjson["query"]["proteinEnd"]),
-                            hgvs=handle_string_field(rjson["query"]["hgvs"]),
-                            geneExist=handle_boolean_field(rjson["geneExist"]),
-                            variantExist=handle_boolean_field(rjson["variantExist"]),
-                            alleleExist=handle_boolean_field(rjson["alleleExist"]),
-                            oncogenic=handle_string_field(rjson["oncogenic"]),
-                            mutationEffectDescription=handle_string_field(rjson["mutationEffect"]["description"]),
-                            knownEffect=handle_string_field(rjson["mutationEffect"]["knownEffect"]),
-                            citationPMids=handle_string_field(",".join(rjson["mutationEffect"]["citations"]["pmids"])),
-                            citationAbstracts=handle_string_field(
-                                str(rjson["mutationEffect"]["citations"]["abstracts"])),
-                            highestSensitiveLevel=handle_string_field(rjson["highestSensitiveLevel"]),
-                            highestResistanceLevel=handle_string_field(rjson["highestResistanceLevel"]),
-                            highestDiagnosticImplicationLevel=handle_string_field(
-                                rjson["highestDiagnosticImplicationLevel"]),
-                            highestPrognosticImplicationLevel=handle_string_field(
-                                rjson["highestPrognosticImplicationLevel"]),
-                            highestFdaLevel=handle_string_field(rjson["highestFdaLevel"]),
-                            otherSignificantSensitiveLevels=handle_string_field(
-                                rjson["otherSignificantSensitiveLevels"]),
-                            otherSignificantResistanceLevels=handle_string_field(
-                                rjson["otherSignificantResistanceLevels"]),
-                            hotspot=handle_boolean_field(rjson["hotspot"]),
-                            geneSummary=handle_string_field(rjson["geneSummary"]),
-                            variantSummary=handle_string_field(rjson["variantSummary"]),
-                            tumorTypeSummary=handle_string_field(rjson["tumorTypeSummary"]),
-                            prognosticSummary=handle_string_field(rjson["prognosticSummary"]),
-                            diagnosticSummary=handle_string_field(rjson["diagnosticSummary"]),
-                            diagnosticImplications=handle_string_field(rjson["diagnosticImplications"]),
-                            prognosticImplications=handle_string_field(rjson["prognosticImplications"]),
-                            treatments=handle_treatments_field(rjson["treatments"]),
-                            dataVersion=handle_string_field(rjson["dataVersion"]),
-                            lastUpdate=handle_date_field(rjson["lastUpdate"]),
-                            vus=handle_boolean_field(rjson["vus"])
-                        )
+                        # rec, created = OncoKBAnnotation.objects.get_or_create(
+                        #     patient_id=int(patient_id),
+                        #     sample_id=handle_string_field(cryptocode.decrypt(row["CGI-Sample ID"], settings.CRYPTOCODE)),
+                        #     hugoSymbol=handle_string_field(row["CGI-Gene"]),
+                        #     #entrezGeneId=handle_string_field(rjson["query"]["entrezGeneId"]),
+                        #     alteration=handle_string_field(rjson["query"]["alteration"]),
+                        #     #alterationType=handle_string_field(rjson["query"]["alterationType"]),
+                        #     svType=handle_string_field(rjson["query"]["svType"]),
+                        #     tumorType=handle_string_field(rjson["query"]["tumorType"]),
+                        #     consequence=handle_string_field(rjson["query"]["consequence"]),
+                        #     proteinStart=handle_int_field(rjson["query"]["proteinStart"]),
+                        #     proteinEnd=handle_int_field(rjson["query"]["proteinEnd"]),
+                        #     hgvs=handle_string_field(rjson["query"]["hgvs"]),
+                        #     geneExist=handle_boolean_field(rjson["geneExist"]),
+                        #     variantExist=handle_boolean_field(rjson["variantExist"]),
+                        #     alleleExist=handle_boolean_field(rjson["alleleExist"]),
+                        #     oncogenic=handle_string_field(rjson["oncogenic"]),
+                        #     mutationEffectDescription=handle_string_field(rjson["mutationEffect"]["description"]),
+                        #     knownEffect=handle_string_field(rjson["mutationEffect"]["knownEffect"]),
+                        #     citationPMids=handle_string_field(",".join(rjson["mutationEffect"]["citations"]["pmids"])),
+                        #     citationAbstracts=handle_string_field(
+                        #         str(rjson["mutationEffect"]["citations"]["abstracts"])),
+                        #     highestSensitiveLevel=handle_string_field(rjson["highestSensitiveLevel"]),
+                        #     highestResistanceLevel=handle_string_field(rjson["highestResistanceLevel"]),
+                        #     highestDiagnosticImplicationLevel=handle_string_field(
+                        #         rjson["highestDiagnosticImplicationLevel"]),
+                        #     highestPrognosticImplicationLevel=handle_string_field(
+                        #         rjson["highestPrognosticImplicationLevel"]),
+                        #     highestFdaLevel=handle_string_field(rjson["highestFdaLevel"]),
+                        #     otherSignificantSensitiveLevels=handle_string_field(
+                        #         rjson["otherSignificantSensitiveLevels"]),
+                        #     otherSignificantResistanceLevels=handle_string_field(
+                        #         rjson["otherSignificantResistanceLevels"]),
+                        #     hotspot=handle_boolean_field(rjson["hotspot"]),
+                        #     geneSummary=handle_string_field(rjson["geneSummary"]),
+                        #     variantSummary=handle_string_field(rjson["variantSummary"]),
+                        #     tumorTypeSummary=handle_string_field(rjson["tumorTypeSummary"]),
+                        #     prognosticSummary=handle_string_field(rjson["prognosticSummary"]),
+                        #     diagnosticSummary=handle_string_field(rjson["diagnosticSummary"]),
+                        #     diagnosticImplications=handle_string_field(rjson["diagnosticImplications"]),
+                        #     prognosticImplications=handle_string_field(rjson["prognosticImplications"]),
+                        #     treatments=handle_treatments_field(rjson["treatments"]),
+                        #     dataVersion=handle_string_field(rjson["dataVersion"]),
+                        #     lastUpdate=handle_date_field(rjson["lastUpdate"]),
+                        #     vus=handle_boolean_field(rjson["vus"])
+                        # )
 
                         rec.save()
                     except Exception as e:
@@ -539,52 +539,52 @@ def query_cgi_job_merge_db(patient_id, jobid):
                             predicted_match = handle_string_field(row["predicted_match"]),
                             known_match = handle_string_field(row["known_match"])
                         )
-                        rec, created = OncoKBAnnotation.objects.get_or_create(
-                            patient_id=int(patient_id),
-                            sample_id=handle_string_field(cryptocode.decrypt(row["sample"], settings.CRYPTOCODE)),
-                            hugoSymbol=handle_string_field(row["gene"]),
-                            # entrezGeneId=handle_string_field(rjson["query"]["entrezGeneId"]),
-                            alteration=handle_string_field(AlterationTypeLCase[row["cna"]].value),
-                            # alterationType=handle_string_field(rjson["query"]["alterationType"]),
-                            # svType=handle_string_field(rjson["query"]["svType"]),
-                            tumorType=handle_string_field(row["cancer"]),
-                            #consequence=handle_string_field(rjson["query"]["consequence"]),
-                            #proteinStart=handle_int_field(rjson["query"]["proteinStart"]),
-                            #proteinEnd=handle_int_field(rjson["query"]["proteinEnd"]),
-                            #hgvs=handle_string_field(rjson["query"]["hgvs"]),
-                            #geneExist=handle_boolean_field(rjson["geneExist"]),
-                            #variantExist=handle_boolean_field(rjson["variantExist"]),
-                            #alleleExist=handle_boolean_field(rjson["alleleExist"]),
-                            oncogenic=handle_string_field(row["driver"]),
-                            #mutationEffectDescription=handle_string_field(rjson["mutationEffect"]["description"]),
-                            knownEffect=handle_string_field(row["gene_role"]),
-                            citationPMids=handle_string_field(",".join(rjson["mutationEffect"]["citations"]["pmids"])),
-                            citationAbstracts=handle_string_field(
-                                str(rjson["mutationEffect"]["citations"]["abstracts"])),
-                            highestSensitiveLevel=handle_string_field(rjson["highestSensitiveLevel"]),
-                            highestResistanceLevel=handle_string_field(rjson["highestResistanceLevel"]),
-                            highestDiagnosticImplicationLevel=handle_string_field(
-                                rjson["highestDiagnosticImplicationLevel"]),
-                            highestPrognosticImplicationLevel=handle_string_field(
-                                rjson["highestPrognosticImplicationLevel"]),
-                            highestFdaLevel=handle_string_field(rjson["highestFdaLevel"]),
-                            otherSignificantSensitiveLevels=handle_string_field(
-                                rjson["otherSignificantSensitiveLevels"]),
-                            otherSignificantResistanceLevels=handle_string_field(
-                                rjson["otherSignificantResistanceLevels"]),
-                            hotspot=handle_boolean_field(rjson["hotspot"]),
-                            geneSummary=handle_string_field(rjson["geneSummary"]),
-                            variantSummary=handle_string_field(rjson["variantSummary"]),
-                            tumorTypeSummary=handle_string_field(rjson["tumorTypeSummary"]),
-                            prognosticSummary=handle_string_field(rjson["prognosticSummary"]),
-                            diagnosticSummary=handle_string_field(rjson["diagnosticSummary"]),
-                            diagnosticImplications=handle_string_field(rjson["diagnosticImplications"]),
-                            prognosticImplications=handle_string_field(rjson["prognosticImplications"]),
-                            treatments=handle_treatments_field(rjson["treatments"]),
-                            dataVersion=handle_string_field(rjson["dataVersion"]),
-                            lastUpdate=handle_date_field(rjson["lastUpdate"]),
-                            vus=handle_boolean_field(rjson["vus"])
-                        )
+                        # rec, created = OncoKBAnnotation.objects.get_or_create(
+                        #     patient_id=int(patient_id),
+                        #     sample_id=handle_string_field(cryptocode.decrypt(row["sample"], settings.CRYPTOCODE)),
+                        #     hugoSymbol=handle_string_field(row["gene"]),
+                        #     # entrezGeneId=handle_string_field(rjson["query"]["entrezGeneId"]),
+                        #     alteration=handle_string_field(AlterationTypeLCase[row["cna"]].value),
+                        #     # alterationType=handle_string_field(rjson["query"]["alterationType"]),
+                        #     # svType=handle_string_field(rjson["query"]["svType"]),
+                        #     tumorType=handle_string_field(row["cancer"]),
+                        #     #consequence=handle_string_field(rjson["query"]["consequence"]),
+                        #     #proteinStart=handle_int_field(rjson["query"]["proteinStart"]),
+                        #     #proteinEnd=handle_int_field(rjson["query"]["proteinEnd"]),
+                        #     #hgvs=handle_string_field(rjson["query"]["hgvs"]),
+                        #     #geneExist=handle_boolean_field(rjson["geneExist"]),
+                        #     #variantExist=handle_boolean_field(rjson["variantExist"]),
+                        #     #alleleExist=handle_boolean_field(rjson["alleleExist"]),
+                        #     oncogenic=handle_string_field(row["driver"]),
+                        #     #mutationEffectDescription=handle_string_field(rjson["mutationEffect"]["description"]),
+                        #     knownEffect=handle_string_field(row["gene_role"]),
+                        #     citationPMids=handle_string_field(",".join(rjson["mutationEffect"]["citations"]["pmids"])),
+                        #     citationAbstracts=handle_string_field(
+                        #         str(rjson["mutationEffect"]["citations"]["abstracts"])),
+                        #     highestSensitiveLevel=handle_string_field(rjson["highestSensitiveLevel"]),
+                        #     highestResistanceLevel=handle_string_field(rjson["highestResistanceLevel"]),
+                        #     highestDiagnosticImplicationLevel=handle_string_field(
+                        #         rjson["highestDiagnosticImplicationLevel"]),
+                        #     highestPrognosticImplicationLevel=handle_string_field(
+                        #         rjson["highestPrognosticImplicationLevel"]),
+                        #     highestFdaLevel=handle_string_field(rjson["highestFdaLevel"]),
+                        #     otherSignificantSensitiveLevels=handle_string_field(
+                        #         rjson["otherSignificantSensitiveLevels"]),
+                        #     otherSignificantResistanceLevels=handle_string_field(
+                        #         rjson["otherSignificantResistanceLevels"]),
+                        #     hotspot=handle_boolean_field(rjson["hotspot"]),
+                        #     geneSummary=handle_string_field(rjson["geneSummary"]),
+                        #     variantSummary=handle_string_field(rjson["variantSummary"]),
+                        #     tumorTypeSummary=handle_string_field(rjson["tumorTypeSummary"]),
+                        #     prognosticSummary=handle_string_field(rjson["prognosticSummary"]),
+                        #     diagnosticSummary=handle_string_field(rjson["diagnosticSummary"]),
+                        #     diagnosticImplications=handle_string_field(rjson["diagnosticImplications"]),
+                        #     prognosticImplications=handle_string_field(rjson["prognosticImplications"]),
+                        #     treatments=handle_treatments_field(rjson["treatments"]),
+                        #     dataVersion=handle_string_field(rjson["dataVersion"]),
+                        #     lastUpdate=handle_date_field(rjson["lastUpdate"]),
+                        #     vus=handle_boolean_field(rjson["vus"])
+                        # )
                         rec.save()
                     except Exception as e:
                         logging.exception(e)
