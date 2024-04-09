@@ -21,6 +21,17 @@ class AlterationTypeLCase(Enum):
     def __str__(self):
         return str(self.value)
 
+class CGI2OncoKBLevels(Enum):
+    A = "LEVEL_1"
+    B = "LEVEL_2"
+    C = "LEVEL_3A"
+    D = "LEVEL_3B"
+    E = "LEVEL_4"
+    R1 = "LEVEL_R1"
+    R2 = "LEVEL_R2"
+    def __str__(self):
+        return str(self.value)
+
 class ActionableTarget(models.Model):
 
     gene = models.CharField(max_length=15, primary_key=True, default=None, blank=False, null=False)
@@ -238,6 +249,15 @@ class OncoKBAnnotation(models.Model):
     dataVersion = models.CharField(max_length=16, default=None, blank=True, null=True)
     lastUpdate = models.DateTimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
     vus = models.BooleanField(default=False, blank=True, null=True)
+    nMinor = models.IntegerField(null=True)
+    nMajor = models.IntegerField(null=True)
+    ad0 = models.IntegerField(null=True)
+    ad1 = models.IntegerField(null=True)
+    af = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=4)
+    dp = models.IntegerField(null=True)
+    lohstatus = models.CharField(max_length=16, default=None, blank=True, null=True)
+    exphomci = models.BooleanField(default=False, blank=False, null=True)
+    readcount = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
 
     class Meta:
         unique_together = ['sample_id', 'hugoSymbol', 'alteration']
