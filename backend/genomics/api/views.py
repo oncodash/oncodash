@@ -16,12 +16,6 @@ from rest_framework.renderers import JSONRenderer
 from django.http import JsonResponse
 import random
 
-def get_allele_frequency(readcount):
-    #expectedAF = function(mut_cn, total_cn, purity):
-    #    (mut_cn * purity) / (total_cn * purity + 2 * (1 - purity))
-
-    return random.random()
-
 class GenomicViewSet(viewsets.GenericViewSet):
     """
     API endpoint for the genomic data of the patients. Provides
