@@ -55,12 +55,12 @@ class GenomicViewSet(viewsets.GenericViewSet):
         samples_info['row'] = samplerows
 
         data = {
-            'samples_info': samples_info,
             'genomic': {
                 'actionable_aberrations': [actionable_aberrations.count(), 'ACTIONABLE ABERRATIONS'],
                 'putative_functionally_relevant_variants': [putative_functionally_relevant_variants.count(), 'PUTATIVE FUNCTIONALLY RELEVANT VARIANTS'],
                 'other_variants': [other_variants.count(), 'OTHER VARIANTS'],
                 },
+            'samples_info': samples_info,
             'actionable_aberrations': {},
             'putative_functionally_relevant_variants': {},
             'other_variants': {},
