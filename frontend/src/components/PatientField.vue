@@ -4,7 +4,7 @@
     <span
       v-if="valueExists()"
       class="value"
-      :class="{ red: isImportant() }">
+      :class="{ red: isNegative(), green: isPositive() }">
       {{ value }}
     </span>
     <span
@@ -21,13 +21,21 @@ const props = defineProps<{
   value: string | number | boolean | null
 }>()
 
-const importantValues = [
+const negativeValues = [
   'No',
   'Deceased'
 ]
 
-function isImportant(): boolean {
-  return importantValues.includes(String(props.value))
+const positiveValues = [
+  'Yes'
+]
+
+function isNegative(): boolean {
+  return negativeValues.includes(String(props.value))
+}
+
+function isPositive(): boolean {
+  return positiveValues.includes(String(props.value))
 }
 
 function valueExists(): boolean {
@@ -64,6 +72,10 @@ function valueExists(): boolean {
 
 .value.red {
   color: var(--red);
+}
+
+.value.green {
+  color: var(--green);
 }
 
 .value.empty {
