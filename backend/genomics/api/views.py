@@ -33,7 +33,7 @@ class GenomicViewSet(viewsets.GenericViewSet):
         putative_functionally_relevant_variants = oncokb_queryset.filter(Q(highestSensitiveLevel__in=["LEVEL_3A", "LEVEL_3B", "LEVEL_4"]) or Q(highestResistanceLevel__in=["LEVEL_R2"]))
         relevant_by_oncokb = actionable_aberrations | putative_functionally_relevant_variants
         rel = relevant_by_oncokb.values('hugoSymbol').distinct()
-        other_variants = oncokb_queryset.exclude(hugoSymbol__in=rel).exclude(consequence="synonymous_variant").exclude(Q(oncogenic="Unknown") & Q(nMajor=None) & Q(nMinor=None))
+        other_variants = oncokb_queryset.exclude(hugoSymbol__in=rel).exclude(consequence="synonymous_variant").exclude(Q(oncogenic="Unknown") & Q(nMajor=None) & Q(nMinor=None) & Q(mutationEffectDescription=""))
 
         samples_info = {
             'name': 'Sample info',
@@ -77,10 +77,9 @@ class GenomicViewSet(viewsets.GenericViewSet):
                     'description': f'{gene_qs[0].geneSummary}',
                     'alterations': []
                 }
-                print(gene_name)
+
                 for alteration_name in gene_qs.values('alteration').distinct():
                     alteration_name = alteration_name.get('alteration')
-                    print(alteration_name)
 
                     grouped_alterations_qs = gene_qs.filter(alteration=alteration_name)
 
