@@ -11,7 +11,7 @@ import json
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Q
+from django.db.models import Q, F
 from rest_framework.renderers import JSONRenderer
 from django.http import JsonResponse
 import random
@@ -33,7 +33,7 @@ class GenomicViewSet(viewsets.GenericViewSet):
         putative_functionally_relevant_variants = oncokb_queryset.filter(Q(highestSensitiveLevel__in=["LEVEL_3A", "LEVEL_3B", "LEVEL_4"]) or Q(highestResistanceLevel__in=["LEVEL_R2"]))
         relevant_by_oncokb = actionable_aberrations | putative_functionally_relevant_variants
         rel = relevant_by_oncokb.values('hugoSymbol').distinct()
-        other_variants = oncokb_queryset.exclude(hugoSymbol__in=rel).exclude(consequence="synonymous_variant").exclude(consequence="synonymous_variant").exclude(oncogenic="Unknown")
+        other_variants = oncokb_queryset.exclude(hugoSymbol__in=rel).exclude(consequence="synonymous_variant").exclude(Q(oncogenic="Unknown") & Q(nMajor=None) & Q(nMinor=None))
 
         samples_info = {
             'name': 'Sample info',
@@ -56,9 +56,9 @@ class GenomicViewSet(viewsets.GenericViewSet):
 
         data = {
             'genomic': {
-                'actionable_aberrations': [actionable_aberrations.count(), 'ACTIONABLE ABERRATIONS'],
-                'putative_functionally_relevant_variants': [putative_functionally_relevant_variants.count(), 'PUTATIVE FUNCTIONALLY RELEVANT VARIANTS'],
-                'other_variants': [other_variants.count(), 'OTHER VARIANTS'],
+                'actionable_aberrations': [actionable_aberrations.values('hugoSymbol').distinct().count(), 'ACTIONABLE ABERRATIONS'],
+                'putative_functionally_relevant_variants': [putative_functionally_relevant_variants.values('hugoSymbol').distinct().count(), 'PUTATIVE FUNCTIONALLY RELEVANT VARIANTS'],
+                'other_variants': [other_variants.values('hugoSymbol').distinct().count(), 'OTHER VARIANTS'],
                 },
             'samples_info': samples_info,
             'actionable_aberrations': {},
@@ -77,8 +77,10 @@ class GenomicViewSet(viewsets.GenericViewSet):
                     'description': f'{gene_qs[0].geneSummary}',
                     'alterations': []
                 }
+                print(gene_name)
                 for alteration_name in gene_qs.values('alteration').distinct():
                     alteration_name = alteration_name.get('alteration')
+                    print(alteration_name)
 
                     grouped_alterations_qs = gene_qs.filter(alteration=alteration_name)
 
