@@ -21,7 +21,7 @@
 
     <div>
       <div class="title">BASIC GENETICS</div>
-      <PatientField field="HRD status" :value="patient.hrd_myriad_status" />
+      <PatientField field="HRD status" :value="patient.hr_signature_per_patient" />
       <PatientField field="BRCA mutation" :value="patient.brca_mutation_status" />
       <PatientField field="Germ line pathogenic variants" :value="patient.germline_pathogenic_variant" />
     </div>
