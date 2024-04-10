@@ -118,7 +118,7 @@ export class Patient {
 
   static hasGenomics(genomicData: GenomicData): boolean {
     const noData = genomicData.genomic.putative_functionally_relevant_variants[0] === 0
-      && genomicData.genomic.actionable_relevant_targets[0] === 0
+      && genomicData.genomic.actionable_aberrations[0] === 0
       && genomicData.genomic.other_variants[0] === 0
 
     return !noData

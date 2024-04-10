@@ -8,16 +8,41 @@
 
   <section class="genomic-summaries">
     <div class="genes-summary">
-      <span class="summary-label">Genes involved:</span>
-      <a v-if="aggregateGenes().length" class="gene-link" v-for="gene in aggregateGenes()" :href="'#' + gene">{{ gene }}</a>
+      <span class="summary-label">Putatively actionable genes :</span>
+      <a v-if="aggregateActionableGenes().length" class="gene-link" v-for="gene in aggregateActionableGenes()" :href="'#' + gene">{{ gene }}</a>
       <span v-else>None</span>
     </div>
 
     <div class="drugs-summary">
-      <span class="summary-label">Drugs involved:</span>
-      <span v-if="aggregateDrugs().length" class="drug" v-for="gene in aggregateDrugs()">{{ gene }}</span>
+      <span class="summary-label">Associated drugs :</span>
+      <span v-if="aggregateActionableDrugs().length" class="drug" v-for="gene in aggregateActionableDrugs()">{{ gene }}</span>
       <span v-else>None</span>
     </div>
+  </section>
+
+  <section class="samples-summary" v-if="genomicData?.samples_info.row.length">
+    <table class="samples-table">
+      <thead>
+        <tr>
+          <th>Sample</th>
+          <th>Purity</th>
+          <th>Ploidy</th>
+          <th>Tumor site</th>
+          <th>Sample time</th>
+          <th>Sample type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="row in genomicData.samples_info.row">
+          <td>{{ row.sample }}</td>
+          <td>{{ row.purity }}</td>
+          <td>{{ row.ploidy }}</td>
+          <td>{{ row.tumor_site }}</td>
+          <td>{{ row.sample_time }}</td>
+          <td>{{ row.sample_type }}</td>
+        </tr>
+      </tbody>
+    </table>
   </section>
 
   <section class="genomic-data" v-if="genomicData">
@@ -48,26 +73,24 @@
           </summary>
 
           <div class="alteration-data">
+            <p class="alteration-drugs">
+              Associated drugs -
+              {{ alteration.reported_sensitivity }}
+            </p>
             <p v-html="linkifyText(alteration.description)"></p>
             <table class="alteration-table">
               <thead>
                 <tr>
-                  <th>SAMPLES IDS</th>
-                  <th>SAMPLES INFO</th>
-                  <th>TREATMENT PHASE</th>
-                  <th>TUMOR PURITY</th>
-                  <th>MUTATION AFFECTS</th>
-                  <th>REPORTED SENSITIVITY RESPONSE</th>
+                  <th v-for="column in Object.keys(alteration.row[0])">
+                    {{ column }}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="row in alteration.row">
-                  <td>{{ row.samples_ids }}</td>
-                  <td>{{ row.samples_info }}</td>
-                  <td>{{ row.treatment_phase }}</td>
-                  <td>{{ row.tumor_purity }}</td>
-                  <td>{{ row.mutation_affects }}</td>
-                  <td>{{ displayDrugs(row.reported_sensitivity) }}</td>
+                  <td v-for="(value) in row">
+                    {{ value }}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -94,6 +117,11 @@ const genomicData = ref<GenomicData>()
 const genomicGroups = computed(() => {
   return Object.keys(genomicData.value?.genomic || {}) as Array<keyof GenomicData['genomic']>
 })
+const actionableGroups = computed(() => {
+  return genomicGroups.value.filter((group) => {
+    return group !== "other_variants"
+  })
+})
 
 /**
  * Fetch the genomic data of the patient on component start.
@@ -109,11 +137,11 @@ onMounted(() => {
 })
 
 /**
- * Lists all the genes involved in the current genomic data.
+ * Lists all the putatively actionable genes.
  * @returns The list of genes
  */
-function aggregateGenes(): string[] {
-  return genomicGroups.value.reduce<string[]>((list, group) => {
+function aggregateActionableGenes(): string[] {
+  return actionableGroups.value.reduce<string[]>((list, group) => {
     const genes = Object.keys(genomicData.value?.[group] || {})
     return list.concat(genes)
   }, [])
@@ -123,17 +151,15 @@ function aggregateGenes(): string[] {
  * Lists all the drugs involved in the current genomic data.
  * @returns The list of drugs
  */
-function aggregateDrugs(): string[] {
-  const allDrugs = genomicGroups.value.reduce<string[]>((list, group) => {
+function aggregateActionableDrugs(): string[] {
+  const allDrugs = actionableGroups.value.reduce<string[]>((list, group) => {
     if (!genomicData.value?.[group]) return list
 
     let drugs: string[] = []
 
     Object.values(genomicData.value?.[group]).forEach(geneData => {
       geneData.alterations.forEach(alteration => {
-        alteration.row.forEach((sample) => {
-          drugs = drugs.concat(displayDrugs(sample.reported_sensitivity).split(', '))
-        })
+        drugs = drugs.concat(displayDrugs(alteration.reported_sensitivity).split(', '))
       })
     })
 
@@ -198,6 +224,27 @@ function displayDrugs(value: string): string {
 </script>
 
 <style scoped>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table th {
+  background-color: var(--grey-light);
+  padding: calc(var(--spacing) / 2);
+  text-align: start;
+  text-wrap: wrap;
+}
+
+table td {
+  padding: calc(var(--spacing) / 2);
+  text-wrap: wrap;
+}
+
+table tbody tr:hover {
+  background-color: var(--primary-light);
+}
+
 .genomic-numbers {
   display: flex;
   gap: var(--spacing);
@@ -233,6 +280,16 @@ function displayDrugs(value: string): string {
   flex-flow: row wrap;
   gap: calc(var(--spacing) / 2);
   justify-content: center;
+}
+
+.samples-summary {
+  margin: var(--spacing);
+  display: flex;
+  justify-content: center;
+}
+
+.samples-table {
+  width: min(1200px, 100%);
 }
 
 .summary-label {
@@ -278,6 +335,10 @@ summary h3 {
   padding-left: var(--spacing);
 }
 
+.gene-section {
+  padding-bottom: var(--spacing);
+}
+
 .genomic-group {
   padding-right: var(--spacing);
 }
@@ -292,24 +353,7 @@ summary h3 {
   font-style: italic;
 }
 
-.alteration-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-.alteration-table th {
-  background-color: var(--grey-light);
-  padding: var(--spacing);
-  text-align: start;
-  text-wrap: wrap;
-}
-
-.alteration-table td {
-  padding: var(--spacing);
-  text-wrap: wrap;
-}
-
-.alteration-table tbody tr:hover {
-  background-color: var(--primary-light);
+.alteration-drugs {
+  font-weight: bold;
 }
 </style>
