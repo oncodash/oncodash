@@ -108,13 +108,12 @@ class GenomicViewSet(viewsets.GenericViewSet):
                                 'samples': f'{grouped_alterations_qs[i].sample_id}',
                                 'AD.0': f'{grouped_alterations_qs[i].ad0}',
                                 'AD.1': f'{grouped_alterations_qs[i].ad1}',
-                                'DP': f'{grouped_alterations_qs[i].dp}',
-                                'AF': f'{grouped_alterations_qs[i].af}',
-                                'nMajor': f'{grouped_alterations_qs[i].nMajor}',
-                                'nMinor': f'{grouped_alterations_qs[i].nMinor}',
-                                'LOHstatus': f'{grouped_alterations_qs[i].lohstatus}',
-                                'expHomCI.cover': f'{grouped_alterations_qs[i].exphomci}',
-                                #'estimated_homogeneity': f'{get_homogeneity_est(af)}',
+                                'DP': f'{get_dp(grouped_alterations_qs[i].dp)}',
+                                'AF': f'{get_af(grouped_alterations_qs[i].af)}',
+                                'nMajor': f'{get_nmajor(grouped_alterations_qs[i])}',
+                                'nMinor': f'{get_nminor(grouped_alterations_qs[i])}',
+                                'LOHstatus': f'{get_loh_status(grouped_alterations_qs[i])}',
+                                'expHomCI.cover': f'{get_homogeneity_est(grouped_alterations_qs[i].af)}',
                             }
                             for i in range(alts_count)
                         ]
@@ -164,13 +163,12 @@ class GenomicViewSet(viewsets.GenericViewSet):
                                 'samples': f'{grouped_alterations_qs[i].sample_id}',
                                 'AD.0': f'{grouped_alterations_qs[i].ad0}',
                                 'AD.1': f'{grouped_alterations_qs[i].ad1}',
-                                'DP': f'{grouped_alterations_qs[i].dp}',
-                                'AF': f'{grouped_alterations_qs[i].af}',
-                                'nMajor': f'{grouped_alterations_qs[i].nMajor}',
-                                'nMinor': f'{grouped_alterations_qs[i].nMinor}',
-                                'LOHstatus': f'{grouped_alterations_qs[i].lohstatus}',
-                                'expHomCI.cover': f'{grouped_alterations_qs[i].exphomci}',
-                                # 'estimated_homogeneity': f'{get_homogeneity_est(af)}',
+                                'DP': f'{get_dp(grouped_alterations_qs[i].dp)}',
+                                'AF': f'{get_af(grouped_alterations_qs[i].af)}',
+                                'nMajor': f'{get_nmajor(grouped_alterations_qs[i])}',
+                                'nMinor': f'{get_nminor(grouped_alterations_qs[i])}',
+                                'LOHstatus': f'{get_loh_status(grouped_alterations_qs[i])}',
+                                'expHomCI.cover': f'{get_homogeneity_est(grouped_alterations_qs[i].af)}',
                             }
                             for i in range(alts_count)
                         ]
@@ -220,13 +218,12 @@ class GenomicViewSet(viewsets.GenericViewSet):
                                 'samples': f'{grouped_alterations_qs[i].sample_id}',
                                 'AD.0': f'{grouped_alterations_qs[i].ad0}',
                                 'AD.1': f'{grouped_alterations_qs[i].ad1}',
-                                'DP': f'{grouped_alterations_qs[i].dp}',
-                                'AF': f'{grouped_alterations_qs[i].af}',
-                                'nMajor': f'{grouped_alterations_qs[i].nMajor}',
-                                'nMinor': f'{grouped_alterations_qs[i].nMinor}',
-                                'LOHstatus': f'{grouped_alterations_qs[i].lohstatus}',
-                                'expHomCI.cover': f'{grouped_alterations_qs[i].exphomci}',
-                                # 'estimated_homogeneity': f'{get_homogeneity_est(af)}',
+                                'DP': f'{get_dp(grouped_alterations_qs[i].dp)}',
+                                'AF': f'{get_af(grouped_alterations_qs[i].af)}',
+                                'nMajor': f'{get_nmajor(grouped_alterations_qs[i])}',
+                                'nMinor': f'{get_nminor(grouped_alterations_qs[i])}',
+                                'LOHstatus': f'{get_loh_status(grouped_alterations_qs[i])}',
+                                'expHomCI.cover': f'{get_homogeneity_est(grouped_alterations_qs[i].af)}',
                             }
                             for i in range(alts_count)
                         ]
@@ -238,6 +235,38 @@ class GenomicViewSet(viewsets.GenericViewSet):
         #return Response(json.dumps(data, indent=4))  # use a serializer!
         return JsonResponse(data)
 
+def get_nminor(object):
+    cna = CopyNumberAlteration.objects.all().filter(patient_id=object.patient_id).filter(sample_id=object.sample_id).filter(gene=object.hugoSymbol)
+    if cna:
+        return cna[0].nMinor
+    else:
+        return "NA"
+def get_nmajor(object):
+    cna = CopyNumberAlteration.objects.all().filter(patient_id=object.patient_id).filter(sample_id=object.sample_id).filter(gene=object.hugoSymbol)
+    if cna:
+        return cna[0].nMinor
+    else:
+        return "NA"
+
+def get_loh_status(object):
+    cna = CopyNumberAlteration.objects.all().filter(patient_id=object.patient_id).filter(sample_id=object.sample_id).filter(gene=object.hugoSymbol)
+    if cna:
+        return cna[0].LOHstatus
+    else:
+        return "NA"
+
+def get_dp(dp):
+    if dp:
+        return dp
+    else:
+        return "NA"
+
+def get_af(af):
+    if af:
+        return af
+    else:
+        return "NA"
+
 def get_homogeneity_est(af):
     # mutate(totalCN=nMajor + nMinor) % > %
     # mutate(expHomAF=expectedAF(totalCN, totalCN, purity)) % > %
@@ -245,7 +274,8 @@ def get_homogeneity_est(af):
     # mutate(expHomCI.hi = qbinom(0.975, DP, expHomAF)) % > %
     # mutate(expHomCI.cover = expHomCI.lo <= AD.1) % > %  # & AD.1 <= expHomCI.hi ### the comparison to upper CI boundary is irrelevant and leads to wrong interpretation
     # mutate(expHom.pbinom.lower = pbinom(AD.1, DP, expHomAF))
-    return True if af >= 0.5 else False
+    return "NA"
+    #return True if af >= 0.5 else False
 
 def get_ploidy(est_objs):
     if est_objs:
