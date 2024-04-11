@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import re
+import string
+import random
 import logging
 
 def column_to_tables(targets, cur):
@@ -16,7 +18,7 @@ def column_to_tables(targets, cur):
         logging.debug(table)
 
         q=f"SELECT p.name as columnName FROM sqlite_master m LEFT OUTER JOIN pragma_table_info((m.name)) p on m.name <> p.name WHERE m.name == \"{table}\" ORDER BY m.name, columnName;"
-        logging.debug(q)
+        # logging.debug(q)
         cur.execute(q)
 
         columns = cur.fetchall()
@@ -33,21 +35,22 @@ def column_to_tables(targets, cur):
     return col2tab
 
 
+
+def find_cohort_code(value):
+    m = re.search("^([A-Z]{1,2}[0-9]{3})_\w*.*$", value)
+    if m:
+        return m.group(1)
+    elif re.match("^[A-Z]{1,2}[0-9]{3}$", value):
+        return value
+    else:
+        return None
+
 def find_cohort_codes(col2tab, cur):
     queries = []
     for column in col2tab:
         for table in col2tab[column]:
             queries.append(f"SELECT {column} FROM {table}")
     query = " UNION ".join(queries)
-
-    def find_cohort_code(value):
-        m = re.search("^([A-Z][0-9]{3})_\w*.*$", value)
-        if m:
-            return m.group(1)
-        elif re.match("^[A-Z][0-9]{3}$", value):
-            return value
-        else:
-            return None
 
     cohort_codes = set()
     for v in cur.execute(query):
@@ -103,7 +106,63 @@ if __name__ == "__main__":
 
     logging.info("Find out cohort codes...")
     cohort_codes = find_cohort_codes(col2tab, cur)
-    logging.debug(cohort_codes)
+    # logging.debug(cohort_codes)
 
-    logging.debug("Close database connection")
+    logging.info("Prepare anonymization mapping...")
+    anon_map = {}
+    for cc in cohort_codes:
+        anon_map[cc] = "CC" + "".join(random.choices(string.digits, k=4))
+
+    for cc in anon_map:
+        logging.debug(f"\t{cc}\t=>\t{anon_map[cc]}")
+
+    logging.info("Compute anonymization...")
+
+    def anonymize(value, anon_map):
+        assert(";" not in value)
+        value = re.sub("_DNA[1-2]*$", "", value)
+        m = re.search("^([A-Z]{1,2}[0-9]{3})", value)
+        if m:
+            code = m.group(1)
+            return re.sub(code, anon_map[code], value)
+        else:
+            return None
+
+    for column in col2tab:
+        for table in col2tab[column]:
+            # Long entries first, to avoid partial replacement.
+            cur.execute(f"SELECT DISTINCT {column} FROM {table} ORDER BY length({column}) DESC;")
+            values = cur.fetchall()
+            # logging.debug(values)
+            for v in values:
+                value = v[0]
+                if ";" in value:
+                    vals = []
+                    for val in value.split(";"):
+                        new = anonymize(val, anon_map)
+                        vals.append(new)
+                    new_val = ";".join(vals)
+                else:
+                    new_val = anonymize(value, anon_map)
+
+                if value and new_val:
+                    # logging.debug(f"\t{value}\t=>\t{new_val}")
+                    cur.execute(f"UPDATE {table} SET {column} = REPLACE({column}, '{value}', '{new_val}');")
+                    # con.commit()
+
+    logging.info("Apply anonymization...")
+    con.commit()
+
+    logging.info("Consistency checks...")
+    for column in col2tab:
+        for table in col2tab[column]:
+            for v in cur.execute(f"SELECT DISTINCT {column} FROM {table};"):
+                value = v[0]
+                cc = find_cohort_code(value)
+                if cc in anon_map:
+                    logging.error(f"{cc} found in {column} of {table}: {value}")
+
+
+    logging.debug("Close database connection...")
     con.close()
+    logging.info("Done")
