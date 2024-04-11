@@ -142,6 +142,13 @@ You will be asked to accept some user contract at first launch.
 9. Query OncoKB and Cancer Genome Interpreter actionable targets per patient identified by cohortcode.
 
     ```sh
+    # run this section if OncoKB and CGI results need to be removed from Django DB before querying
+    docker compose run --rm backend sh -c "python manage.py shell"
+    > from genomics.models import OncoKBAnnotation, CGIMutation, CGICopyNumberAlteration, CGIDrugPrescriptions
+    > OncoKBAnnotation.objects.all().delete().delete(); CGICopyNumberAlteration.objects.all().delete(); CGIMutation.objects.all().delete(); CGIDrugPrescriptions.objects.all().delete()
+    ```
+   
+    ```sh
     docker-compose run --rm backend sh -c "python manage.py genomic_db_query_utils --oncokbcna --actionable --cohortcode=<cohortcode>"
     docker-compose run --rm backend sh -c "python manage.py genomic_db_query_utils --oncokbsnv --actionable --cohortcode=<cohortcode>"
     ```
@@ -275,7 +282,14 @@ You have two options: *Python's virtual environments* or *conda*:
     ```
 
 10. Query OncoKB and Cancer Genome Interpreter actionable targets per patient identified by cohort code.
-
+    
+    ```sh
+    # run this section if OncoKB and CGI results need to be removed from Django DB before querying
+    python manage.py shell
+    > from genomics.models import OncoKBAnnotation, CGIMutation, CGICopyNumberAlteration, CGIDrugPrescriptions
+    > OncoKBAnnotation.objects.all().delete().delete(); CGICopyNumberAlteration.objects.all().delete(); CGIMutation.objects.all().delete(); CGIDrugPrescriptions.objects.all().delete()
+    ```
+    
     ```sh
     python manage.py genomic_db_query_utils --oncokbcna --actionable --cohortcode=<cohortcode>
     python manage.py genomic_db_query_utils --oncokbsnv --actionable --cohortcode=<cohortcode>
