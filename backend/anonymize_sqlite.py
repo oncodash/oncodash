@@ -104,10 +104,13 @@ def anonymize_all(col2tab, cur):
 if __name__ == "__main__":
     import argparse
     import sqlite3
+    import os
+    import sys
 
     do = argparse.ArgumentParser(
-        prog='Oncodash SQLite3 database Anonymizer',
-        description='Alter Oncodash’s Django/SQLite3 database to anonymize out sensitive clinical data.')
+        formatter_class=argparse.RawTextHelpFormatter,
+        description="""Alter an Oncodash’s Django/SQLite3 database to anonymize out cohort and sample names.\n\nWARNING: does alter IN PLACE the database file, do not forget to make a backup first.""",
+        epilog=f"Example:\n\t./{os.path.basename(sys.argv[0])} db.sqlite3 --targets cohort_code sample_id samples sample --log-level INFO")
 
     do.add_argument("--log-level",
         default="INFO",
@@ -118,7 +121,7 @@ if __name__ == "__main__":
     do.add_argument('-t', '--targets', nargs='+', default=["cohort_code", "sample_id", "samples", "sample"],
         help="Columns names in which to anonymize cohort codes.")
 
-    do.add_argument("filename")
+    do.add_argument("filename", metavar="FILENAME")
 
     asked = do.parse_args()
 
