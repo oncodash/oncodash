@@ -67,9 +67,10 @@ def find_cohort_codes(col2tab, cur):
     return cohort_codes
 
 
-def anonymize_value(value, anon_map):
+def anonymize_value(value, anon_map, remove_site = False):
     assert(";" not in value)
-    value = re.sub("_DNA[1-2]*$", "", value)
+    if remove_site:
+        value = re.sub("_DNA[1-2]*$", "", value)
     m = re.search("^([A-Z]{1,2}[0-9]{3})", value)
     if m:
         code = m.group(1)
@@ -77,7 +78,7 @@ def anonymize_value(value, anon_map):
     else:
         return None
 
-def anonymize_all(col2tab, cur):
+def anonymize_all(col2tab, cur, remove_site = False):
     for column in col2tab:
         logging.info(f"\t{column}")
         for table in col2tab[column]:
@@ -90,11 +91,11 @@ def anonymize_all(col2tab, cur):
                 if ";" in value:
                     vals = []
                     for val in value.split(";"):
-                        new = anonymize_value(val, anon_map)
+                        new = anonymize_value(val, anon_map, remove_site)
                         vals.append(new)
                     new_val = ";".join(vals)
                 else:
-                    new_val = anonymize_value(value, anon_map)
+                    new_val = anonymize_value(value, anon_map, remove_site)
 
                 if value and new_val:
                     # logging.debug(f"\t{value}\t=>\t{new_val}")
@@ -120,6 +121,8 @@ if __name__ == "__main__":
 
     do.add_argument('-t', '--targets', nargs='+', default=["cohort_code", "sample_id", "samples", "sample"],
         help="Columns names in which to anonymize cohort codes.")
+
+    do.add_argument('-s', '--remove-sample-site', action="store_true")
 
     do.add_argument("filename", metavar="FILENAME")
 
@@ -158,7 +161,7 @@ if __name__ == "__main__":
         logging.debug(f"\t{cc}\t=>\t{anon_map[cc]}")
 
     logging.info("Compute anonymization...")
-    anonymize_all(col2tab, cur)
+    anonymize_all(col2tab, cur, remove_site = asked.remove_sample_site)
 
     logging.info("Apply anonymization...")
     con.commit()
