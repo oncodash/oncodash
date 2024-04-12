@@ -5,6 +5,19 @@ The oncodash back-end is used to serve API-endpoints for the front-end applicati
 
 # Tools
 
+## Export
+
+The `export_sqlite_csp.py` script allows to export some tables to CSV files.
+
+You can indicate which table you want using a matching regular expression.
+
+For example:
+```sh
+./export_sqlite_csv.py db.sqlite3 genomics_cgi[dm] genomics_oncokb --log-level INFO --prefix test_
+```
+
+## Anonymization
+
 The `anonymize_sqlite.py` script allows to alter an Oncodash’s Django/SQLite3
 database to anonymize out cohort and sample names.
 
