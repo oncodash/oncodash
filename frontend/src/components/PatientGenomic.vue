@@ -64,7 +64,7 @@
 
         <p>{{ geneData.description }}</p>
 
-        <details open class="alteration-section" v-for="alteration in geneData.alterations">
+        <details class="alteration-section" v-for="alteration in geneData.alterations">
           <summary class="alteration-header">
             <h3>
               Alteration -
