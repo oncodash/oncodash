@@ -44,12 +44,15 @@ defineProps<{
 </script>
 
 <style scoped>
-.clinical-data,
-.timelines {
+.clinical-data {
   display: flex;
   flex-flow: row wrap;
   gap: var(--spacing);
   justify-content: center;
+  padding: var(--spacing);
+}
+
+.timelines {
   padding: var(--spacing);
 }
 

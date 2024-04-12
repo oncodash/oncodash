@@ -1,4 +1,7 @@
 <template>
+  <div class="demo-label">
+    Dates are not real for demonstration purpose
+  </div>
   <CanvasJSStockChart
     :options="chartOptions()"
     :style="chartStyle"
@@ -362,3 +365,11 @@ export default {
   }
 }
 </script>
+
+<style>
+.demo-label {
+  text-align: end;
+  color: orangered;
+  padding: 8px;
+}
+</style>
