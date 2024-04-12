@@ -8,8 +8,12 @@
 
   <section class="genomic-summaries">
     <div class="genes-summary">
+      <span class="summary-label">Actionable genes :</span>
+      <a v-if="actionableGenes.length" class="gene-link" v-for="gene in actionableGenes" :href="'#' + gene">{{ gene }}</a>
+      <span v-else>None</span>
+
       <span class="summary-label">Putatively actionable genes :</span>
-      <a v-if="aggregateActionableGenes().length" class="gene-link" v-for="gene in aggregateActionableGenes()" :href="'#' + gene">{{ gene }}</a>
+      <a v-if="putativelyActionableGenes.length" class="gene-link" v-for="gene in putativelyActionableGenes" :href="'#' + gene">{{ gene }}</a>
       <span v-else>None</span>
     </div>
 
@@ -123,6 +127,16 @@ const actionableGroups = computed(() => {
   })
 })
 
+const actionableGenes = computed(() => {
+  if (!genomicData.value) return []
+  return Object.keys(genomicData.value?.actionable_aberrations)
+})
+
+const putativelyActionableGenes = computed(() => {
+  if (!genomicData.value) return []
+  return Object.keys(genomicData.value?.putative_functionally_relevant_variants)
+})
+
 /**
  * Fetch the genomic data of the patient on component start.
  */
@@ -137,17 +151,6 @@ onMounted(() => {
 })
 
 /**
- * Lists all the putatively actionable genes.
- * @returns The list of genes
- */
-function aggregateActionableGenes(): string[] {
-  return actionableGroups.value.reduce<string[]>((list, group) => {
-    const genes = Object.keys(genomicData.value?.[group] || {})
-    return list.concat(genes)
-  }, [])
-}
-
-/**
  * Lists all the drugs involved in the current genomic data.
  * @returns The list of drugs
  */
@@ -159,19 +162,23 @@ function aggregateActionableDrugs(): string[] {
 
     Object.values(genomicData.value?.[group]).forEach(geneData => {
       geneData.alterations.forEach(alteration => {
-        drugs = drugs.concat(displayDrugs(alteration.reported_sensitivity).split(', '))
+        const drugList = alteration.reported_sensitivity
+          .replace('Responsive:', '')
+          .replace('Resistant:', '')
+          .trim()
+          .split(' ')
+
+        drugs = drugs.concat(drugList)
       })
     })
 
     return list.concat(drugs)
   }, [])
-    .filter(drug => {
-      return drug !== "None"
-    })
+  .filter(drug => { return drug !== "None" })
 
   // Make all drugs unique by using a set and
   // turning it back to an array
-  return Array.from(new Set(allDrugs)).sort()
+  return [...new Set(allDrugs)].sort()
 }
 
 /**
@@ -210,16 +217,6 @@ function linkifyText(text: string): string {
  */
 function buildPubmedLink(pmid: string): string {
   return `<a href="https://pubmed.ncbi.nlm.nih.gov/${pmid}" target="_blank">${pmid}</a>`
-}
-
-/**
- * Display the list of drugs in the "reported sensitivity response"
- * as a comma-separated list.
- * @param value - The initial string
- * @returns The comma-separated string
- */
-function displayDrugs(value: string): string {
-  return value.replaceAll(/[;\s]/g, ', ')
 }
 </script>
 
