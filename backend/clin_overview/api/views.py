@@ -12,7 +12,7 @@ import pandas as pd
 from rest_framework.permissions import IsAuthenticated
 import re
 
-    
+
 
 class ClinicalViewSet(viewsets.ModelViewSet):
     """
@@ -201,7 +201,6 @@ class TimelineViewSet(viewsets.ModelViewSet): # id paziente
     serializer_class = TimelineRecordSerializer
 
     def retrieve(self, request, patient_id=None):
-        print(patient_id)
         queryset = TimelineRecord.objects.filter(patient_id=patient_id, event="laboratory")
         ca125 = queryset.filter(name="ca125").order_by("date_relative")
         hb = queryset.filter(name="hb").order_by("date_relative")

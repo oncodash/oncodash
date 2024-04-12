@@ -335,7 +335,6 @@ def get_sample_type_info(sample_id, timeline_qs):
     else:
         return "NA"
 def get_site_info(sample_id):
-    print(sample_id)
     ss = sample_id.split("_")
     site = str(ss[1][1:])
     if site.startswith("BDNA"):
