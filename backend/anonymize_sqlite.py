@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import re
+import csv
 import string
 import random
 import logging
@@ -102,6 +103,10 @@ def anonymize_all(col2tab, cur, remove_site = False):
                     cur.execute(f"UPDATE {table} SET {column} = REPLACE({column}, '{value}', '{new_val}');")
 
 
+def random_code():
+    return "CC" + "".join(random.choices(string.digits, k=4))
+
+
 if __name__ == "__main__":
     import argparse
     import sqlite3
@@ -124,7 +129,9 @@ if __name__ == "__main__":
 
     do.add_argument('-s', '--remove-sample-site', action="store_true")
 
-    do.add_argument("filename", metavar="FILENAME")
+    do.add_argument('-c', '--eoc', help="Use the given (;-separated) mapping instead of generating a random one.", metavar="EOC_FILE")
+
+    do.add_argument("filename", metavar="DATABASE_FILE")
 
     asked = do.parse_args()
 
@@ -154,8 +161,21 @@ if __name__ == "__main__":
 
     logging.info("Prepare anonymization mapping...")
     anon_map = {}
-    for cc in cohort_codes:
-        anon_map[cc] = "CC" + "".join(random.choices(string.digits, k=4))
+    if asked.eoc:
+        with open(asked.eoc, 'r') as fd:
+            eocs = csv.reader(fd, delimiter=';')
+            for row in eocs:
+                anon_map[row[0]] = row[1]
+        # Check for missing codes.
+        for cc in cohort_codes:
+            if cc not in anon_map:
+                # Fallback to random code.
+                anon_map[cc] = random_code()
+                logging.warning(f"Cohort code `{cc}` found in database but not in EOC mapping, use random `{anon_map[cc]}`.")
+
+    else:
+        for cc in cohort_codes:
+            anon_map[cc] = random_code()
 
     for cc in anon_map:
         logging.debug(f"\t{cc}\t=>\t{anon_map[cc]}")
