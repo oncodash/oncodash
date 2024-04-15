@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="131.88782mm"
+   height="19.44552mm"
+   viewBox="0 0 131.88782 19.44552"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="oncodash-logo.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title42118">Oncodash logo</title>
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#1a2c79"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="1"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     showguides="false"
+     inkscape:guide-bbox="true"
+     inkscape:snap-intersection-paths="true"
+     inkscape:object-paths="true"
+     inkscape:snap-bbox="true"
+     inkscape:snap-smooth-nodes="true"
+     inkscape:snap-midpoints="true"
+     inkscape:zoom="4.6314286"
+     inkscape:cx="256.72424"
+     inkscape:cy="62.723627"
+     inkscape:current-layer="layer1"
+     inkscape:snap-global="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:snap-center="true"
+     inkscape:snap-object-midpoints="true"
+     inkscape:snap-nodes="false"
+     inkscape:snap-bbox-midpoints="true">
+    <sodipodi:guide
+       position="70.167951,17.891582"
+       orientation="0,-1"
+       id="guide34811" />
+    <sodipodi:guide
+       position="70.167951,1.5539417"
+       orientation="0,-1"
+       id="guide34813" />
+    <sodipodi:guide
+       position="83.715041,9.7227617"
+       orientation="0,-1"
+       id="guide38889" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2">
+    <rect
+       x="135.41196"
+       y="257.65555"
+       width="218.17149"
+       height="22.241835"
+       id="rect23494" />
+  </defs>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-45.004589,-22.862672)">
+    <rect
+       style="fill:#1a2c79;fill-opacity:1;stroke:none;stroke-width:0.10109;stroke-linecap:round"
+       id="rect1195"
+       width="35.07803"
+       height="35.07803"
+       x="95.325203"
+       y="15.046423"
+       inkscape:export-filename="/home/nojhan/code/oncodash/oncodash/oncodash-logo-pill.png"
+       inkscape:export-xdpi="289.63998"
+       inkscape:export-ydpi="289.63998" />
+    <text
+       xml:space="preserve"
+       transform="scale(0.26458333)"
+       id="text23492"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:18.6667px;line-height:1.25;font-family:'Nimbus Sans';-inkscape-font-specification:'Nimbus Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;writing-mode:lr-tb;white-space:pre;shape-inside:url(#rect23494);fill:black;stroke:none;stroke-width:5;stroke-linecap:round" />
+    <g
+       id="g1069">
+      <path
+         style="fill:none;stroke:#1e9dbc;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 108.54288,40.754256 H 104.51683 C 100.35739,40.754256 97.008813,37.405683 97.008813,33.246244 V 31.924632 C 97.008813,27.765193 100.35739,24.416619 104.51683,24.416619 H 108.54288 C 109.63024,24.416619 110.5559,25.397841 110.5559,26.458824 V 28.501028 V 32.585437 V 36.669847 V 38.712051 C 110.58401,39.959282 109.50375,40.754256 108.54288,40.754256 Z"
+         id="path27923"
+         sodipodi:nodetypes="cssssccccccc" />
+      <path
+         style="fill:none;stroke:#46a26e;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 115.17254,24.416619 H 117.18556 H 121.21161 C 125.37105,24.416619 128.71963,27.765193 128.71963,31.924632 V 33.246244 C 128.71963,37.405683 125.37105,40.754256 121.21161,40.754256 H 117.18556 H 115.17254 Z"
+         id="rect27008" />
+    </g>
+    <path
+       style="fill:none;stroke:white;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 94.036108,24.416619 C 93.026594,24.286149 90.010058,24.416619 90.010058,24.416619 C 85.850618,24.416619 82.502038,27.765193 82.502038,31.924632 V 33.246244 C 82.502038,37.405683 85.850618,40.754256 90.010058,40.754256 C 90.010058,40.754256 93.026594,40.884726 94.036108,40.754256"
+       id="path35484"
+       sodipodi:nodetypes="cssssc" />
+    <g
+       id="g37550"
+       transform="matrix(1,0,0,1.0156233,9.8262863,-0.50909141)"
+       style="stroke-width:0.992279;stroke-linecap:round">
+      <path
+         style="fill:none;stroke:white;stroke-width:2.4807;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 43.926673,24.416619 C 39.767233,24.416619 36.418653,27.765193 36.418653,31.924632 V 33.246244 C 36.418653,37.405683 39.767233,40.754256 43.926673,40.754256"
+         id="path35623"
+         sodipodi:nodetypes="cssc" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#path35623"
+         id="use35844"
+         transform="matrix(-1,0,0,1,87.853346,0)"
+         width="100%"
+         height="100%"
+         style="stroke:white;stroke-width:0.992279;stroke-linecap:round" />
+    </g>
+    <g
+       id="g37546"
+       transform="translate(10.600311)"
+       style="stroke-linecap:round">
+      <path
+         style="fill:none;stroke:white;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 55.718101,40.754249 V 24.41661"
+         id="path36016" />
+      <path
+         style="fill:none;stroke:white;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 66.515246,40.754249 V 24.41661"
+         id="path36232" />
+      <path
+         style="fill:white;stroke:white;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 55.718101,24.416611 L 66.515247,40.754251"
+         id="path37324"
+         sodipodi:nodetypes="cc" />
+    </g>
+    <g
+       id="g39845"
+       transform="translate(1.7461272)"
+       style="stroke-linecap:round">
+      <path
+         style="fill:white;stroke:white;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 130.91023,40.754251 L 136.54224,24.416611"
+         id="path37585"
+         sodipodi:nodetypes="cc" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#path37585"
+         id="use37842"
+         transform="matrix(-1,0,0,1,273.08448,0)"
+         width="100%"
+         height="100%"
+         style="stroke-linecap:round" />
+      <path
+         style="fill:none;stroke:white;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 132.36905,36.522435 H 140.71543"
+         id="path37981"
+         sodipodi:nodetypes="cc" />
+    </g>
+    <g
+       id="g39850"
+       transform="matrix(1,0,0,1.0403909,2.2801937,-1.316154)"
+       style="stroke-width:0.980396;stroke-linecap:round">
+      <path
+         style="fill:none;stroke:white;stroke-width:2.35295;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 156.09932,28.163123 C 156.09932,26.087557 154.05191,24.416611 151.5087,24.416611 H 150.70064 C 148.15745,24.416611 146.11004,26.087557 146.11004,28.163123 V 30.172128"
+         id="path38120"
+         sodipodi:nodetypes="csssc"
+         inkscape:transform-center-x="0.058282893"
+         inkscape:transform-center-y="3.3978642" />
+      <use
+         x="0"
+         y="0"
+         xlink:href="#path38120"
+         id="use38122"
+         transform="rotate(180,151.14767,32.585431)"
+         width="100%"
+         height="100%"
+         inkscape:transform-center-x="-0.089365054"
+         inkscape:transform-center-y="-6.7646021"
+         style="stroke-width:0.907759;stroke-linecap:round" />
+      <path
+         style="fill:none;stroke:white;stroke-width:2.35295;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 146.11058,30.172128 C 146.11058,32.58543 148.69058,32.585431 151.14767,32.585431 C 153.60476,32.585431 156.18476,32.58543 156.18476,34.998734"
+         id="path38450"
+         sodipodi:nodetypes="czc" />
+    </g>
+    <g
+       id="g39856"
+       transform="translate(3.5061954)"
+       style="stroke-linecap:round">
+      <g
+         id="g39547"
+         transform="translate(105.62097)"
+         style="stroke-linecap:round">
+        <path
+           style="fill:none;stroke:white;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 55.718101,40.754249 V 24.41661"
+           id="path39541" />
+        <path
+           style="fill:none;stroke:white;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 66.515246,40.754249 V 24.41661"
+           id="path39543" />
+        <path
+           style="fill:white;stroke:white;stroke-width:2.5;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 55.718101,32.585431 H 66.515246"
+           id="path39545"
+           sodipodi:nodetypes="cc" />
+      </g>
+    </g>
+  </g>
+  <metadata
+     id="metadata42116">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Oncodash logo</dc:title>
+        <dc:date>2023-09-01</dc:date>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Rachel torchet</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:contributor>
+          <cc:Agent>
+            <dc:title>Johann Dreo</dc:title>
+          </cc:Agent>
+        </dc:contributor>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

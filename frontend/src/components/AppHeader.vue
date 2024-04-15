@@ -2,9 +2,10 @@
   <header>
     <RouterLink :to="{ name: 'PatientsListPage' }" v-slot="{ navigate }">
       <img
-        src="/oncodash-logo.png"
+        src="/oncodash-logo.svg"
         alt="The logo of Oncodash"
         height="64"
+        width="300"
         @click="navigate">
     </RouterLink>
     <RouterLink v-if="!isLoggedIn" :to="{ name: 'LoginPage' }" v-slot="{ navigate }">
