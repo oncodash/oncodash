@@ -36,7 +36,8 @@ body {
 
 #app {
   display: flex;
-  flex-flow: column nowrap;
+  flex-flow: column wrap;
+  align-content: center;
 }
 
 a {
