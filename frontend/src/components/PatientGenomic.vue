@@ -29,7 +29,7 @@
       <thead>
         <tr>
           <th>Sample</th>
-          <th>Purity</th>
+          <th>Tumor fraction</th>
           <th>Ploidy</th>
           <th>Tumor site</th>
           <th>Sample time</th>
