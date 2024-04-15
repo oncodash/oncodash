@@ -360,4 +360,18 @@ summary h3 {
 .alteration-drugs {
   font-weight: bold;
 }
+
+.alteration-data {
+  display: flex;
+  flex-flow: column wrap
+}
+
+.alteration-data p {
+  margin-top: 0;
+}
+
+.alteration-table {
+  align-self: center;
+  width: min(1500px, 100%);
+}
 </style>
