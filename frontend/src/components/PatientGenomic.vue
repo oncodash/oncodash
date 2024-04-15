@@ -277,6 +277,13 @@ table tbody tr:hover {
   flex-flow: row wrap;
   gap: calc(var(--spacing) / 2);
   justify-content: center;
+  align-items: center;
+}
+
+.drug {
+  border: 1px solid var(--black-translucent);
+  border-radius: 18px;
+  padding: 4px 8px;
 }
 
 .samples-summary {
