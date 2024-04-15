@@ -50,8 +50,8 @@ onMounted(() => {
 
 .tab {
   background-color: var(--white);
-  border-radius: 20px 20px 0 0;
   border: 1px solid var(--grey);
+  border-radius: 20px 20px 0 0;
   color: var(--black);
   flex-grow: 1;
   padding: var(--spacing);
@@ -59,12 +59,12 @@ onMounted(() => {
 }
 
 .tab:hover {
+  border-color: var(--primary);
   color: var(--primary);
 }
 
 .tab.active {
-  background-color: var(--primary-light);
-  border-color: var(--primary);
+  border-bottom-color: transparent;
   color: var(--primary);
 }
 
