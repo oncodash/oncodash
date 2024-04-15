@@ -1,6 +1,6 @@
 <template>
   <footer>
-    <div>© Decider Project 2021</div>
+    <div>© Decider Project</div>
   </footer>
 </template>
 
