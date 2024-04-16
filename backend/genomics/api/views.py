@@ -244,7 +244,7 @@ def get_nminor(object):
 def get_nmajor(object):
     cna = CopyNumberAlteration.objects.all().filter(patient_id=object.patient_id).filter(sample_id=object.sample_id).filter(gene=object.hugoSymbol)
     if cna:
-        return cna[0].nMinor
+        return cna[0].nMajor
     else:
         return "NA"
 
