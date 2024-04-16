@@ -1,3 +1,4 @@
+import { useApiState } from './apiState'
 import { GenomicData } from './models/GenomicData'
 import { PatientDTO } from './models/PatientDTO'
 import { PatientID } from './models/Patient'
@@ -14,6 +15,21 @@ const cookies = new Cookies()
 
 // Interceptors
 // =========================================================================
+
+api.interceptors.request.use(config => {
+  useApiState().addRequest()
+  return config
+}, (error) => {
+  return Promise.reject(error)
+})
+
+api.interceptors.response.use(response => {
+  useApiState().removeRequest()
+  return response
+}, (error) => {
+  useApiState().removeRequest()
+  return Promise.reject(error)
+})
 
 api.interceptors.response.use(response => {
   return response

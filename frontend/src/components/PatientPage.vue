@@ -1,4 +1,6 @@
 <template>
+  <AppLoader />
+
   <h1>PATIENT {{ id }}</h1>
 
   <PatientSummary :patient="patient" v-if="patient"></PatientSummary>
@@ -19,6 +21,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import api from '../api'
+import AppLoader from './AppLoader.vue'
 import AppTabs from "./AppTabs.vue"
 import AppTabsPanel from './AppTabsPanel.vue'
 import PatientSummary from "./PatientSummary.vue"
