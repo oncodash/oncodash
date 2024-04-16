@@ -1,22 +1,37 @@
 <template>
   <section class="genomic-numbers" v-if="genomicData">
-    <div class="genomic-number" v-for="genomicNumber in genomicData.genomic">
-      <div class="number">{{ genomicNumber[0] }}</div>
-      <div class="name">{{ genomicNumber[1] }}</div>
+    <div class="genomic-number">
+      <div class="number">{{ genomicData.genomic.actionable_aberrations[0] }}</div>
+      <div class="name">{{ genomicData.genomic.actionable_aberrations[1] }}</div>
+      <div class="genes">
+        <a v-if="actionableGenes.length" class="gene-link" v-for="gene in actionableGenes" :href="'#' + gene">
+          {{ gene }}
+        </a>
+      </div>
+    </div>
+
+    <div class="genomic-number">
+      <div class="number">{{ genomicData.genomic.putative_functionally_relevant_variants[0] }}</div>
+      <div class="name">{{ genomicData.genomic.putative_functionally_relevant_variants[1] }}</div>
+      <div class="genes">
+        <a v-if="putativelyActionableGenes.length" class="gene-link" v-for="gene in putativelyActionableGenes" :href="'#' + gene">
+          {{ gene }}
+        </a>
+      </div>
+    </div>
+
+    <div class="genomic-number">
+      <div class="number">{{ genomicData.genomic.other_variants[0] }}</div>
+      <div class="name">{{ genomicData.genomic.other_variants[1] }}</div>
+      <div class="genes">
+        <a v-if="otherGenes.length" class="gene-link" v-for="gene in otherGenes" :href="'#' + gene">
+          {{ gene }}
+        </a>
+      </div>
     </div>
   </section>
 
   <section class="genomic-summaries">
-    <div class="genes-summary">
-      <span class="summary-label">Actionable genes :</span>
-      <a v-if="actionableGenes.length" class="gene-link" v-for="gene in actionableGenes" :href="'#' + gene">{{ gene }}</a>
-      <span v-else>None</span>
-
-      <span class="summary-label">Putatively actionable genes :</span>
-      <a v-if="putativelyActionableGenes.length" class="gene-link" v-for="gene in putativelyActionableGenes" :href="'#' + gene">{{ gene }}</a>
-      <span v-else>None</span>
-    </div>
-
     <div class="drugs-summary">
       <span class="summary-label">Associated drugs :</span>
       <span v-if="aggregateActionableDrugs().length" class="drug" v-for="gene in aggregateActionableDrugs()">{{ gene }}</span>
@@ -137,6 +152,11 @@ const putativelyActionableGenes = computed(() => {
   return Object.keys(genomicData.value?.putative_functionally_relevant_variants)
 })
 
+const otherGenes = computed(() => {
+  if (!genomicData.value) return []
+  return Object.keys(genomicData.value?.other_variants)
+})
+
 /**
  * Fetch the genomic data of the patient on component start.
  */
@@ -251,16 +271,31 @@ table tbody tr:hover {
 }
 
 .genomic-number {
+  display: flex;
+  flex-flow: column wrap;
+  gap: 12px;
   border: 3px solid var(--primary);
   border-radius: 20px;
   text-align: center;
-  padding: var(--spacing);
-  width: clamp(200px, 20%, 500px);
+  padding: var(--spacing) 0;
+  width: clamp(300px, 20%, 500px);
 }
 
 .genomic-number .number {
   color: var(--primary);
   font-size: 50px;
+}
+
+.genomic-number .genes {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.genomic-number .genes .gene-link {
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  padding: 0 8px;
 }
 
 .genomic-summaries {
@@ -271,7 +306,6 @@ table tbody tr:hover {
   align-items: center;
 }
 
-.genes-summary,
 .drugs-summary {
   display: flex;
   flex-flow: row wrap;
