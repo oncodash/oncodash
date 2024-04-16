@@ -94,7 +94,16 @@
           <div class="alteration-data">
             <p class="alteration-drugs">
               Associated drugs -
-              {{ alteration.reported_sensitivity }}
+              <span v-if="alteration.reported_sensitivity !== 'None'">
+                {{ formatDrugs(alteration.reported_sensitivity).effect }} :
+              </span>
+              <span
+                v-if="alteration.reported_sensitivity !== 'None'" class="drug"
+                v-for="drug in formatDrugs(alteration.reported_sensitivity).drugList"
+              >
+                {{ drug }}
+              </span>
+              <span v-else>None</span>
             </p>
             <p v-html="linkifyText(alteration.description)"></p>
             <table class="alteration-table">
@@ -194,11 +203,21 @@ function aggregateActionableDrugs(): string[] {
 
     return list.concat(drugs)
   }, [])
-  .filter(drug => { return drug !== "None" })
+    .filter(drug => { return drug !== "None" })
 
   // Make all drugs unique by using a set and
   // turning it back to an array
   return [...new Set(allDrugs)].sort()
+}
+
+function formatDrugs(drugs: string) {
+  const [effect, drugsString] = drugs.split(':')
+  const drugList = drugsString?.trim().split(" ")
+
+  return {
+    effect,
+    drugList
+  }
 }
 
 /**
@@ -392,7 +411,11 @@ summary h3 {
 }
 
 .alteration-drugs {
+  display: flex;
+  flex-flow: row wrap;
   font-weight: bold;
+  align-items: center;
+  gap: 6px;
 }
 
 .alteration-data {
