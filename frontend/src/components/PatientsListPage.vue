@@ -23,7 +23,7 @@
     <header>
       <div class="page-summary">
         Displaying {{ pageOffset + 1 }} - {{ pageOffset + pageSize }}
-        of {{ patientsList.length }}
+        of {{ filteredPatients.length }}
       </div>
 
       <div class="pagination">
