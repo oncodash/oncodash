@@ -66,6 +66,8 @@ onMounted(() => {
 .tab.active {
   border-bottom-color: transparent;
   color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 0.5rem;
 }
 
 .tabs-content {
