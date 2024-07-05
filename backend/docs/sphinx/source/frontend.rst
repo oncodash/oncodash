@@ -1,5 +1,5 @@
-Frontend
-========
+Oncodash frontend documentation
+###############################
 
 The interface of Oncodash is made with the `Vue.js (v3) <https://vuejs.org/>` framework and build with the `Vite <https://vitejs.dev/>` Bundler. It also uses `Typescript <https://www.typescriptlang.org/>` for better typing. The whole package is made on top of `node.js <https://nodejs.org/>`.
 The source code can be found in the frontend folder at the root of the project:
