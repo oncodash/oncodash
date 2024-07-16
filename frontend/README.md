@@ -16,7 +16,7 @@ The source code can be found in the frontend folder at the root of the project:
 
 ## Source code
 
-The main source code of the interface is under `frontend/src/`, oraganised as such :
+The main source code of the interface is under `frontend/src/`, organised as such :
 
 - assets : contains the images and icons used by the components.
 - components : the list of the Vue components that make the pages.
