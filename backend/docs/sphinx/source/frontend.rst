@@ -35,3 +35,9 @@ Patient timelines
 -----------------
 
 The patient timelines are rendered using `canvajs <https://canvasjs.com/>`, specifically `@canvasjs/vue-stockcharts` as declared in the package.json.
+
+Vue components
+--------------
+
+The Oncodash interface uses the `Vue framework <https://vuejs.org/>` the implement the graphical components.
+It builds on top of standard HTML, CSS, and JavaScript and provides a declarative, component-based programming model that helps you efficiently develop user interfaces of any complexity. The components themselves are written as `Single-File Components <https://vuejs.org/guide/introduction.html#single-file-components>` (SFC) ending with the `.vue` extension.
