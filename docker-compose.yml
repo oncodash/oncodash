@@ -67,7 +67,7 @@ services:
         source: ./data/letsencrypt
         target: /etc/letsencrypt
     depends_on:
-      - nodeserver
+      # - nodeserver
       - frontend
       - backend
 
