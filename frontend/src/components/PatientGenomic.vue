@@ -105,7 +105,13 @@
               </span>
               <span v-else>None</span>
             </p>
-            <p v-html="linkifyText(alteration.description)"></p>
+            <p>
+              <ul>
+                <li v-for="sentence in listifyText(alteration.description)">
+                  <span v-html="linkifyText(sentence)"></span>
+                </li>
+              </ul>
+            </p>
             <table class="alteration-table">
               <thead>
                 <tr>
@@ -218,6 +224,10 @@ function formatDrugs(drugs: string) {
     effect,
     drugList
   }
+}
+
+function listifyText(text: string): any {
+  return text.match(/(.+?\.\s*)/g)
 }
 
 /**
