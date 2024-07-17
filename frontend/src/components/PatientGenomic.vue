@@ -99,18 +99,17 @@
               </span>
               <span
                 v-if="alteration.reported_sensitivity !== 'None'" class="drug"
-                v-for="drug in formatDrugs(alteration.reported_sensitivity).drugList"
-              >
+                v-for="drug in formatDrugs(alteration.reported_sensitivity).drugList">
                 {{ drug }}
               </span>
               <span v-else>None</span>
             </p>
             <p>
-              <ul>
-                <li v-for="sentence in listifyText(alteration.description)">
-                  <span v-html="linkifyText(sentence)"></span>
-                </li>
-              </ul>
+            <ul>
+              <li v-for="sentence in listifyText(alteration.description)">
+                <span v-html="linkifyText(sentence)"></span>
+              </li>
+            </ul>
             </p>
             <table class="alteration-table">
               <thead>
@@ -122,7 +121,7 @@
               </thead>
               <tbody>
                 <tr v-for="row in alteration.row">
-                  <td v-for="(value) in row">
+                  <td v-for="(value, column) in row" :class="{ 'highlight-cell': highlightCell(column, row) }">
                     {{ value }}
                   </td>
                 </tr>
@@ -141,7 +140,7 @@ import { onMounted, ref } from 'vue'
 import { computed } from '@vue/reactivity'
 import api from '../api'
 import { Patient } from '../models/Patient'
-import { GenomicData } from '../models/GenomicData'
+import { AlterationSampleData, GenomicData } from '../models/GenomicData'
 
 const props = defineProps<{
   patient: Patient
@@ -266,6 +265,16 @@ function linkifyText(text: string): string {
  */
 function buildPubmedLink(pmid: string): string {
   return `<a href="https://pubmed.ncbi.nlm.nih.gov/${pmid}" target="_blank">${pmid}</a>`
+}
+
+function highlightCell(column: string, row: AlterationSampleData): boolean {
+  return (column === 'nMinor' || column === 'nMajor') && MajorMinorNot11(row)
+}
+
+function MajorMinorNot11(row: AlterationSampleData): boolean {
+  if (row.nMajor === '1' && row.nMinor === '1') return false
+  if (row.nMajor === 'NA' || row.nMinor === 'NA') return false
+  return true
 }
 </script>
 
@@ -440,5 +449,9 @@ summary h3 {
 .alteration-table {
   align-self: center;
   width: min(1500px, 100%);
+}
+
+.highlight-cell {
+  color: orangered;
 }
 </style>
