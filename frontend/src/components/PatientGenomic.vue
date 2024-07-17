@@ -215,7 +215,13 @@ function aggregateActionableDrugs(): string[] {
   return [...new Set(allDrugs)].sort()
 }
 
-function formatDrugs(drugs: string) {
+/**
+ * Split the drug list returned by the server to display it
+ * properly in the interface.
+ * @param drugs - A string with all the drugs names
+ * @returns - An object with the drugs and their common effect
+ */
+function formatDrugs(drugs: string): Record<string, string | string[]> {
   const [effect, drugsString] = drugs.split(':')
   const drugList = drugsString?.trim().split(" ")
 
@@ -225,7 +231,12 @@ function formatDrugs(drugs: string) {
   }
 }
 
-function listifyText(text: string): any {
+/**
+ * Split a text sentence by sentence into an array.
+ * @param text - The text to split
+ * @returns The array of sentences
+ */
+function listifyText(text: string): RegExpMatchArray | null {
   return text.match(/(.+?\.\s*)/g)
 }
 
@@ -267,10 +278,22 @@ function buildPubmedLink(pmid: string): string {
   return `<a href="https://pubmed.ncbi.nlm.nih.gov/${pmid}" target="_blank">${pmid}</a>`
 }
 
+/**
+ * Check if the sample table cell should be highlighted or not.
+ * @param column - The column of the row
+ * @param row - The sample row
+ * @returns If the cell should be highlighted or not
+ */
 function highlightCell(column: string, row: AlterationSampleData): boolean {
   return (column === 'nMinor' || column === 'nMajor') && MajorMinorNot11(row)
 }
 
+/**
+ * Check if the nMajor / nMinor combination is not 1:1 in
+ * order to highlight it properly.
+ * @param row - The row to check
+ * @returns If the combination is 1:1 or not
+ */
 function MajorMinorNot11(row: AlterationSampleData): boolean {
   if (row.nMajor === '1' && row.nMinor === '1') return false
   if (row.nMajor === 'NA' || row.nMinor === 'NA') return false
