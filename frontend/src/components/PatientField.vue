@@ -4,7 +4,8 @@
     <span
       v-if="valueExists()"
       class="value"
-      :class="{ red: isNegative(), green: isPositive() }">
+      :class="{ red: isNegative(), green: isPositive() }"
+    >
       {{ value }}
     </span>
     <span
@@ -76,6 +77,11 @@ function valueExists(): boolean {
 
 .value.green {
   color: var(--green);
+
+  &::before {
+    content: "\2705";
+    margin-right: 5px;
+  }
 }
 
 .value.empty {
