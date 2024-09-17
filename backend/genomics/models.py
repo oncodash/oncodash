@@ -261,3 +261,107 @@ class OncoKBAnnotation(models.Model):
 
     class Meta:
         unique_together = ['sample_id', 'hugoSymbol', 'alteration']
+
+class cna_annotation(models.Model):
+
+    patient_id = models.IntegerField()
+    sample_id = models.CharField(max_length=64, default=None, blank=True, null=True)
+    referenceGenome = models.CharField(max_length=16, default=None, blank=True, null=True)
+    hugoSymbol = models.CharField(max_length=32, default=None, blank=True, null=True)
+    entrezGeneId = models.CharField(max_length=32, default=None, blank=True, null=True)
+    alteration = models.CharField(max_length=16, default=None, blank=True, null=True)
+    tumorType = models.CharField(max_length=16, default=None, blank=True, null=True)
+    consequence = models.CharField(max_length=16, default=None, blank=True, null=True)
+    proteinStart = models.CharField(max_length=16, default=None, blank=True, null=True)
+    proteinEnd = models.CharField(max_length=16, default=None, blank=True, null=True)
+    oncogenic = models.CharField(max_length=32, default=None, blank=True, null=True)
+    mutationEffectDescription = models.CharField(max_length=1024, default=None, blank=True, null=True)
+    gene_role = models.CharField(max_length=64, default=None, blank=True, null=True) #oncokb knowneffect
+    citationPMids = models.CharField(max_length=1024, default=None, blank=True, null=True)
+    geneSummary = models.CharField(max_length=1024, default=None, blank=True, null=True)
+    variantSummary = models.CharField(max_length=1024, default=None, blank=True, null=True)
+    tumorTypeSummary = models.CharField(max_length=1024, default=None, blank=True, null=True)
+    diagnosticSummary = models.CharField(max_length=1024, default=None, blank=True, null=True)
+    diagnosticImplications = models.CharField(max_length=512, default=None, blank=True, null=True)
+    prognosticImplications = models.CharField(max_length=512, default=None, blank=True, null=True)
+    treatments = models.CharField(max_length=1024, default=None, blank=True, null=True)
+    ploidy = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=16)
+    nMinor = models.IntegerField(null=True)
+    nMajor = models.IntegerField(null=True)
+    lohstatus = models.CharField(max_length=16, default=None, blank=True, null=True)
+    oncokb_level = models.CharField(max_length=32, default=None, blank=True, null=True)
+    cgi_level = models.CharField(max_length=32, default=None, blank=True, null=True)
+    rank = models.IntegerField(null=True)
+
+    class Meta:
+        unique_together = ['sample_id', 'hugoSymbol', 'alteration']
+
+class snv_annotation(models.Model):
+
+    # generic
+    patient_id = models.IntegerField()
+    sample_id = models.CharField(max_length=64, default=None, blank=True, null=True)
+    ref_id = models.CharField(max_length=15, default=None, blank=True, null=True)  # Reference database identifier (dbSNP)
+    chromosome = models.CharField(max_length=2, default=None, blank=True, null=True)  # Chromosome number
+    position = models.BigIntegerField(blank=True, null=True)  # Position in reference genome
+    reference_allele = models.CharField(max_length=15, default=None, blank=True, null=True)
+    sample_allele = models.CharField(max_length=15, default=None, blank=True, null=True)  # Allele in sample genome
+    referenceGenome = models.CharField(max_length=16, default=None, blank=True, null=True)
+    hugoSymbol = models.CharField(max_length=32, default=None, blank=True, null=True)
+    entrezGeneId = models.CharField(max_length=32, default=None, blank=True, null=True)
+    alteration = models.CharField(max_length=16, default=None, blank=True, null=True)
+    tumorType = models.CharField(max_length=16, default=None, blank=True, null=True)
+    consequence = models.CharField(max_length=16, default=None, blank=True, null=True)
+    proteinStart = models.CharField(max_length=16, default=None, blank=True, null=True)
+    proteinEnd = models.CharField(max_length=16, default=None, blank=True, null=True)
+    oncogenic = models.CharField(max_length=32, default=None, blank=True, null=True)
+    mutationEffectDescription = models.CharField(max_length=1024, default=None, blank=True, null=True)
+    gene_role = models.CharField(max_length=64, default=None, blank=True, null=True) #oncokb knowneffect
+    citationPMids = models.CharField(max_length=1024, default=None, blank=True, null=True)
+    geneSummary = models.CharField(max_length=1024, default=None, blank=True, null=True)
+    variantSummary = models.CharField(max_length=1024, default=None, blank=True, null=True)
+    tumorTypeSummary = models.CharField(max_length=1024, default=None, blank=True, null=True)
+    diagnosticSummary = models.CharField(max_length=1024, default=None, blank=True, null=True)
+    diagnosticImplications = models.CharField(max_length=512, default=None, blank=True, null=True)
+    prognosticImplications = models.CharField(max_length=512, default=None, blank=True, null=True)
+    treatments = models.CharField(max_length=1024, default=None, blank=True, null=True)
+    nMinor = models.IntegerField(null=True)
+    nMajor = models.IntegerField(null=True)
+    oncokb_level = models.CharField(max_length=32, default=None, blank=True, null=True)
+    cgi_level = models.CharField(max_length=32, default=None, blank=True, null=True)
+    rank = models.IntegerField(null=True)
+
+    # sample specific
+    ad0 = models.IntegerField(null=True)
+    ad1 = models.IntegerField(null=True)
+    af = models.DecimalField(blank=True, null=True, max_digits=6, decimal_places=4)
+    readcount = models.IntegerField(blank=True, null=True, default=None)
+    depth = models.IntegerField(null=True)
+    lohstatus = models.CharField(max_length=16, default=None, blank=True, null=True)
+    hom_lo = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
+    hom_hi = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
+    hom_pbinom_lo = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
+    homogenous = models.BooleanField(default=False, blank=False, null=True)  # truncal field??
+
+    # SNV specific
+    funcMane = models.CharField(max_length=32, default=None, blank=True, null=True)
+    funcRefgene = models.CharField(max_length=32, default=None, blank=True, null=True)
+    exonicFuncMane = models.CharField(max_length=32, default=None, blank=True, null=True)
+    cadd_score = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=3)
+    ada_score = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=3)
+    rf_score = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=3)
+    sift_cat = models.CharField(max_length=32, default=None, blank=True, null=True)
+    sift_val = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=3)
+    polyphen_cat = models.CharField(max_length=32, default=None, blank=True, null=True)
+    polyphen_val = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=3)
+    amis_score = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=3)
+    clinvar_id = models.CharField(max_length=32, default=None, blank=True, null=True)
+    clinvar_sig = models.CharField(max_length=32, default=None, blank=True, null=True)
+    clinvar_status = models.CharField(max_length=32, default=None, blank=True, null=True)
+    clinvar_assoc = models.CharField(max_length=32, default=None, blank=True, null=True)
+    pathogenecity = models.CharField(max_length=32, default=None, blank=True, null=True)
+    classification = models.CharField(max_length=32, default=None, blank=True, null=True)
+
+
+    class Meta:
+        unique_together = ['sample_id', 'hugoSymbol', 'alteration']
