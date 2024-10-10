@@ -37,13 +37,13 @@ def get_nminor(pid, sid, gene):
     if cna:
         return cna[0].nMinor
     else:
-        return "NA"
+        return None
 def get_nmajor(pid, sid, gene):
     cna = cna_annotation.objects.all().filter(patient_id=pid).filter(sample_id=sid).filter(hugoSymbol=gene)
     if cna:
         return cna[0].nMinor
     else:
-        return "NA"
+        return None
 
 def get_loh(pid, sid, gene):
     cna = cna_annotation.objects.all().filter(patient_id=pid).filter(sample_id=sid).filter(hugoSymbol=gene)
@@ -63,7 +63,6 @@ def parse_isoforms(aaChangeRefGene):
         fields = rec.split(":")
         if len(fields) > 1:
             gene = fields[0]
-            print(fields)
             protein = fields[len(fields)-1].split(".")[1]
             isoform = gene+":"+protein
             isoforms.append(isoform)
@@ -191,15 +190,22 @@ class Command(BaseCommand):
             help="tumortype identifier OncoKB: HGSOC = CGI: OVE",
         )
 
+        parser.add_argument(
+            "--refgen",
+            type=str,
+            required=False,
+            help="Reference genome version in format GRCh38",
+        )
+
     def handle(self, *args, **kwargs):
 
-        def handle_boolean_field(value, field=None, default=False, ):
-            if str(value).lower() in ["yes", "t"]:
+        def handle_boolean_field(value, field=None, default=False):
+            if str(value).lower() in ["yes", "t", "true"]:
                 return True
-            elif str(value).lower() in ["no", "f"]:
+            elif str(value).lower() in ["no", "f", "false"]:
                 return False
             else:
-                return None if field is None or field.__dict__["field"].null else default
+                return None if pd.isna(value) else value
 
         def handle_float_field(value):
             return None if pd.isna(value) else float(value.replace(",", "."))
@@ -217,11 +223,12 @@ class Command(BaseCommand):
             return None if pd.isna(value) else value
 
         def handle_decimal_field(value):
-            return value if pd.isna(value) else None
+            return None if pd.isna(value) else value
 
 
         # USAGE:  docker compose run --rm backend sh -c "python manage.py import_genomic_variants --somatic_variants /path/to/file"
         if kwargs["somatic_variants"]:
+            refgenome = kwargs["refgen"] if kwargs["refgen"] else "GRCh38"
             tumortype = kwargs["tumortype"] if kwargs["tumortype"] else "HGSOC"
             ascats = pd.read_csv(kwargs["ascatestimates"], sep="\t", encoding='utf-8')
             alphamissense = pd.read_csv(kwargs["alphamissense"], sep="\t", encoding='utf-8')
@@ -255,19 +262,26 @@ class Command(BaseCommand):
                         sv_class = None
                         amisscore = None
                         pathogenecity = None
-                        if len(str(row['aaChangeRefGene'])) > 2:
-                            isoforms = parse_isoforms(str(row['aaChangeRefGene']))
+                        if len(str(row['AAChange.refGene'])) > 2:
+                            isoforms = parse_isoforms(str(row['AAChange.refGene']))
                             for isof in isoforms:
                                 ps = isof.split(':')
                                 protein = ps[1]
+                                print("protein: "+protein)
                                 amis = alphamissense.loc[alphamissense['protein_variant'] == protein]
-                                amisscore = amis['am_pathogenicity'].values[0]
+                                amisscore = amis['am_pathogenicity'].values[0] if len(amis['am_pathogenicity']) > 0 else 0.0
                                 # TODO: vote pathogenecity by multiple estimates from sift,polyphen,oncokb,cgi
-                                pathogenecity = amis['am_class'].values[0]
+                                pathogenecity = amis['am_class'].values[0] if len(amis['am_class']) > 0 else None
 
                         samples = handle_string_field(row["samples"]).split(';') if handle_string_field(row["samples"]) else []
                         readcounts = handle_string_field(row["readCounts"]).split(';') if handle_string_field(row["readCounts"]) else []
                         i = 0
+
+                        exonicFuncMane = handle_string_field(row["ExonicFunc.MANE"])
+                        funcMane = handle_string_field(row["Func.MANE"])
+                        funcRefgene = handle_string_field(row["Func.refGene"])
+                        ada_score = handle_decimal_field(row["dbscSNV_ADA_SCORE"])
+                        rf_score = handle_decimal_field(row["dbscSNV_RF_SCORE"])
                         for sample_id in samples:
 
                             # Splicing mutations
@@ -277,97 +291,114 @@ class Command(BaseCommand):
 
                             # Truncating and Missenses => test homogeneity
                             #truncating
-                            exonicFuncMane = handle_string_field(row["exonicFuncMANE"])
-                            if exonicFuncMane == ("frameshift_insertion" or "frameshift_deletion" or "stopgain" or "nonsynonymous_SNV"):
 
-                                tf = ascats.loc[ascats['sample'] == row["sample_id"]]['purity'].values[0]
-                                readcount = readcounts[i].split(',')
-                                ad0 = int(readcount[0])
-                                ad1 = int(readcount[1])
-                                depth = ad0+ad1
-                                geneMANE = handle_string_field(row["Gene.MANE"]).split(';')
-                                genes = set(geneMANE)
-                                geneRefGene = handle_string_field(row["Gene.refGene"]).split(';')
-                                genes.add(geneRefGene)
-                                for gene in genes:
-                                    nMajor = handle_cn_field(get_nmajor(pid, sample_id, gene))
-                                    nMinor = handle_cn_field(get_nminor(pid, sample_id, gene))
-                                    lohstatus = get_loh(pid, sample_id, gene)
-                                    if nMajor and nMinor:
-                                        cn = int(nMinor)+int(nMajor)
-                                        expHomAF = expectedAF(cn, cn, tf)
-                                        expHomCI_lo = stats.binom.ppf(0.025, depth, expHomAF)
-                                        expHomCI_hi = stats.binom.ppf(0.975, depth, expHomAF)
-                                        expHomCI_cover = expHomCI_lo <= ad1
-                                        expHom_pbinom_lower = stats.binom.cdf(ad1, depth, expHomAF)
-                                        homogenous = expHom_pbinom_lower > 0.05
+                            #if exonicFuncMane == ("frameshift_insertion" or "frameshift_deletion" or "stopgain" or "nonsynonymous_SNV"):
+                                # Calculate homogeneity estimate
+                            tf = ascats.filter(sample=sample_id)[0].purity #loc[ascats['sample'] == sample_id]['purity'].values[0]
+                            readcount = readcounts[i].split(',')
+                            ad0 = int(readcount[0])
+                            ad1 = int(readcount[1])
+                            depth = ad0+ad1
+                            geneMANE = handle_string_field(row["Gene.MANE"]).split(';')
+                            genes = set(geneMANE)
+                            geneRefGene = handle_string_field(row["Gene.refGene"]).split(';')
+                            for g in geneRefGene:
+                                genes.add(g)
+                            for gene in genes:
+                                nMajor = handle_cn_field(get_nmajor(pid, sample_id, gene))
+                                nMinor = handle_cn_field(get_nminor(pid, sample_id, gene))
+                                lohstatus = get_loh(pid, sample_id, gene)
+                                expHomAF = 0.0
+                                expHomCI_lo = 0.0
+                                expHomCI_hi = 0.0
+                                expHom_pbinom_lower = 0.0
+                                homogenous = None
 
-                                        if homogenous and exonicFuncMane == "nonsynonymous_SNV":
-                                            sv_class = "Missense"
-                                        if exonicFuncMane == ("frameshift_insertion" or "frameshift_deletion" or "stopgain"):
-                                            sv_class = "Truncating"
+                                if nMajor and nMinor:
+                                    cn = int(nMinor)+int(nMajor)
+                                    expHomAF = expectedAF(cn, cn, tf)
+                                    expHomCI_lo = stats.binom.ppf(0.025, depth, expHomAF)
+                                    expHomCI_hi = stats.binom.ppf(0.975, depth, expHomAF)
+                                    expHomCI_cover = expHomCI_lo <= ad1
+                                    expHom_pbinom_lower = stats.binom.cdf(ad1, depth, expHomAF)
+                                    homogenous = expHom_pbinom_lower > 0.05
 
-                                        snvobjs.append(snv_annotation(
-                                            patient_id=pid,
-                                            sample_id= handle_string_field(row["sample"]),
-                                            ref_id = handle_string_field(row["ID"]),
-                                            chromosome = handle_string_field(row["CHROM"]),
-                                            position = handle_int_field(row["POS"]),
-                                            reference_allele = handle_string_field(row["REF"]),
-                                            sample_allele = handle_string_field(row["ALT"]),
-                                            referenceGenome = "hg38",
-                                            hugoSymbol = gene,
-                                            #entrezGeneId = "",
-                                            #alteration: string;
-                                            tumorType = tumortype,
-                                            consequence = exonicFuncMane,
-                                            #proteinStart: string;
-                                            #proteinEnd: string;
-                                            #oncogenic: string;
-                                            #mutationEffectDescription: string;
-                                            #gene_role: string;
-                                            #citationPMids: string;
-                                            #geneSummary: string;
-                                            #variantSummary: string;
-                                            #tumorTypeSummary: string;
-                                            #diagnosticSummary: string;
-                                            #diagnosticImplications: string;
-                                            #prognosticImplications: string;
-                                            #treatments: string;
-                                            nMinor = nMinor,
-                                            nMajor = nMajor,
-                                            #oncokb_level: string;
-                                            #cgi_level: string;
-                                            #rank: number;
-                                            ad0 = ad0,
-                                            ad1 = ad1,
-                                            af = expHomAF,
-                                            readcount = ad0+ad1,
-                                            depth = depth,
-                                            lohstatus = lohstatus,
-                                            hom_lo = expHomCI_lo,
-                                            hom_hi = expHomCI_hi,
-                                            hom_pbinom_lo = expHom_pbinom_lower,
-                                            homogenous = homogenous,
-                                            funcMane = handle_string_field(row["Func.MANE"]),
-                                            funcRefgene = handle_string_field(row["Func.refGene"]),
-                                            exonicFuncMane = handle_string_field(row["ExonicFunc.MANE"]),
-                                            cadd_score = handle_decimal_field(row["CADD_phred"]),
-                                            ada_score = handle_decimal_field(row["dbscSNV_ADA_SCORE"]),
-                                            rf_score = handle_decimal_field(row["dbscSNV_RF_SCORE"]),
-                                            #sift_cat: string;
-                                            #sift_val: number;
-                                            #polyphen_cat: string;
-                                            #polyphen_val: number;
-                                            amis_score = handle_decimal_field(amisscore),
-                                            cosmic_id = handle_string_field(row["COSMIC_ID"]),
-                                            clinvar_id = handle_string_field(row["CLNALLELEID"]),
-                                            clinvar_sig = handle_string_field(row["CLNSIG"]),
-                                            clinvar_status = handle_string_field(row["CLNREVSTAT"]),
-                                            clinvar_assoc = handle_string_field(row["CLNDN"]),
-                                            pathogenecity = handle_string_field(pathogenecity),
-                                            classification = sv_class,
-                                        ))
+                                if homogenous and exonicFuncMane == "nonsynonymous_SNV":
+                                    sv_class = "Missense"
+                                if exonicFuncMane == ("frameshift_insertion" or "frameshift_deletion" or "stopgain"):
+                                    sv_class = "Truncating"
+                                if exonicFuncMane == (
+                                        "nonframeshift_deletion" or "nonframeshift_substitution" or "nonframeshift_insertion"):
+                                    sv_class = "Other"
+                                if not sv_class:
+                                    if funcMane == ("splicing" or "splicesite" or "intron" or "intronic") or funcRefgene == ("splicing" or "splicesite" or "intron" or "intronic"):
+                                        if (ada_score and float(ada_score) > 0.95) or (rf_score and float(rf_score) > 0.95):
+                                            sv_class = "Splicing"
+                                        else:
+                                            continue
+                                if(sv_class):
+                                    snvobjs.append(snv_annotation(
+                                        patient_id=pid,
+                                        sample_id= sample_id,
+                                        ref_id = handle_string_field(row["ID"]),
+                                        chromosome = handle_string_field(row["CHROM"]),
+                                        position = handle_int_field(row["POS"]),
+                                        reference_allele = handle_string_field(row["REF"]),
+                                        sample_allele = handle_string_field(row["ALT"]),
+                                        referenceGenome = refgenome,
+                                        hugoSymbol = gene,
+                                        #entrezGeneId = "",
+                                        #alteration: string;
+                                        tumorType = tumortype,
+                                        consequence = exonicFuncMane,
+                                        #proteinStart: string;
+                                        #proteinEnd: string;
+                                        #oncogenic: string;
+                                        #mutationEffectDescription: string;
+                                        #gene_role: string;
+                                        #citationPMids: string;
+                                        #geneSummary: string;
+                                        #variantSummary: string;
+                                        #tumorTypeSummary: string;
+                                        #diagnosticSummary: string;
+                                        #diagnosticImplications: string;
+                                        #prognosticImplications: string;
+                                        #treatments: string;
+                                        nMinor = nMinor,
+                                        nMajor = nMajor,
+                                        #oncokb_level: string;
+                                        #cgi_level: string;
+                                        #rank: number;
+                                        ad0 = ad0,
+                                        ad1 = ad1,
+                                        af = expHomAF,
+                                        readcount = ad0+ad1,
+                                        depth = depth,
+                                        lohstatus = lohstatus,
+                                        hom_lo = expHomCI_lo,
+                                        hom_hi = expHomCI_hi,
+                                        hom_pbinom_lo = expHom_pbinom_lower,
+                                        homogenous = homogenous,
+                                        funcMane = handle_string_field(row["Func.MANE"]),
+                                        funcRefgene = handle_string_field(row["Func.refGene"]),
+                                        exonicFuncMane = handle_string_field(row["ExonicFunc.MANE"]),
+                                        cadd_score = handle_decimal_field(row["CADD_phred"]),
+                                        ada_score = ada_score,
+                                        rf_score = rf_score,
+                                        #sift_cat: string;
+                                        #sift_val: number;  # Will be dded to WGS output in near future https://sift.bii.a-star.edu.sg/
+                                        #polyphen_cat: string;
+                                        #polyphen_val: number;  # Will be dded to WGS output in near future http://genetics.bwh.harvard.edu/pph2/
+                                        amis_score = handle_decimal_field(amisscore),
+                                        cosmic_id = handle_string_field(row["COSMIC_ID"]),
+                                        clinvar_id = handle_string_field(row["CLNALLELEID"]),
+                                        clinvar_sig = handle_string_field(row["CLNSIG"]),
+                                        clinvar_status = handle_string_field(row["CLNREVSTAT"]),
+                                        clinvar_assoc = handle_string_field(row["CLNDN"]),
+                                        pathogenecity = handle_string_field(pathogenecity),
+                                        classification = sv_class,
+                                    ))
+                                    print("class: "+sv_class)
                             i += 1
                     else:
                         logging.warning("No clinical data available for patient "+row["patient"])
@@ -380,7 +411,9 @@ class Command(BaseCommand):
 
         # USAGE:  docker compose run --rm backend sh -c "python manage.py import_genomic_variants --copy_number_alterations /path/to/file"
         if kwargs["copy_number_alterations"]:
+            refgenome = kwargs["refgen"] if kwargs["refgen"] else "GRCh38"
             ploidy_coeff = 2.5
+            ploidy = None
             # TODO: if given, map tumortype(implement internal list) to external api identificator in query phase, else None
             tumortype = kwargs["tumortype"] if kwargs["tumortype"] else "HGSOC"
             header = ["ID","Gene","chr","start","end","strand","band","type","sample","nProbesCr","nProbesAf","logR","baf","nAraw","nBraw","nMajor","nMinor","purifiedLogR","purifiedBaf","purifiedLoh","CNstatus","LOHstatus","minPurifiedLogR","maxPurifiedLogR","breaksInGene"]
@@ -416,8 +449,7 @@ class Command(BaseCommand):
                     nmajor = handle_cn_field(row['nMajor'])
                     if nminor and nmajor:
                         cn = int(nminor) + int(nmajor)
-                        ploidy = handle_decimal_field(ascats.loc[ascats['sample'] == row["sample"]]['ploidy'].values[0])
-                        if ploidy:
+                        if ploidy and float(ploidy) > 0:
                             if cn < 1 or cn > ploidy_coeff * float(ploidy):
                                 varfilter = True
 
@@ -425,19 +457,20 @@ class Command(BaseCommand):
                     varfilter = True
 
                 if varfilter == True:
+                    logging.info(row["sample"])
                     ### "ID"			"Gene"		"chr"	"start"		"end"		"strand""band"		"type"		"sample"	"nProbesCr"	"nProbesAf"	"logR""baf"	"nAraw"	"nBraw"	"nMajor"	"nMinor"	"purifiedLogR"	"purifiedBaf"	"purifiedLoh"	"CNstatus"	"LOHstatus"	"minPurifiedLogR"	"maxPurifiedLogR"	"breaksInGene"
                     pid = map_sample_to_patient_id(row["sample"])
                     if pid:
                         cnaobjects.append(cna_annotation(
                             patient_id=pid,    # sample name includes cohort code which is mapped to patient id
                             sample_id=handle_string_field(row["sample"]),
+                            referenceGenome = refgenome,
                             hugoSymbol=handle_string_field(row["Gene"]),
                             entrezGeneId=handle_string_field(row["ID"]),
-                            alteration=handle_string_field(AlterationType[row["CNstatus"]].value),
+                            alteration=str.upper(handle_string_field(AlterationType[row["CNstatus"]].value)),
                             tumorType=handle_string_field(tumortype),
-                            nmajor=handle_int_field(row["nMajor"]),
-                            nminor=handle_int_field(row["nMinor"]),
-                            cn=handle_int_field(row["nMinor"])+handle_int_field(row["nMajor"]),
+                            nMajor=handle_int_field(row["nMajor"]),
+                            nMinor=handle_int_field(row["nMinor"]),
                             lohstatus=handle_string_field(row["LOHstatus"]),
                             ploidy=handle_decimal_field(ploidy)
                         ))
@@ -469,7 +502,7 @@ class Command(BaseCommand):
                 except Exception as e:
                     logging.exception(e)
 
-        if kwargs["ascatestimates"] and not kwargs['copy_number_alterations']:
+        if kwargs["ascatestimates"]:
             csv = pd.read_csv(kwargs["ascatestimates"], sep="\t", encoding='utf-8')
             estobjects = []
             #"sample"    "aberrant"    "purity"    "psi"    "ploidy"    "TP53.purity.mean"    "TP53.VAF"    "goodnessOfFit"    "penalizedGoodnessOfFit"

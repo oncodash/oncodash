@@ -6,7 +6,6 @@ from genomics.api.serializers import SomaticVariantSerializer, CopyNumberAlterat
 from genomics.models import SomaticVariant, CopyNumberAlteration, CGIMutation, CGICopyNumberAlteration, CGIFusionGene, \
     CGIDrugPrescriptions, OncoKBAnnotation, AlterationType, ActionableTarget, CNAscatEstimate
 from clin_overview.models import TimelineRecord
-import genomics.management.commands.genomic_db_query_utils as gdbq
 import json
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404

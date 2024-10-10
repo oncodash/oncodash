@@ -264,7 +264,7 @@ class OncoKBAnnotation(models.Model):
 
 class cna_annotation(models.Model):
 
-    patient_id = models.IntegerField()
+    patient_id = models.CharField(max_length=64, default=None, blank=True, null=True)
     sample_id = models.CharField(max_length=64, default=None, blank=True, null=True)
     referenceGenome = models.CharField(max_length=16, default=None, blank=True, null=True)
     hugoSymbol = models.CharField(max_length=32, default=None, blank=True, null=True)
@@ -284,6 +284,7 @@ class cna_annotation(models.Model):
     diagnosticSummary = models.CharField(max_length=1024, default=None, blank=True, null=True)
     diagnosticImplications = models.CharField(max_length=512, default=None, blank=True, null=True)
     prognosticImplications = models.CharField(max_length=512, default=None, blank=True, null=True)
+    prognosticSummary = models.CharField(max_length=512, default=None, blank=True, null=True)
     treatments = models.CharField(max_length=1024, default=None, blank=True, null=True)
     ploidy = models.DecimalField(blank=True, null=True, max_digits=20, decimal_places=16)
     nMinor = models.IntegerField(null=True)
@@ -293,13 +294,13 @@ class cna_annotation(models.Model):
     cgi_level = models.CharField(max_length=32, default=None, blank=True, null=True)
     rank = models.IntegerField(null=True)
 
-    class Meta:
-        unique_together = ['sample_id', 'hugoSymbol', 'alteration']
+    #class Meta:
+    #    unique_together = ['sample_id', 'hugoSymbol', 'alteration']
 
 class snv_annotation(models.Model):
 
     # generic
-    patient_id = models.IntegerField()
+    patient_id = models.CharField(max_length=64, default=None, blank=True, null=True)
     sample_id = models.CharField(max_length=64, default=None, blank=True, null=True)
     ref_id = models.CharField(max_length=15, default=None, blank=True, null=True)  # Reference database identifier (dbSNP)
     chromosome = models.CharField(max_length=2, default=None, blank=True, null=True)  # Chromosome number
@@ -324,6 +325,7 @@ class snv_annotation(models.Model):
     diagnosticSummary = models.CharField(max_length=1024, default=None, blank=True, null=True)
     diagnosticImplications = models.CharField(max_length=512, default=None, blank=True, null=True)
     prognosticImplications = models.CharField(max_length=512, default=None, blank=True, null=True)
+    prognosticSummary = models.CharField(max_length=512, default=None, blank=True, null=True)
     treatments = models.CharField(max_length=1024, default=None, blank=True, null=True)
     nMinor = models.IntegerField(null=True)
     nMajor = models.IntegerField(null=True)
@@ -338,23 +340,24 @@ class snv_annotation(models.Model):
     readcount = models.IntegerField(blank=True, null=True, default=None)
     depth = models.IntegerField(null=True)
     lohstatus = models.CharField(max_length=16, default=None, blank=True, null=True)
-    hom_lo = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
-    hom_hi = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
-    hom_pbinom_lo = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
+    hom_lo = models.DecimalField(default=None, blank=True, null=True, max_digits=10, decimal_places=2)
+    hom_hi = models.DecimalField(default=None, blank=True, null=True, max_digits=10, decimal_places=2)
+    hom_pbinom_lo = models.DecimalField(default=None, blank=True, null=True, max_digits=10, decimal_places=2)
     homogenous = models.BooleanField(default=False, blank=False, null=True)  # truncal field??
 
     # SNV specific
     funcMane = models.CharField(max_length=32, default=None, blank=True, null=True)
     funcRefgene = models.CharField(max_length=32, default=None, blank=True, null=True)
     exonicFuncMane = models.CharField(max_length=32, default=None, blank=True, null=True)
-    cadd_score = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=3)
-    ada_score = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=3)
-    rf_score = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=3)
+    cadd_score = models.DecimalField(default=None, blank=True, null=True, max_digits=10, decimal_places=3)
+    ada_score = models.DecimalField(default=None, blank=True, null=True, max_digits=10, decimal_places=3)
+    rf_score = models.DecimalField(default=None, blank=True, null=True, max_digits=10, decimal_places=3)
     sift_cat = models.CharField(max_length=32, default=None, blank=True, null=True)
-    sift_val = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=3)
+    sift_val = models.DecimalField(default=None, blank=True, null=True, max_digits=10, decimal_places=3)
     polyphen_cat = models.CharField(max_length=32, default=None, blank=True, null=True)
-    polyphen_val = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=3)
-    amis_score = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=3)
+    polyphen_val = models.DecimalField(default=None, blank=True, null=True, max_digits=10, decimal_places=3)
+    amis_score = models.DecimalField(default=None, blank=True, null=True, max_digits=10, decimal_places=3)
+    cosmic_id = models.CharField(max_length=32, default=None, blank=True, null=True)
     clinvar_id = models.CharField(max_length=32, default=None, blank=True, null=True)
     clinvar_sig = models.CharField(max_length=32, default=None, blank=True, null=True)
     clinvar_status = models.CharField(max_length=32, default=None, blank=True, null=True)
@@ -363,5 +366,5 @@ class snv_annotation(models.Model):
     classification = models.CharField(max_length=32, default=None, blank=True, null=True)
 
 
-    class Meta:
-        unique_together = ['sample_id', 'hugoSymbol', 'alteration']
+    #class Meta:
+    #    unique_together = ['sample_id', 'hugoSymbol', 'alteration']

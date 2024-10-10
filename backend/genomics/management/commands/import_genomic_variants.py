@@ -287,8 +287,8 @@ class Command(BaseCommand):
                     nmajor = handle_cn_field(row['nMajor'])
                     if nminor and nmajor:
                         cn = int(nminor) + int(nmajor)
-                        ploidy = handle_decimal_field(ascats.loc[ascats['sample'] == row["sample"]]['ploidy'].values[0])
-                        if ploidy:
+                        ploidys = ascats.loc[ascats['sample'] == row["sample"]]['ploidy']
+                        for ploidy in ploidys:
                             if cn < 1 or cn > ploidy_coeff * float(ploidy):
                                 varfilter = True
 
