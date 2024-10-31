@@ -94,7 +94,7 @@ function PatientView(props) {
                                         {state !== undefined? <Genomic patient={selectedPatient}></Genomic>: "" }
                                     </Row>
                                 </Tab>
-                                <Tab eventKey="explainer" title="EXPLAINER">
+                                <Tab eventKey="Explainer" title="EXPLAINER">
                                     <Row className="bg-white bottomBorderRadius">
                                         {state !== undefined? <ExplAIner patient={selectedPatient}></ExplAIner>: "" }
                                     </Row>

@@ -120,7 +120,7 @@ function App() {
             <Routes>
                 {/* <Route path="/patientview"    element={<PatientView token={token}/>}    /> */}
                 {/* <Route path="/clinical"       element={<Clinical/>}       />
-                <Route path="/explainer"      element={<Explainer/>}      /> */}
+                <Route path="/Explainer"      element={<Explainer/>}      /> */}
                 {/* <Route path="/"               element={elem_type}    /> */}
                 {routes.map(p=>p)}
                 
