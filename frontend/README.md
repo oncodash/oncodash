@@ -37,3 +37,19 @@ The patient timelines are rendered using [canvajs](https://canvasjs.com/), speci
 
 The Oncodash interface uses the [Vue framework](https://vuejs.org/) the implement the graphical components.
 It builds on top of standard HTML, CSS, and JavaScript and provides a declarative, component-based programming model that helps you efficiently develop user interfaces of any complexity. The components themselves are written as [Single-File Components](https://vuejs.org/guide/introduction.html#single-file-components) (SFC) ending with the `.vue` extension.
+
+## Development
+
+Managing the server is done with the ususal node.js commands, setup in the package.json scripts declarations.
+
+Install dependencies
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
