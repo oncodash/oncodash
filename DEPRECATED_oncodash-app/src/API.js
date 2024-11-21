@@ -45,7 +45,7 @@ import configData from "./conf.json";
         },
       })
     ).then(patients => {
-      // console.log(patients);
+      console.log("PATIENTS:",patients);
       return patients.map((patient)=> new Patient(  
         patient.patient_id,
         patient.cohort_code,
@@ -104,14 +104,14 @@ import configData from "./conf.json";
         },
       })
     ).then(patient => {
-      // console.log(patient.time_series);
+      console.log("PATIENT", patient_id, " TIME SERIES:", patient.time_series);
       patient = new Patient(                     
               patient.patient_id,
               patient.cohort_code,
               patient.chronic_illnesses_at_dg,
               patient.chronic_illnesses_type,
-              JSON.parse(patient.time_series),
-              JSON.parse(patient.event_series),
+              patient.time_series  ? JSON.parse(patient.time_series ) : null,
+              patient.event_series ? JSON.parse(patient.event_series) : null,
               patient.histology,
               patient.stage,
               patient.primary_therapy_outcome,

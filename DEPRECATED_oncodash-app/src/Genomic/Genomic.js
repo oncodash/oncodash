@@ -3,6 +3,9 @@ import Container from 'react-bootstrap/Container';
 import OverviewGenomicCard from './OverviewGenomicCard'
 
 function Genomic(props) {
+
+    console.log("GENOMIC PROPS:",props);
+
     let counter = 0;
     const genomic = props.patient.genomic.genomic;
     // const genomic = {
@@ -13,12 +16,18 @@ function Genomic(props) {
     // };
 
     const genomic_all = props.patient.genomic
-    const displayObjectsKeys = ["putative_functionally_relevant_variant","variants_of_unknown_functional_significance","putative_functionally_neutral_variants","other_alterations"];
+    // const displayObjectsKeys = ["putative_functionally_relevant_variant","variants_of_unknown_functional_significance","putative_functionally_neutral_variants","other_alterations"];
+    const displayObjectsKeys = ["actionable_aberrations","putative_functionally_relevant_variants","other_variants"];
+    // const nameDICT = {
+    //     "putative_functionally_relevant_variant":"PUTATIVE FUNCTIONALLY RELEVANT VARIANT",
+    //     "variants_of_unknown_functional_significance":"VARIANTS OF UNKNOWN FUNCTIONAL SIGNIFICANCE",
+    //     "putative_functionally_neutral_variants":"PUTATIVE FUNCTIONALLY NEUTRAL VARIANTS",
+    //     "other_alterations":"OTHER ALTERATIONS",
+    // }
     const nameDICT = {
-        "putative_functionally_relevant_variant":"PUTATIVE FUNCTIONALLY RELEVANT VARIANT",
-        "variants_of_unknown_functional_significance":"VARIANTS OF UNKNOWN FUNCTIONAL SIGNIFICANCE",
-        "putative_functionally_neutral_variants":"PUTATIVE FUNCTIONALLY NEUTRAL VARIANTS",
-        "other_alterations":"OTHER ALTERATIONS",
+        "actionable_aberrations": "ACTIONABLE ABERRATION",
+        "putative_functionally_relevant_variants": "PUTATIVE FUNCTIONALLY RELEVANT VARIANTS",
+        "other_variants": "OTHER VARIANTS",
     }
     // const putative_functionally_relevant_variant = {
     //     "BRCA": {
@@ -73,15 +82,30 @@ function Genomic(props) {
     //     }
     // };
 
-    const displayOrder = ["samples_ids", "samples_info", "treatment_phase", "tumor_purity", "mutation_affects", "reported_sensitivity"]
+    /*
+    "AD.0", ​​​​​​​"AD.1", ​​​​​​​​"AF", "​​​​​​​​​DP", ​​​​​​​​​"LOHstatus", ​​​​​​​​​"expHomCI.cover", ​​​​​​​​​"nMajor", ​​​​​​​​​"nMinor", ​​​​​​​​​"samples",
+    */
+    // const displayOrder = ["samples_ids", "samples_info", "treatment_phase", "tumor_purity", "mutation_affects", "reported_sensitivity"]
+    const displayOrder = ["AD.0","AD.1","AF","DP","LOHstatus","expHomCI.cover","nMajor","nMinor","samples"];
+    // const displayOrderNameMap = {
+    //     "samples_ids":"SAMPLES IDS",
+    //     "samples_info":"SAMPLES INFO",
+    //     "treatment_phase":"TREATMENT PHASE",
+    //     "tumor_purity":"TUMOR PURITY",
+    //     "mutation_affects":"MUTATION AFFECTS",
+    //     "reported_sensitivity":"REPORTED SENSITIVITY RESPONSE",
+    // }
     const displayOrderNameMap = {
-        "samples_ids":"SAMPLES IDS",
-        "samples_info":"SAMPLES INFO",
-        "treatment_phase":"TREATMENT PHASE",
-        "tumor_purity":"TUMOR PURITY",
-        "mutation_affects":"MUTATION AFFECTS",
-        "reported_sensitivity":"REPORTED SENSITIVITY RESPONSE",
-    }
+        "AD.0":"AD.0",
+        "AD.1":"AD.1",
+        "AF":"AF",
+        "DP":"DP",
+        "LOHstatus":"LOHstatus",
+        "expHomCI.cover":"expHomCI.cover",
+        "nMajor":"nMajor",
+        "nMinor":"nMinor",
+        "samples":"samples"
+    };
 
     return(
         <Container className="py-4 px-5 bottomBorderRadius">
@@ -136,9 +160,16 @@ function Genomic(props) {
                                                                 <Row key={counter++} className="px-5">
                                                                     {
                                                                         displayOrder.map(d=>
-                                                                            <Col key={counter++} className="text-center" xs={2} sm={2} md={2} lg={2} xl={2} xxl={2}>
-                                                                                {d=="samples_ids"? r[d].replaceAll("_","-"): r[d].split(";").map(f => <div key={counter++}><div>{f}</div><div style={{"height":"10px", }}>&nbsp;</div></div>)}
-                                                                            </Col>
+                                                                            // {
+                                                                            //         <Col key={counter++} className="text-center" xs={2} sm={2} md={2} lg={2} xl={2} xxl={2}>
+                                                                            //             {d=="samples_ids"? r[d].replaceAll("_","-"): r[d].split(";").map(f => <div key={counter++}><div>{f}</div><div style={{"height":"10px", }}>&nbsp;</div></div>)}
+                                                                            //         </Col>
+                                                                            // }
+                                                                            {
+                                                                                <Col key={counter++} className="text-center" xs={2} sm={2} md={2} lg={2} xl={2} xxl={2}>
+                                                                                    {d=="samples" ? r[d].replaceAll("_","-") : r[d].split(";").map(f => <div key={counter++}><div>{f}</div><div style={{"height":"10px", }}>&nbsp;</div></div>)}
+                                                                                </Col>
+                                                                            }
                                                                         )
                                                                     }
                                                                 </Row>
