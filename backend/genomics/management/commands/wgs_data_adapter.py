@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 
 import pandas as pd
 import psutil
@@ -166,9 +167,9 @@ class CGI2OncoKBLevels(Enum):
 #         print("No patient with cohort code", cohort_code, "available in the database")
 #
 
-def get_variant_assoc_cnas(cnas, pid, sid, gene):
-    cnar = cnas.loc[(cnas['patient_id'] == pid) & (cnas['sample_id'] == sid) & (cnas['hugoSymbol'] == gene)]
-    return cnar.iloc[0] if not cnar.empty else None
+def get_variant_assoc_cnas(cnas, sid, gene):
+    cnar = cnas.loc[(cnas['sample'] == sid) & (cnas['Gene'] == gene)]
+    return cnar.iloc[0] if not cnar.empty else []
 
 def expectedAF(N_t, CN_t, TF):
     return (N_t * TF) / (CN_t * TF + 2 * (1 - TF))
@@ -188,13 +189,6 @@ def parse_isoforms(aaChangeRefGene):
             # else aaChangeRefGene can have UNKNOWN status, what to do with it?
     return list(dict.fromkeys(isoforms))
 
-
-class cna_object:
-
-    def __init__(self, patient_id, sample_id, referenceGenome, hugoSymbol, entrezGeneId, alteration, tumorType, nMajor, nMinor, lohstatus, ploidy):
-        self
-
-
 def filter_cnas_by_ploidy(row, ascats=None):
     #print(ascats)
     #print(row)
@@ -212,7 +206,6 @@ def filter_cnas_by_ploidy(row, ascats=None):
                     'sample_id':handle_string_field(row["sample"]),
                     'referenceGenome' : "GRCh38",
                     'hugoSymbol':handle_string_field(row["Gene"]),
-                    'entrezGeneId':handle_string_field(row["ID"]),
                     'alteration':handle_cn_type_field(row["CNstatus"]),
                     'tumorType':handle_string_field("HGSOC"),
                     'nMajor':handle_int_field(row["nMajor"]),
@@ -225,19 +218,30 @@ def filter_cnas_by_ploidy(row, ascats=None):
 def filter_and_classify_snvs(row, cnas=None, alphamissenses=None, ascats=None):
     pid = row['patient']
     sv_class = None
-    amisscore = None
-    pathogenecity = None
+
     snv_annotations = []
 
-    if len(str(row['AAChange.refGene'])) > 2:
-        isoforms = parse_isoforms(str(row['AAChange.refGene']))
-        for isof in isoforms:
-            ps = isof.split(':')
-            protein = ps[1]
-            amis = alphamissenses.loc[alphamissenses['protein_variant'] == protein]
-            amisscore = amis.iloc[0]['am_pathogenicity'] if len(amis) > 0 else 0.0
-            # TODO: vote pathogenecity by multiple estimates from sift,polyphen,oncokb,cgi
-            pathogenecity = amis.iloc[0]['am_class'] if len(amis) > 0 else None
+    amisscore = None
+    amis_category = None
+    sift_category = None
+    sift_score = None  # Will be dded to WGS output in near future https://sift.bii.a-star.edu.sg/
+    polyphen_category = None
+    polyphen_score = None   # Will be dded to WGS output in near future http://genetics.bwh.harvard.edu/pph2/
+    pathogenecity = handle_string_field(row["CLNSIG"]) # Currently Clinvar annotation is included in WGS pipeline output
+    # TODO: Change pathogenecity annotation to voting after all scorings are included in output
+    # if len(str(row['AAChange.refGene'])) > 2:
+    #     isoforms = parse_isoforms(str(row['AAChange.refGene']))
+    #     for isof in isoforms:
+    #         ps = isof.split(':')
+    #         protein = ps[1]
+    #         amis = alphamissenses.loc[alphamissenses['protein_variant'] == protein]
+    #         amisscore = amis.iloc[0]['am_pathogenicity'] if len(amis) > 0 else 0.0
+    #         # TODO: vote pathogenecity by multiple estimates from sift,polyphen,oncokb,cgi
+    #         amis_category = amis.iloc[0]['am_class'] if len(amis) > 0 else None
+    #         pathogenecity = amis_category
+    amisscore = row['AM_score']
+    amis_category = row['AM_class']
+    pathogenecity = amis_category
 
     samples = handle_string_field(row["samples"]).split(';') if handle_string_field(
         row["samples"]) else []
@@ -253,7 +257,7 @@ def filter_and_classify_snvs(row, cnas=None, alphamissenses=None, ascats=None):
     for sample_id in samples:
 
         # Splicing mutations
-        #   funcMane | funRefgene = splicing / splicesite / intronic = > dbscSNV_ADA / RF_SCORE > 0.95
+        #  funcMane | funRefgene = splicing / splicesite / intronic = > dbscSNV_ADA / RF_SCORE > 0.95
         # funcMane = handle_string_field(row["Func.MANE"])
         # funcRefgene = handle_string_field(row["Func.refGene"])
 
@@ -262,7 +266,8 @@ def filter_and_classify_snvs(row, cnas=None, alphamissenses=None, ascats=None):
 
         # if exonicFuncMane == ("frameshift_insertion" or "frameshift_deletion" or "stopgain" or "nonsynonymous_SNV"):
         # Calculate homogeneity estimate
-        tf = ascats.loc[ascats['sample']==sample_id]['purity'].iloc[0]  # loc[ascats['sample'] == sample_id]['purity'].values[0]
+        tfs = ascats.loc[ascats['sample']==sample_id]['purity']
+        tf = tfs.iloc[0] if len(tfs) > 0 else 0.0 # loc[ascats['sample'] == sample_id]['purity'].values[0]
         readcount = readcounts[i].split(',')
         ad0 = int(readcount[0])
         ad1 = int(readcount[1])
@@ -276,13 +281,11 @@ def filter_and_classify_snvs(row, cnas=None, alphamissenses=None, ascats=None):
             nMajor = None
             nMinor = None
             lohstatus = None
-            vcnas = get_variant_assoc_cnas(cnas, pid, sample_id, gene)
-            try:
-                nMajor = handle_cn_field(vcnas['nMajor']) if vcnas else None
-                nMinor = handle_cn_field(vcnas['nMinor']) if vcnas else None
-                lohstatus = vcnas['lohstatus'] if vcnas else None
-            except Exception as e:
-                pass
+            vcnas = get_variant_assoc_cnas(cnas, sample_id, gene)
+            nMajor = handle_cn_field(vcnas['nMajor']) if len(vcnas) > 0 else None
+            nMinor = handle_cn_field(vcnas['nMinor']) if len(vcnas) > 0 else None
+            lohstatus = vcnas['LOHstatus'] if len(vcnas) > 0 else None
+
             expHomAF = 0.0
             expHomCI_lo = 0.0
             expHomCI_hi = 0.0
@@ -291,12 +294,13 @@ def filter_and_classify_snvs(row, cnas=None, alphamissenses=None, ascats=None):
 
             if nMajor and nMinor:
                 cn = int(nMinor) + int(nMajor)
-                expHomAF = expectedAF(cn, cn, tf)
-                expHomCI_lo = stats.binom.ppf(0.025, depth, expHomAF)
-                expHomCI_hi = stats.binom.ppf(0.975, depth, expHomAF)
+                expHomAF = float(expectedAF(cn, cn, tf))
+                expHomCI_lo = float(stats.binom.ppf(0.025, depth, expHomAF))
+                expHomCI_hi = float(stats.binom.ppf(0.975, depth, expHomAF))
                 expHomCI_cover = expHomCI_lo <= ad1
-                expHom_pbinom_lower = stats.binom.cdf(ad1, depth, expHomAF)
+                expHom_pbinom_lower = float(stats.binom.cdf(ad1, depth, expHomAF))
                 homogenous = expHom_pbinom_lower > 0.05
+            # TODO: Check FGFR2 in H266, why not estimated as homogenous
             if homogenous and exonicFuncMane == "nonsynonymous_SNV":
                 sv_class = "Missense"
             if exonicFuncMane in ["frameshift_insertion", "frameshift_deletion", "stopgain"]:
@@ -309,8 +313,10 @@ def filter_and_classify_snvs(row, cnas=None, alphamissenses=None, ascats=None):
                         sv_class = "Splicing"
                     else:
                         continue
-            if sv_class:
-                snv_annotations.append(pd.Series({
+
+            alteration = gene + ":" + handle_string_field(row["CHROM"]) + ":" + str(handle_int_field(row["POS"])) + ":" + handle_string_field(row["REF"]) + ">" + handle_string_field(row["ALT"])
+
+            snv_annotations.append(pd.Series({
                     'patient_id':pid,
                     'sample_id':sample_id,
                     'ref_id':handle_string_field(row["ID"]),
@@ -320,7 +326,8 @@ def filter_and_classify_snvs(row, cnas=None, alphamissenses=None, ascats=None):
                     'sample_allele':handle_string_field(row["ALT"]),
                     'referenceGenome':"GRCh38",
                     'hugoSymbol':gene,
-                    # entrezGeneId ': "",
+                    'alteration':alteration,
+                    # ensemblGeneId ': "",
                     # alteration: string;
                     'tumorType':"HGSOC",
                     'consequence':exonicFuncMane,
@@ -345,23 +352,23 @@ def filter_and_classify_snvs(row, cnas=None, alphamissenses=None, ascats=None):
                     'ad0':ad0,
                     'ad1':ad1,
                     'af':expHomAF,
-                    'readcount':ad0 + ad1,
                     'depth':depth,
                     'lohstatus':lohstatus,
-                    'hom_lo':expHomCI_lo,
-                    'hom_hi':expHomCI_hi,
-                    'hom_pbinom_lo':expHom_pbinom_lower,
+                    'hom_lo':"{:.9f}".format(expHomCI_lo),
+                    'hom_hi':"{:.9f}".format(expHomCI_hi),
+                    'hom_pbinom_lo':"{:.9f}".format(expHom_pbinom_lower),
                     'homogenous':homogenous,
-                    'funcMane':handle_string_field(row["Func.MANE"]),
-                    'funcRefgene':handle_string_field(row["Func.refGene"]),
-                    'exonicFuncMane':handle_string_field(row["ExonicFunc.MANE"]),
+                    # 'funcMane':handle_string_field(row["Func.MANE"]),
+                    # 'funcRefgene':handle_string_field(row["Func.refGene"]),
+                    # 'exonicFuncMane':handle_string_field(row["ExonicFunc.MANE"]),
                     'cadd_score':handle_decimal_field(row["CADD_phred"]),
                     'ada_score':ada_score,
                     'rf_score':rf_score,
-                    # sift_cat: string;
-                    # sift_val: number;  # Will be dded to WGS output in near future https://sift.bii.a-star.edu.sg/
-                    # polyphen_cat: string;
-                    # polyphen_val: number;  # Will be dded to WGS output in near future http://genetics.bwh.harvard.edu/pph2/
+                    'sift_category': sift_category,
+                    'sift_score': sift_score,  # Will be dded to WGS output in near future https://sift.bii.a-star.edu.sg/
+                    'polyphen_category': polyphen_category,
+                    'polyphen_score': polyphen_score,  # Will be dded to WGS output in near future http://genetics.bwh.harvard.edu/pph2/
+                    'amis_category': amis_category,
                     'amis_score':handle_decimal_field(amisscore),
                     'cosmic_id':handle_string_field(row["COSMIC_ID"]),
                     'clinvar_id':handle_string_field(row["CLNALLELEID"]),
@@ -375,8 +382,121 @@ def filter_and_classify_snvs(row, cnas=None, alphamissenses=None, ascats=None):
     if len(snv_annotations) > 0:
         return snv_annotations
 
+def post_filter_and_classify_snvs(row, cnas=None, ascats=None):
+    try:
+        exonicFuncMane = handle_string_field(row["exonicFuncMane"])
+        sample_id =row['sample_id']
 
+        # Calculate homogeneity estimate
+        tfs = ascats.loc[ascats['sample'] == sample_id]['purity']
+        tf = tfs.iloc[0] if len(tfs) > 0 else 0.0  # loc[ascats['sample'] == sample_id]['purity'].values[0]
+        ad0 = int(row['ad0'])
+        ad1 = int(row['ad1'])
+        depth = ad0 + ad1
+        gene= handle_string_field(row["hugoSymbol"])
 
+        nMajor = None
+        nMinor = None
+        lohstatus = None
+        vcnas = get_variant_assoc_cnas(cnas, sample_id, gene)
+        nMajor = handle_cn_field(vcnas['nMajor']) if len(vcnas) > 0 else None
+        nMinor = handle_cn_field(vcnas['nMinor']) if len(vcnas) > 0 else None
+        lohstatus = vcnas['LOHstatus'] if len(vcnas) > 0 else None
+        expHomAF = 0.0
+        expHomCI_lo = 0.0
+        expHomCI_hi = 0.0
+        expHom_pbinom_lower = 0.0
+        homogenous = None
+
+        if nMajor and nMinor:
+            cn = int(nMinor) + int(nMajor)
+            expHomAF = float(expectedAF(cn, cn, tf))
+            expHomCI_lo = float(stats.binom.ppf(0.025, depth, expHomAF))
+            expHomCI_hi = float(stats.binom.ppf(0.975, depth, expHomAF))
+            expHomCI_cover = expHomCI_lo <= ad1
+            expHom_pbinom_lower = float(stats.binom.cdf(ad1, depth, expHomAF))
+            homogenous = expHom_pbinom_lower > 0.05
+
+        row['nMinor'] = nMinor
+        row['nMajor'] = nMajor
+        row['lohstatus'] = lohstatus
+        row['hom_lo'] = "{:.9f}".format(expHomCI_lo),
+        row['hom_hi'] = "{:.9f}".format(expHomCI_hi),
+        row['hom_pbinom_lo'] = "{:.9f}".format(expHom_pbinom_lower),
+        row['homogenous'] = homogenous
+        row['af'] = expHomAF
+        if homogenous and exonicFuncMane == "nonsynonymous_SNV":
+            row['classification'] = "Missense"
+        row['hom_lo'] = row['hom_lo'][0] if isinstance(row['hom_lo'], tuple) else row['hom_lo']
+        row['hom_hi'] = row['hom_hi'][0] if isinstance(row['hom_hi'], tuple) else row['hom_hi']
+        row['hom_pbinom_lo'] = row['hom_pbinom_lo'][0] if isinstance(row['hom_pbinom_lo'], tuple) else row['hom_pbinom_lo']
+
+    except Exception as e:
+        print(e)
+        pass
+
+    return row
+
+def post_filter_and_classify_snvs_by_sample(row, cnas=None, ascats=None):
+
+    try:
+
+        exonicFuncMane = handle_string_field(row["exonicFuncMane"])
+        sample_id =row['sample_id']
+
+        # Calculate homogeneity estimate
+        tfs = ascats.loc[ascats['sample'] == sample_id]['purity']
+        tf = tfs.iloc[0] if len(tfs) > 0 else 0.0  # loc[ascats['sample'] == sample_id]['purity'].values[0]
+        ad0 = int(row['ad0'])
+        ad1 = int(row['ad1'])
+        depth = ad0 + ad1
+        gene= handle_string_field(row["hugoSymbol"])
+
+        nMajor = None
+        nMinor = None
+        lohstatus = None
+        pathogenecity = handle_string_field(row["clinvar_sig"])
+        vcnas = get_variant_assoc_cnas(cnas, sample_id, gene)
+        nMajor = handle_cn_field(vcnas['nMajor']) if len(vcnas) > 0 else None
+        nMinor = handle_cn_field(vcnas['nMinor']) if len(vcnas) > 0 else None
+        lohstatus = vcnas['LOHstatus'] if len(vcnas) > 0 else None
+        expHomAF = 0.0
+        expHomCI_lo = 0.0
+        expHomCI_hi = 0.0
+        expHom_pbinom_lower = 0.0
+        homogenous = None
+
+        if nMajor and nMinor:
+            cn = int(nMinor) + int(nMajor)
+            expHomAF = float(expectedAF(cn, cn, tf))
+            expHomCI_lo = float(stats.binom.ppf(0.025, depth, expHomAF))
+            expHomCI_hi = float(stats.binom.ppf(0.975, depth, expHomAF))
+            expHomCI_cover = expHomCI_lo <= ad1
+            expHom_pbinom_lower = float(stats.binom.cdf(ad1, depth, expHomAF))
+            homogenous = expHom_pbinom_lower > 0.05
+        if homogenous == True and row['classification'] == "Truncating":
+            pathogenecity = "Pathogenic"
+
+        row['nMinor'] = nMinor
+        row['nMajor'] = nMajor
+        row['lohstatus'] = lohstatus
+        row['hom_lo'] = "{:.9f}".format(expHomCI_lo),
+        row['hom_hi'] = "{:.9f}".format(expHomCI_hi),
+        row['hom_pbinom_lo'] = "{:.9f}".format(expHom_pbinom_lower),
+        row['homogenous'] = homogenous
+        row['pathogenecity'] = pathogenecity
+        row['af'] = expHomAF
+        if homogenous and exonicFuncMane == "nonsynonymous_SNV":
+            row['classification'] = "Missense"
+        row['hom_lo'] = row['hom_lo'][0] if isinstance(row['hom_lo'], tuple) else row['hom_lo']
+        row['hom_hi'] = row['hom_hi'][0] if isinstance(row['hom_hi'], tuple) else row['hom_hi']
+        row['hom_pbinom_lo'] = row['hom_pbinom_lo'][0] if isinstance(row['hom_pbinom_lo'], tuple) else row['hom_pbinom_lo']
+
+    except Exception as e:
+        print(e)
+        pass
+
+    return row
 
 def main(**kwargs): #clinical_data: pd.DataFrame, cna_data: pd.DataFrame, snv_data: pd.DataFrame, ascat_data: pd.DataFrame, amis_data: pd.DataFrame):
     """Import genomic variants produced by sequencing analysis pipelines to populate corresponding models into Django database.
@@ -424,17 +544,18 @@ def main(**kwargs): #clinical_data: pd.DataFrame, cna_data: pd.DataFrame, snv_da
 
         # TODO: Rank results by Sift, Polyphen, Alphamissense scores, OncoKB and CGI levels
 
-    if kwargs["somatic_variants"]:
+    if kwargs["somatic_variants"] and not kwargs["post_annotate"]:
         output = kwargs["output"]
         cores = int(kwargs["cores"]) if kwargs["cores"] else 0
         refgenome = kwargs["refgen"] if kwargs["refgen"] else "GRCh38"
         tumortype = kwargs["tumortype"] if kwargs["tumortype"] else "HGSOC"
         ascats = pd.read_csv(kwargs["ascatestimates"], sep="\t", encoding='utf-8')
-        alphamissenses = pd.read_csv(kwargs["alphamissenses"], sep="\t", encoding='utf-8')
+        #alphamissenses = pd.read_csv(kwargs["alphamissenses"], sep="\t", encoding='utf-8')
         snvs = pd.read_csv(kwargs["somatic_variants"], sep="\t", encoding='utf-8')
-        cnas = pd.read_csv(kwargs["cn_annotations"], sep="\t", encoding='utf-8').reset_index()
-        #print(cnas)
-        snvs_filtered = df_apply(snvs, filter_and_classify_snvs, None, None, True, False, cores=cores, cnas=cnas, alphamissenses=alphamissenses, ascats=ascats)
+        cnas = pd.read_csv(kwargs["cn_annotations"], sep="\t", encoding='utf-8')[['sample','Gene','nMinor','nMajor','LOHstatus']].dropna(subset=['Gene','nMinor', 'nMajor','LOHstatus'])
+
+        print("CNAs len",len(cnas))
+        snvs_filtered = df_apply(snvs, filter_and_classify_snvs, None, None, True, True, cores=cores, cnas=cnas, alphamissenses=None, ascats=ascats)
 
         joined = []
         for s in snvs_filtered:
@@ -447,6 +568,44 @@ def main(**kwargs): #clinical_data: pd.DataFrame, cna_data: pd.DataFrame, snv_da
 
         snvdf.to_csv(output, sep='\t')
         print(snvdf)
+
+    if kwargs["somatic_variants"] and kwargs["post_annotate"]:
+        output = kwargs["output"]
+        cores = int(kwargs["cores"]) if kwargs["cores"] else 0
+        refgenome = kwargs["refgen"] if kwargs["refgen"] else "GRCh38"
+        tumortype = kwargs["tumortype"] if kwargs["tumortype"] else "HGSOC"
+        ascats = pd.read_csv(kwargs["ascatestimates"], sep="\t", encoding='utf-8')
+        snvs = pd.read_csv(kwargs["somatic_variants"], sep="\t", encoding='utf-8')
+        cnas = pd.read_csv(kwargs["cn_annotations"], sep="\t", encoding='utf-8')[['sample','Gene','nMinor','nMajor','LOHstatus']].dropna(subset=['Gene','nMinor', 'nMajor','LOHstatus'])
+
+        print("CNAs len",len(cnas))
+        cna_grps = cnas.groupby('sample')
+        snv_grps = snvs.groupby('sample_id')
+        for gname, cna_grp in cna_grps:
+            print(gname)
+            try:
+                if os.path.exists(output+"/"+gname+"_snvs.csv"):
+                    print("Output exists! Skipping..")
+                    continue
+                snv_grp = snv_grps.get_group(gname)
+                snvs_filtered = df_apply(snv_grp, post_filter_and_classify_snvs_by_sample, None, None, True, True, cores=cores,
+                                         cnas=cna_grp, ascats=ascats)
+                snvdf = pd.DataFrame(snvs_filtered)
+                snvdf.to_csv(output+"/"+gname+"_snvs.csv", sep='\t', header=False)
+            except Exception as e:
+                print(e)
+                pass
+
+        #snvs_filtered = df_apply(snvs, post_filter_and_classify_snvs, None, None, True, True, cores=cores, cnas=cnas, ascats=ascats)
+
+        #joined = []
+        #for s in snvs_filtered:
+        #    if isinstance(s, list):
+        #        joined.extend(s)
+        #print(joined)
+        #snvdf = pd.DataFrame(dict(zip(snvs_filtered[0][0].index, snvs_filtered[0][0].values))).T
+        #snvdf = pd.concat([s for s in joined], axis=0)
+
 
 
 if __name__ == "__main__":
@@ -587,6 +746,13 @@ if __name__ == "__main__":
         type=str,
         required=False,
         help="Filtered and annotated CNAs",
+    )
+    parser.add_argument(
+        "--post_annotate",
+        action='store_true',
+        required=False,
+        help="",
+
     )
     args = parser.parse_args()
 
