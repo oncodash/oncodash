@@ -263,22 +263,14 @@ You have two options: *Python's virtual environments* or *conda*:
     CRYPTOCODE = ""
     ```
 
-9. Import genomic variants to the database. "\<filepath\>" is the path of file containing annotated variants. **The expected column separator is tabulator**. Optionally, you can filter the data by column and value with --filter \<column name\> --\<filter type\> \<value\>. See --help for different filter types.
+9. Preprocess and annotate genomic variants. "\<filepath\>" is the path of file containing annotated variants. **The expected column separator is tabulator**. Optionally, you can filter the data by column and value with --filter \<column name\> --\<filter type\> \<value\>. See --help for different filter types.
 
     ```sh
-    python manage.py import_genomic_variants --somatic_variants <filepath>
+    python wgs_data_adapter.py --copy_number_alterations cnas.csv --ascatestimates ascats.csv --output filtered_cnas.csv
     ```
 
     ```sh
-    python manage.py import_genomic_variants --copy_number_alterations <filepath>
-    ```
-
-    ```sh
-    python manage.py import_genomic_variants --ascatestimates <filepath>
-    ```
-
-    ```sh
-    python manage.py import_genomic_variants --oncokb_actionable_targets <filepath>
+    python wgs_data_adapter.py --somatic_variants snvs.csv --ascatestimates ascats.csv
     ```
 
 10. Query OncoKB and Cancer Genome Interpreter actionable targets per patient identified by cohort code.

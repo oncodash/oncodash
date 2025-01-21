@@ -248,7 +248,7 @@ def query_oncokb_cnas_to_csv(cna_annotations: pd.DataFrame):
 
             #print("Updated "+str(updatedf.count())+" CNAs")
         cna_annotations.drop(columns=cna_annotations.columns[0], axis=1, inplace=True)
-        cna_annotations.to_csv("cna_annotated_oncokb.csv", sep="\t")
+        cna_annotations.to_csv("cna_annotated_oncokb.csv", mode="a", sep="\t")
         trdf = pd.DataFrame(treatments)
         trdf.to_csv("treatments.csv", mode="a", sep="\t")
     else:
@@ -626,7 +626,7 @@ def generate_temp_cgi_query_files(snv_annotations: pd.DataFrame = None, cna_anno
 
                 uniques = snv_annotations[['chromosome', 'position', 'reference_allele', 'sample_allele', 'tumorType', 'referenceGenome']].drop_duplicates()
                 for indx, snv in uniques.iterrows():
-                    id = "SNV:"+snv['chromosome']+':'+str(snv['position'])+':'+snv['reference_allele']+':'+snv['sample_allele']
+                    id = snv['hugoSymbol']+":"+snv['chromosome']+':'+str(snv['position'])+':'+snv['reference_allele']+':'+snv['sample_allele']
                     row = snv['chromosome']+'\t'+str(snv['position'])+'\t'+snv['reference_allele']+'\t'+snv['sample_allele']+'\t'+id+'\n' #+'\t'+cryptocode.encrypt(snv.samples, settings.CRYPTOCODE)+'\n'
                     file1.write(row)
                 file1.close()
@@ -640,7 +640,7 @@ def generate_temp_cgi_query_files(snv_annotations: pd.DataFrame = None, cna_anno
                 print(type(uniques))
                 for indx, cna in uniques.iterrows():
                     print(cna)
-                    id = "CNA:"+str(cna['hugoSymbol']) + ':' + str(cna['alteration'])
+                    id = str(cna['hugoSymbol']) + ':' + str(cna['alteration'])
                     row = cna['hugoSymbol']+'\t'+cna_alt_to_cgi[cna['alteration']].value+'\t'+id+'\n'#+'\t'+cryptocode.encrypt(cna.sample_id, settings.CRYPTOCODE)+'\n'
                     file2.write(row)
                 file2.close()
@@ -809,7 +809,21 @@ def main(**kwargs):
         #    cnas = cna_annotation.objects.filter(patient_id=pid.get('patient_id'))
         #   if cnas:
         cnas = pd.read_csv(kwargs["copy_number_alterations"], sep="\t")
-        query_oncokb_cnas_to_csv(cnas)
+        cnas['tumorType'] = ""
+        cnas['oncogenic'] = ""
+        cnas['mutationEffectDescription'] = ""
+        cnas['gene_role'] = ""
+        cnas['citationPMids'] = ""
+        cnas['level_of_evidence'] = ""
+        cnas['cgi_level'] = ""
+        cnas['geneSummary'] = ""
+        cnas['variantSummary'] = ""
+        cnas['tumorTypeSummary'] = ""
+        cnas['treatments'] = ""
+
+        chunks = [cnas[x:x + 4999] for x in range(0, len(cnas), 5000)]
+        for c in chunks:
+            query_oncokb_cnas_to_csv(c)
 
 
     if kwargs["oncokbsnv"] and kwargs["somatic_variants"] and kwargs["all"]:
