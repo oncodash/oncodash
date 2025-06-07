@@ -1,0 +1,588 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>JabRef references</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+<!--
+// QuickSearch script for JabRef HTML export 
+// Version: 3.0
+//
+// Copyright (c) 2006-2011, Mark Schenk
+//
+// This software is distributed under a Creative Commons Attribution 3.0 License
+// http://creativecommons.org/licenses/by/3.0/
+//
+// Features:
+// - intuitive find-as-you-type searching
+//    ~ case insensitive
+//    ~ ignore diacritics (optional)
+//
+// - search with/without Regular Expressions
+// - match BibTeX key
+//
+
+// Search settings
+var searchAbstract = true;	// search in abstract
+var searchComment = true;	// search in comment
+
+var noSquiggles = true; 	// ignore diacritics when searching
+var searchRegExp = false; 	// enable RegExp searches
+
+
+if (window.addEventListener) {
+	window.addEventListener("load",initSearch,false); }
+else if (window.attachEvent) {
+	window.attachEvent("onload", initSearch); }
+
+function initSearch() {
+	// check for quick search table and searchfield
+	if (!document.getElementById('qs_table')||!document.getElementById('quicksearch')) { return; }
+
+	// load all the rows and sort into arrays
+	loadTableData();
+	
+	//find the query field
+	qsfield = document.getElementById('qs_field');
+
+	// previous search term; used for speed optimisation
+	prevSearch = '';
+
+	//find statistics location
+	stats = document.getElementById('stat');
+	setStatistics(-1);
+	
+	// set up preferences
+	initPreferences();
+
+	// shows the searchfield
+	document.getElementById('quicksearch').style.display = 'block';
+	document.getElementById('qs_field').onkeyup = quickSearch;
+}
+
+function loadTableData() {
+	// find table and appropriate rows
+	searchTable = document.getElementById('qs_table');
+	var allRows = searchTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+	// split all rows into entryRows and infoRows (e.g. abstract, comment, bibtex)
+	entryRows = new Array(); infoRows = new Array(); absRows = new Array(); revRows = new Array();
+
+	// get data from each row
+	entryRowsData = new Array(); absRowsData = new Array(); revRowsData = new Array(); 
+	
+	BibTeXKeys = new Array();
+	
+	for (var i=0, k=0, j=0; i<allRows.length;i++) {
+		if (allRows[i].className.match(/entry/)) {
+			entryRows[j] = allRows[i];
+			entryRowsData[j] = stripDiacritics(getTextContent(allRows[i]));
+			allRows[i].id ? BibTeXKeys[j] = allRows[i].id : allRows[i].id = 'autokey_'+j;
+			j ++;
+		} else {
+			infoRows[k++] = allRows[i];
+			// check for abstract/comment
+			if (allRows[i].className.match(/abstract/)) {
+				absRows.push(allRows[i]);
+				absRowsData[j-1] = stripDiacritics(getTextContent(allRows[i]));
+			} else if (allRows[i].className.match(/comment/)) {
+				revRows.push(allRows[i]);
+				revRowsData[j-1] = stripDiacritics(getTextContent(allRows[i]));
+			}
+		}
+	}
+	//number of entries and rows
+	numEntries = entryRows.length;
+	numInfo = infoRows.length;
+	numAbs = absRows.length;
+	numRev = revRows.length;
+}
+
+function quickSearch(){
+	
+	tInput = qsfield;
+
+	if (tInput.value.length == 0) {
+		showAll();
+		setStatistics(-1);
+		qsfield.className = '';
+		return;
+	} else {
+		t = stripDiacritics(tInput.value);
+
+		if(!searchRegExp) { t = escapeRegExp(t); }
+			
+		// only search for valid RegExp
+		try {
+			textRegExp = new RegExp(t,"i");
+			closeAllInfo();
+			qsfield.className = '';
+		}
+			catch(err) {
+			prevSearch = tInput.value;
+			qsfield.className = 'invalidsearch';
+			return;
+		}
+	}
+	
+	// count number of hits
+	var hits = 0;
+
+	// start looping through all entry rows
+	for (var i = 0; cRow = entryRows[i]; i++){
+
+		// only show search the cells if it isn't already hidden OR if the search term is getting shorter, then search all
+		if(cRow.className.indexOf('noshow')==-1 || tInput.value.length <= prevSearch.length){
+			var found = false; 
+
+			if (entryRowsData[i].search(textRegExp) != -1 || BibTeXKeys[i].search(textRegExp) != -1){ 
+				found = true;
+			} else {
+				if(searchAbstract && absRowsData[i]!=undefined) {
+					if (absRowsData[i].search(textRegExp) != -1){ found=true; } 
+				}
+				if(searchComment && revRowsData[i]!=undefined) {
+					if (revRowsData[i].search(textRegExp) != -1){ found=true; } 
+				}
+			}
+			
+			if (found){
+				cRow.className = 'entry show';
+				hits++;
+			} else {
+				cRow.className = 'entry noshow';
+			}
+		}
+	}
+
+	// update statistics
+	setStatistics(hits)
+	
+	// set previous search value
+	prevSearch = tInput.value;
+}
+
+
+// Strip Diacritics from text
+// http://stackoverflow.com/questions/990904/javascript-remove-accents-in-strings
+
+// String containing replacement characters for stripping accents 
+var stripstring = 
+    'AAAAAAACEEEEIIII'+
+    'DNOOOOO.OUUUUY..'+
+    'aaaaaaaceeeeiiii'+
+    'dnooooo.ouuuuy.y'+
+    'AaAaAaCcCcCcCcDd'+
+    'DdEeEeEeEeEeGgGg'+
+    'GgGgHhHhIiIiIiIi'+
+    'IiIiJjKkkLlLlLlL'+
+    'lJlNnNnNnnNnOoOo'+
+    'OoOoRrRrRrSsSsSs'+
+    'SsTtTtTtUuUuUuUu'+
+    'UuUuWwYyYZzZzZz.';
+
+function stripDiacritics(str){
+
+    if(noSquiggles==false){
+        return str;
+    }
+
+    var answer='';
+    for(var i=0;i<str.length;i++){
+        var ch=str[i];
+        var chindex=ch.charCodeAt(0)-192;   // Index of character code in the strip string
+        if(chindex>=0 && chindex<stripstring.length){
+            // Character is within our table, so we can strip the accent...
+            var outch=stripstring.charAt(chindex);
+            // ...unless it was shown as a '.'
+            if(outch!='.')ch=outch;
+        }
+        answer+=ch;
+    }
+    return answer;
+}
+
+// http://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
+// NOTE: must escape every \ in the export code because of the JabRef Export...
+function escapeRegExp(str) {
+  return str.replace(/[-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
+function toggleInfo(articleid,info) {
+
+	var entry = document.getElementById(articleid);
+	var abs = document.getElementById('abs_'+articleid);
+	var rev = document.getElementById('rev_'+articleid);
+	var bib = document.getElementById('bib_'+articleid);
+	
+	if (abs && info == 'abstract') {
+		abs.className.indexOf('noshow') == -1?abs.className = 'abstract noshow':abs.className = 'abstract show';
+	} else if (rev && info == 'comment') {
+		rev.className.indexOf('noshow') == -1?rev.className = 'comment noshow':rev.className = 'comment show';
+	} else if (bib && info == 'bibtex') {
+		bib.className.indexOf('noshow') == -1?bib.className = 'bibtex noshow':bib.className = 'bibtex show';
+	} else { 
+		return;
+	}
+
+	// check if one or the other is available
+	var revshow; var absshow; var bibshow;
+	(abs && abs.className.indexOf('noshow') == -1)? absshow = true: absshow = false;
+	(rev && rev.className.indexOf('noshow') == -1)? revshow = true: revshow = false;	
+	(bib && bib.className.indexOf('noshow') == -1)? bibshow = true: bibshow = false;
+	
+	// highlight original entry
+	if(entry) {
+		if (revshow || absshow || bibshow) {
+		entry.className = 'entry highlight show';
+		} else {
+		entry.className = 'entry show';
+		}
+	}
+	
+	// When there's a combination of abstract/comment/bibtex showing, need to add class for correct styling
+	if(absshow) {
+		(revshow||bibshow)?abs.className = 'abstract nextshow':abs.className = 'abstract';
+	} 
+	if (revshow) {
+		bibshow?rev.className = 'comment nextshow': rev.className = 'comment';
+	}	
+	
+}
+
+function setStatistics (hits) {
+	if(hits < 0) { hits=numEntries; }
+	if(stats) { stats.firstChild.data = hits + '/' + numEntries}
+}
+
+function getTextContent(node) {
+	// Function written by Arve Bersvendsen
+	// http://www.virtuelvis.com
+	
+	if (node.nodeType == 3) {
+	return node.nodeValue;
+	} // text node
+	if (node.nodeType == 1 && node.className != "infolinks") { // element node
+	var text = [];
+	for (var chld = node.firstChild;chld;chld=chld.nextSibling) {
+		text.push(getTextContent(chld));
+	}
+	return text.join("");
+	} return ""; // some other node, won't contain text nodes.
+}
+
+function showAll(){
+	closeAllInfo();
+	for (var i = 0; i < numEntries; i++){ entryRows[i].className = 'entry show'; }
+}
+
+function closeAllInfo(){
+	for (var i=0; i < numInfo; i++){
+		if (infoRows[i].className.indexOf('noshow') ==-1) {
+			infoRows[i].className = infoRows[i].className + ' noshow';
+		}
+	}
+}
+
+function clearQS() {
+	qsfield.value = '';
+	showAll();
+}
+
+function redoQS(){
+	showAll();
+	quickSearch(qsfield);
+}
+
+function updateSetting(obj){
+	var option = obj.id;
+	var checked = obj.value;
+
+	switch(option)
+	 {
+	 case "opt_searchAbs":
+	   searchAbstract=!searchAbstract;
+	   redoQS();
+	   break;
+	 case "opt_searchRev":
+	   searchComment=!searchComment;
+	   redoQS();
+	   break;
+	 case "opt_useRegExp":
+	   searchRegExp=!searchRegExp;
+	   redoQS();
+	   break;
+	 case "opt_noAccents":
+	   noSquiggles=!noSquiggles;
+	   loadTableData();
+	   redoQS();
+	   break;
+	 }
+}
+
+function initPreferences(){
+	if(searchAbstract){document.getElementById("opt_searchAbs").checked = true;}
+	if(searchComment){document.getElementById("opt_searchRev").checked = true;}
+	if(noSquiggles){document.getElementById("opt_noAccents").checked = true;}
+	if(searchRegExp){document.getElementById("opt_useRegExp").checked = true;}
+	
+	if(numAbs==0) {document.getElementById("opt_searchAbs").parentNode.style.display = 'none';}
+	if(numRev==0) {document.getElementById("opt_searchRev").parentNode.style.display = 'none';}
+}
+
+function toggleSettings(){
+	var togglebutton = document.getElementById('showsettings');
+	var settings = document.getElementById('settings');
+	
+	if(settings.className == "hidden"){
+		settings.className = "show";
+		togglebutton.innerText = "close settings";
+		togglebutton.textContent = "close settings";
+	}else{
+		settings.className = "hidden";
+		togglebutton.innerText = "settings...";		
+		togglebutton.textContent = "settings...";
+	}
+}
+
+-->
+</script>
+<style type="text/css">
+body { background-color: white; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2; padding: 1em; color: #2E2E2E; margin: auto 2em; }
+
+form#quicksearch { width: auto; border-style: solid; border-color: gray; border-width: 1px 0px; padding: 0.7em 0.5em; display:none; position:relative; }
+span#searchstat {padding-left: 1em;}
+
+div#settings { margin-top:0.7em; /* border-bottom: 1px transparent solid; background-color: #efefef; border: 1px grey solid; */ }
+div#settings ul {margin: 0; padding: 0; }
+div#settings li {margin: 0; padding: 0 1em 0 0; display: inline; list-style: none; }
+div#settings li + li { border-left: 2px #efefef solid; padding-left: 0.5em;}
+div#settings input { margin-bottom: 0px;}
+
+div#settings.hidden {display:none;}
+
+#showsettings { border: 1px grey solid; padding: 0 0.5em; float:right; line-height: 1.6em; text-align: right; }
+#showsettings:hover { cursor: pointer; }
+
+.invalidsearch { background-color: red; }
+input[type="button"] { background-color: #efefef; border: 1px #2E2E2E solid;}
+
+table { width: 100%; empty-cells: show; border-spacing: 0em 0.2em; margin: 1em 0em; border-style: none; }
+th, td { border: 1px gray solid; border-width: 1px 1px; padding: 0.5em; vertical-align: top; text-align: left; }
+th { background-color: #efefef; }
+td + td, th + th { border-left: none; }
+
+td a { color: navy; text-decoration: none; }
+td a:hover  { text-decoration: underline; }
+
+tr.noshow { display: none;}
+tr.highlight td { background-color: #EFEFEF; border-top: 2px #2E2E2E solid; font-weight: bold; }
+tr.abstract td, tr.comment td, tr.bibtex td { background-color: #EFEFEF; text-align: justify; border-bottom: 2px #2E2E2E solid; }
+tr.nextshow td { border-bottom: 1px gray solid; }
+
+tr.bibtex pre { width: 100%; overflow: auto; white-space: pre-wrap;}
+p.infolinks { margin: 0.3em 0em 0em 0em; padding: 0px; }
+
+@media print {
+	p.infolinks, #qs_settings, #quicksearch, t.bibtex { display: none !important; }
+	tr { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<form action="" id="quicksearch">
+<input type="text" id="qs_field" autocomplete="off" placeholder="Type to search..." /> <input type="button" onclick="clearQS()" value="clear" />
+<span id="searchstat">Matching entries: <span id="stat">0</span></span>
+<div id="showsettings" onclick="toggleSettings()">settings...</div>
+<div id="settings" class="hidden">
+<ul>
+<li><input type="checkbox" class="search_setting" id="opt_searchAbs" onchange="updateSetting(this)"><label for="opt_searchAbs"> include abstract</label></li>
+<li><input type="checkbox" class="search_setting" id="opt_searchRev" onchange="updateSetting(this)"><label for="opt_searchRev"> include comment</label></li>
+<li><input type="checkbox" class="search_setting" id="opt_useRegExp" onchange="updateSetting(this)"><label for="opt_useRegExp"> use RegExp</label></li>
+<li><input type="checkbox" class="search_setting" id="opt_noAccents" onchange="updateSetting(this)"><label for="opt_noAccents"> ignore accents</label></li>
+</ul>
+</div>
+</form>
+<table id="qs_table" border="1">
+<thead><tr><th width="20%">Author</th><th width="30%">Title</th><th width="5%">Year</th><th width="30%">Journal/Proceedings</th><th width="10%">Reftype</th><th width="5%">DOI/URL</th></tr></thead>
+<tbody><tr id="Ceccaroni2025" class="entry">
+	<td>Ceccaroni, L., Parkinson, S., Angel, D., Dreo, J., Edelist, D., Freitas, C., Ganchev, T., Ipektsidis, C., Kruniawan, F., Laudy, C., Markova, V., Nkosana Mlandu, D., Paredes, H., Pearlman, J., Simpson, P., Venus, V. and Wahyudi, F.</td>
+	<td>Engaging the public in scientific research to enhance digital twins of the ocean and practical applications <p class="infolinks">[<a href="javascript:toggleInfo('Ceccaroni2025','bibtex')">BibTeX</a>]</p></td>
+	<td>2025</td>
+	<td>submitted&nbsp;</td>
+	<td>inproceedings</td>
+	<td>&nbsp;</td>
+</tr>
+<tr id="bib_Ceccaroni2025" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Ceccaroni2025,
+  author = {Ceccaroni, Luigi and Parkinson, Stephen and Angel, Dror and Dreo, Johann and Edelist, Dori and Freitas, Carlos and Ganchev, Todor and Ipektsidis, Charalampos and Kruniawan, Firdaus and Laudy, Claire and Markova, Valentina and Nkosana Mlandu, Daniel and Paredes, Hugo and Pearlman, Jay and Simpson, Pauline and Venus, Valentijn and Wahyudi, Firman},
+  title = {Engaging the public in scientific research to enhance digital twins of the ocean and practical applications},
+  booktitle = {submitted},
+  year = {2025}
+}
+</pre></td>
+</tr>
+<tr id="Dreo2025pint" class="entry">
+	<td>Dreo, J.</td>
+	<td>IA métissée : quand données et symboles s’enlacent <p class="infolinks">[<a href="javascript:toggleInfo('Dreo2025pint','bibtex')">BibTeX</a>]</p></td>
+	<td>2025</td>
+	<td>Pint of Science&nbsp;</td>
+	<td>inproceedings</td>
+	<td>&nbsp;</td>
+</tr>
+<tr id="bib_Dreo2025pint" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Dreo2025pint,
+  author = {Dreo, Johann},
+  title = {IA métissée : quand données et symboles s’enlacent},
+  booktitle = {Pint of Science},
+  year = {2025}
+}
+</pre></td>
+</tr>
+<tr id="Dreo2024" class="entry">
+	<td>Dreo, J., Laudy, C., Lobentanzer, S., Baric, M., Gaydukova, E. and Schwikowski, B.</td>
+	<td>Reproducible Mapping of Tabular Data into Semantic Knowledge Graphs with OntoWeaver and BioCypher <p class="infolinks">[<a href="javascript:toggleInfo('Dreo2024','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Dreo2024','bibtex')">BibTeX</a>]</p></td>
+	<td>2024</td>
+	<td>27th International Conference on Information Fusion&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="https://hal.science/hal-04509632">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Dreo2024" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Large-scale high-level information fusion<br>and data integration is a pressing need in several sci-<br>entific domains. Recently, the biomedical community<br>established BioCypher, a tool to help create large<br>Semantic Knowledge Graphs (SKGs) in a simple and<br>reproducible way. In this article, we introduce On-<br>toWeaver, a companion tool to BioCypher that allows<br>to easily extract tabular data into SKGs by using a<br>simple declarative mapping. OntoWeaver allows imple-<br>menting reproducible mappings from tabular data to<br>SKGs with a simple declarative configuration. The use<br>of OntoWeaver and BioCypher is demonstrated in two<br>different use cases: cancer database integration and in-<br>vasive species monitoring. We believe that OntoWeaver<br>and BioCypher, both free and open-source software,<br>can help several scientific communities working on<br>SKGs and high-level information fusion problems.</td>
+</tr>
+<tr id="bib_Dreo2024" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Dreo2024,
+  author = {Dreo, Johann and Laudy, Claire and Lobentanzer, Sebastian and Baric, Marko and Gaydukova, Ekaterina and Schwikowski, Benno},
+  title = {Reproducible Mapping of Tabular Data into Semantic Knowledge Graphs with OntoWeaver and BioCypher},
+  booktitle = {27th International Conference on Information Fusion},
+  year = {2024},
+  url = {https://hal.science/hal-04509632}
+}
+</pre></td>
+</tr>
+<tr id="Dreo2024a" class="entry">
+	<td>Dreo, J., Lobentanzer, S., Gaydukova, E., Baric, M., Maarala, A.I., Muranen, T., Oikkonen, J., Bolelli, F., Pipoli, V., Isoviita, V.-M. and others</td>
+	<td>High-level biomedical data integration in a semantic knowledge graph with oncodashkb for finding personalized actionable drugs in ovarian cancer <p class="infolinks">[<a href="javascript:toggleInfo('Dreo2024a','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Dreo2024a','bibtex')">BibTeX</a>]</p></td>
+	<td>2024</td>
+	<td>Cancer Genomics, Multiomics and Computational Biology&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="https://hal.science/hal-04509599">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_Dreo2024a" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Background: The growing amount of biomedical knowledge about cancer in combination with genome-scale patient profiling data offers unprecedented opportunities for personalized oncology. However, the large amounts of knowledge and data require scalable approaches to providing actionable information to support clinicians in decision-making [1]. Objective: To develop software and methods that integrate all relevant clinical and genomic data about patients and that enables the discovery of optimal personalized treatment options, together with the supporting literature knowledge and data. Methods: We exploit a Semantic Knowledge Graph (SKG), a type of database that represents medical data in the form of objects and relationships, linking previously unconnected information across several cancer databases. To build up this SKG (OncodashKB), we use the BioCypher library [2]. We then integrate clinical data from patients with high-grade serous ovarian cancer, including information on genome changes collected as part of the DECIDER project (https://deciderproject.eu). The SKG can then be queried to gather evidence paths linking patient-specific alterations to actionable drugs. Results: Our approach provides a fully automated, systematic, and reproducible data integration workflow, along with the use of existing expert-made ontologies to provide interoperability and semantic descriptions. The integrated data is assessed by experts on molecular tumor boards and allows for the exploration of relevant clinical and genomic patient data in a visually accessible format, designed for ease of interpretation by clinicians. Importantly, we expect the system to reveal compelling findings/indications from multiple lines of converging evidence to a strong case from multi-omics patient data and a broad and automated review of the latest clinical and experimental knowledge. Conclusion: Decision support systems using graph databases emerge as valuable tools by revealing new connections between various patient data and treatment options shown in an easy-to-understand format.</td>
+</tr>
+<tr id="bib_Dreo2024a" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Dreo2024a,
+  author = {Dreo, Johann and Lobentanzer, Sebastian and Gaydukova, Ekaterina and Baric, Marko and Maarala, Altti Ilari and Muranen, Taru and Oikkonen, Jaana and Bolelli, Federico and Pipoli, Vittorio and Isoviita, Veli-Matti and others},
+  title = {High-level biomedical data integration in a semantic knowledge graph with oncodashkb for finding personalized actionable drugs in ovarian cancer},
+  booktitle = {Cancer Genomics, Multiomics and Computational Biology},
+  year = {2024},
+  url = {https://hal.science/hal-04509599}
+}
+</pre></td>
+</tr>
+<tr id="Dreo2024b" class="entry">
+	<td>Dreo, J., Laudy, C., Lobentanzer, S., Baric, M., Gaydukova, E. and Schwikowski, B.</td>
+	<td>Intégration reproductible d’informations de haut niveau dans des graphes de connaissances sémantiques avec OntoWeaver et BioCypher, applications en oncologie et en écologie <p class="infolinks">[<a href="javascript:toggleInfo('Dreo2024b','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Dreo2024b','bibtex')">BibTeX</a>]</p></td>
+	<td>2024</td>
+	<td>Journées ouvertes de biologie, informatique et mathématiques&nbsp;</td>
+	<td>inproceedings</td>
+	<td>&nbsp;</td>
+</tr>
+<tr id="abs_Dreo2024b" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: La fusion d'informations de haut niveau à grande échelle et l'intégration de données constituent un besoin pressant dans plusieurs domaines scientifiques. Récemment, la communauté biomédicale a créé BioCypher, un outil permettant de créer de grands graphes de connaissances sémantiques (<i>Semantic Knowledge Graph</i>, SKG) de manière simple et reproductible. Dans cet article, nous présentons OntoWeaver, un outil complémentaire à BioCypher qui permet d'extraire facilement des données tabulaires dans des SKG à l'aide d'un simple mappage déclaratif. L'intérêt d'OntoWeaver et de BioCypher est démontré via deux cas d'utilisation différents : l'intégration d'une base de données sur le cancer et la surveillance d'espèces invasives. Nous pensons qu'OntoWeaver et BioCypher, deux logiciels libres et gratuits, peuvent aider plusieurs communautés scientifiques travaillant sur les SKG et les problèmes de fusion d'informations sémantiques.</td>
+</tr>
+<tr id="bib_Dreo2024b" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Dreo2024b,
+  author = {Dreo, Johann and Laudy, Claire and Lobentanzer, Sebastian and Baric, Marko and Gaydukova, Ekaterina and Schwikowski, Benno},
+  title = {Intégration reproductible d’informations de haut niveau dans des graphes de connaissances sémantiques avec OntoWeaver et BioCypher, applications en oncologie et en écologie},
+  booktitle = {Journées ouvertes de biologie, informatique et mathématiques},
+  year = {2024}
+}
+</pre></td>
+</tr>
+<tr id="Dreo2024c" class="entry">
+	<td>Dreo, J., Laudy, C., Lobentanzer, S., Baric, M., Gaydukova, E. and Schwikowski, B.</td>
+	<td>Intégration reproductible d’informations de haut niveau dans des graphes de connaissances sémantiques avec OntoWeaver et BioCypher, applications en oncologie et en écologie <p class="infolinks">[<a href="javascript:toggleInfo('Dreo2024c','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('Dreo2024c','bibtex')">BibTeX</a>]</p></td>
+	<td>2024</td>
+	<td>Journées NetBio&nbsp;</td>
+	<td>inproceedings</td>
+	<td>&nbsp;</td>
+</tr>
+<tr id="abs_Dreo2024c" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: La fusion d'informations de haut niveau à grande échelle et l'intégration de données constituent un besoin pressant dans plusieurs domaines scientifiques. Récemment, la communauté biomédicale a créé BioCypher, un outil permettant de créer de grands graphes de connaissances sémantiques (<i>Semantic Knowledge Graph</i>, SKG) de manière simple et reproductible. Dans cet article, nous présentons OntoWeaver, un outil complémentaire à BioCypher qui permet d'extraire facilement des données tabulaires dans des SKG à l'aide d'un simple mappage déclaratif. L'intérêt d'OntoWeaver et de BioCypher est démontré via deux cas d'utilisation différents : l'intégration d'une base de données sur le cancer et la surveillance d'espèces invasives. Nous pensons qu'OntoWeaver et BioCypher, deux logiciels libres et gratuits, peuvent aider plusieurs communautés scientifiques travaillant sur les SKG et les problèmes de fusion d'informations sémantiques.</td>
+</tr>
+<tr id="bib_Dreo2024c" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Dreo2024c,
+  author = {Dreo, Johann and Laudy, Claire and Lobentanzer, Sebastian and Baric, Marko and Gaydukova, Ekaterina and Schwikowski, Benno},
+  title = {Intégration reproductible d’informations de haut niveau dans des graphes de connaissances sémantiques avec OntoWeaver et BioCypher, applications en oncologie et en écologie},
+  booktitle = {Journées NetBio},
+  year = {2024}
+}
+</pre></td>
+</tr>
+<tr id="Dreo2023" class="entry">
+	<td>Dreo, J.</td>
+	<td>Consistent Symbolic Data Integration with OntoWeaver <p class="infolinks">[<a href="javascript:toggleInfo('Dreo2023','bibtex')">BibTeX</a>]</p></td>
+	<td>2023</td>
+	<td>Journée annuelle du groupe de travail sur la biologie systémique symbolique&nbsp;</td>
+	<td>inproceedings</td>
+	<td>&nbsp;</td>
+</tr>
+<tr id="bib_Dreo2023" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{Dreo2023,
+  author = {Dreo, Johann},
+  title = {Consistent Symbolic Data Integration with OntoWeaver},
+  booktitle = {Journée annuelle du groupe de travail sur la biologie systémique symbolique},
+  year = {2023}
+}
+</pre></td>
+</tr>
+<tr id="Lobentanzer2023" class="entry">
+	<td>Lobentanzer, S., Aloy, P., Baumbach, J., Bohar, B., Carey, V.J., Charoentong, P., Danhauser, K., Doğan, T., Dreo, J., Dunham, I., Farr, E., Fernadez-Torras, A., Gyori, B.M., Hartung, M., Tapley Hoyt, C., Klein, C., Korcsmaros, T., Maier, A., Mann, M., Ochoa, D., Pareja-Lorente, E., Popp, F., Preusse, M., Probul, N., Schwikowski, B., Sen, B., Strauss, M.T., Turei, D., Ulusoy, E., Waltemath, D., Wodke, J.A.H. and Saez-Rodriguez, J.</td>
+	<td>Democratizing knowledge representation with BioCypher <p class="infolinks">[<a href="javascript:toggleInfo('Lobentanzer2023','bibtex')">BibTeX</a>]</p></td>
+	<td>2023</td>
+	<td>Nature Biotechnology<br/>Vol. 41(8), pp. 1056-1059&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://doi.org/10.1038/s41587-023-01848-y">DOI</a> <a href="https://hal.science/hal-04135813">URL</a>&nbsp;</td>
+</tr>
+<tr id="bib_Lobentanzer2023" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{Lobentanzer2023,
+  author = {Lobentanzer, Sebastian and Aloy, Patrick and Baumbach, Jan and Bohar, Balazs and Carey, Vincent J. and Charoentong, Pornpimol and Danhauser, Katharina and Doğan, Tunca and Dreo, Johann and Dunham, Ian and Farr, Elisa and Fernadez-Torras, Adrià and Gyori, Benjamin M. and Hartung, Michael and Tapley Hoyt, Charles and Klein, Christoph and Korcsmaros, Tamas and Maier, Andreas and Mann, Matthias and Ochoa, David and Pareja-Lorente, Elena and Popp, Ferdinand and Preusse, Martin and Probul, Niklas and Schwikowski, Benno and Sen, Bünyamin and Strauss, Maximilian T. and Turei, Denes and Ulusoy, Erva and Waltemath, Dagmar and Wodke, Judith A. H. and Saez-Rodriguez, Julio},
+  title = {Democratizing knowledge representation with BioCypher},
+  journal = {Nature Biotechnology},
+  publisher = {Nature Publishing Group US New York},
+  year = {2023},
+  volume = {41},
+  number = {8},
+  pages = {1056--1059},
+  url = {https://hal.science/hal-04135813},
+  doi = {https://doi.org/10.1038/s41587-023-01848-y}
+}
+</pre></td>
+</tr>
+</tbody>
+</table>
+<footer>
+ <small>Created by <a href="https://www.jabref.org">JabRef</a> on 2025/06/07.</small>
+</footer>
+<!-- file generated by JabRef -->
+</body>
+</html>
