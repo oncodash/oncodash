@@ -1,10 +1,12 @@
 import os
 import re
+import sys
 import json
 import toml
 import flask
 import neo4j
 import logging
+from markupsafe import escape
 from werkzeug.exceptions import HTTPException, NotFound
 
 app = flask.Flask(__name__)
@@ -106,11 +108,50 @@ def handle_exception(e):
         "description": e.description,
     })
     response.content_type = "application/json"
+    app.logger.debug("└ERROR")
     return response
+
+
+def endpoints():
+    links = {}
+    module = sys.modules[__name__]
+    for rule in app.url_map.iter_rules():
+        func = rule.endpoint
+        if hasattr(module, func):
+            doc = getattr(module, func).__doc__
+            url = str(rule)
+            links[url] = doc
+    return links
+
+
+@app.route("/")
+def root():
+    """Map of this website."""
+    app.logger.debug(f"Asking for {root.__doc__}...")
+    html = "<ul>"
+    for url,doc in endpoints().items():
+        if url == '/':
+            continue
+        a = escape(url)
+        html += f"<li><a href='{url}'>{a}</a>: {doc}</li>"
+    html += "</ul>"
+    app.logger.debug("└OK")
+    return html
+
+
+@app.route("/map")
+def map():
+    """API map as JSON"""
+    app.logger.debug(f"Asking for {map.__doc__}...")
+    links = endpoints()
+    app.logger.debug("└OK")
+    return flask.jsonify(links)
 
 
 @app.route("/ping")
 def ping():
+    """metadata about the Oncodash API"""
+    app.logger.debug(f"Asking for {ping.__doc__}...")
     api_info = {
         "title": "Oncodash API",
         "summary": "Virtual Molecular Tumor Board Data access",
@@ -120,56 +161,69 @@ def ping():
         },
         "version": "0.1.0",
     }
+    app.logger.debug("└OK")
     return flask.jsonify({"info": api_info})
+
+
+def cypher(query):
+    with neo4j.GraphDatabase.driver(config["neo4j"]["uri"], auth=config["neo4j"]["auth"]) as db:
+        app.logger.debug(f"│ {query}")
+        records, _, _ = db.execute_query(
+            query,
+            name=config["neo4j"]["user"], database_ = config["neo4j"]["database"])
+    return records
 
 
 @app.route("/api/clinical-overview/data/<patient_id>")
 def patient(patient_id):
-    app.logger.debug(f"Asked for patient `{patient_id}`.")
-    with neo4j.GraphDatabase.driver(config["neo4j"]["uri"], auth=config["neo4j"]["auth"]) as db:
-        records, _, _ = db.execute_query(
-            f"MATCH (p:Patient)"
-            " WHERE p.id = '{patient_id}'"
-            " RETURN ALL *",
-            name="neo4j", database_ = "oncodash")
-    patients = []
-    app.logger.debug(f"{len(records)} patient")
+    """data about a specific patient"""
+    app.logger.debug(f"Asking for {patient.__doc__}: `{patient_id}`...")
+    records = cypher(
+        f"MATCH (p:Patient)"             \
+        f" WHERE p.id = '{patient_id}'"  \
+         " RETURN ALL *")
     if len(records) == 0:
-        msg = f"Found no patient with id: `{patient_id}`."
+        msg = f"│ Found no patient with id: `{patient_id}`."
+        app.logger.error(msg)
         raise NotFound(msg)
     elif len(records) > 1:
-        msg = f"Found {len(records)} patients with id: `{patient_id}`, but there can be only one."
+        msg = f"│ Found {len(records)} patients with id: `{patient_id}`, but there can be only one."
+        app.logger.error(msg)
         raise NotFound(msg)
     else:
-        for r in records:
-            rp = r["p"]
-            patient = {"id": rp["id"]}
-            patientDTO = {}
-            for key,val in rp._properties.items():
-                if key in fields(schema.PatientDTO):
-                    patientDTO[key] = cast(schema.PatientDTO,key,val)
-            patientDTOs.append(patientDTO)
-        return flask.jsonify(patientDTOs)
-
-
-@app.route("/api/clinical-overview/data")
-def patients():
-    with neo4j.GraphDatabase.driver(config["neo4j"]["uri"], auth=config["neo4j"]["auth"]) as db:
-        records, _, _ = db.execute_query(
-            "MATCH (p:Patient)"
-            " RETURN ALL *",
-            name="neo4j", database_ = "oncodash")
-    patients = []
-    app.logger.debug(f"{len(records)} records")
-    for r in records:
+        app.logger.error("│ Found a patient")
+        r = records[0]
         rp = r["p"]
-        patient = {"id": rp["id"]}
         patientDTO = {}
         for key,val in rp._properties.items():
             if key in fields(schema.PatientDTO):
                 patientDTO[key] = cast(schema.PatientDTO,key,val)
-        patientDTOs.append(patientDTO)
-    return flask.jsonify(patientDTOs)
+        app.logger.debug("└OK")
+        return flask.jsonify(patientDTO)
+
+
+@app.route("/api/clinical-overview/data")
+def patients():
+    """all patients at once"""
+    app.logger.debug(f"Asking for {patients.__doc__}...")
+    records = cypher(
+        "MATCH (p:Patient)"  \
+        " RETURN ALL *")
+    data = []
+    app.logger.debug(f"│ {len(records)} records")
+    for r in records:
+        rp = r["p"]
+        patientDTO = {}
+        for key,val in rp._properties.items():
+            if key in fields(schema.PatientDTO):
+                patientDTO[key] = cast(schema.PatientDTO,key,val)
+        data.append({
+            "id": rp["id"],
+            "DTO": patientDTO
+        })
+    app.logger.debug("└OK")
+    return flask.jsonify(data)
+
 
 @app.route("/api/genomic-overview/data/<patient_id>")
 def genomic(patient_id):
