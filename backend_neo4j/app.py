@@ -1,3 +1,5 @@
+import os
+import re
 import json
 import toml
 import flask
@@ -23,51 +25,73 @@ with open("neo4j.pass") as fd:
 config["neo4j"]["auth"] = (config["neo4j"]["user"], config["neo4j"]["passwd"])
 
 
+def fields(cls):
+    for f in dir(cls):
+        if not re.match(r'^__', f):
+            yield f
+
+def cast(cls, key, val):
+    return getattr(cls, key)(val)
+
 class schema:
-    PatientDTO = {
-        "age_at_diagnosis": int,
-        "bmi_at_diagnosis": int,
-        "brca_mutation_status": str,
-        "chronic_illnesses_at_dg": bool,
-        "chronic_illnesses_type": str,
-        "clinical_trial": bool,
-        "cohort_code": str,
-        "current_treatment_phase": str,
-        "days_from_beva_maintenance_end_to_progression": int,
-        "days_to_death": int,
-        "days_to_progression": int,
-        "debulking_surgery_ids": bool,
-        "drug_trial_name": str,
-        "drug_trial_unblinded": bool,
-        "event_series": str,
-        "followup_time": int,
-        "germline_pathogenic_variant": str,
-        "height_at_diagnosis": int,
-        "histology": str,
-        "hr_signature_per_patient": str,
-        "hr_signature_pretreatment_wgs": str,
-        "hrd_myriad_status": str,
-        "maintenance_therapy": str,
-        "operation1_cancelled": bool,
-        "operation2_cancelled": bool,
-        "paired_fresh_samples_available": bool,
-        "patient_id": int,
-        "platinum_free_interval": int,
-        "platinum_free_interval_at_update": int,
-        "previous_cancer": bool,
-        "previous_cancer_diagnosis": str,
-        "primary_therapy_outcome": str,
-        "progression": bool,
-        "residual_tumor_ids": str,
-        "residual_tumor_pds": str,
-        "sequencing_available": bool,
-        "stage": str,
-        "survival": str,  # FIXME should be bool
-        "time_series": str,
-        "treatment_strategy": str,
-        "weight_at_diagnosis": int,
-        "wgs_available": bool,
-    }
+    class PatientDTO:
+        age_at_diagnosis = int
+        bmi_at_diagnosis = int
+        brca_mutation_status = str
+        chronic_illnesses_at_dg = bool
+        chronic_illnesses_type = str
+        clinical_trial = bool
+        cohort_code = str
+        current_treatment_phase = str
+        days_from_beva_maintenance_end_to_progression = int
+        days_to_death = int
+        days_to_progression = int
+        debulking_surgery_ids = bool
+        drug_trial_name = str
+        drug_trial_unblinded = bool
+        event_series = str
+        followup_time = int
+        germline_pathogenic_variant = str
+        height_at_diagnosis = int
+        histology = str
+        hr_signature_per_patient = str
+        hr_signature_pretreatment_wgs = str
+        hrd_myriad_status = str
+        maintenance_therapy = str
+        operation1_cancelled = bool
+        operation2_cancelled = bool
+        paired_fresh_samples_available = bool
+        patient_id = int
+        platinum_free_interval = int
+        platinum_free_interval_at_update = int
+        previous_cancer = bool
+        previous_cancer_diagnosis = str
+        primary_therapy_outcome = str
+        progression = bool
+        residual_tumor_ids = str
+        residual_tumor_pds = str
+        sequencing_available = bool
+        stage = str
+        survival = str  # FIXME should be bool
+        time_series = str
+        treatment_strategy = str
+        weight_at_diagnosis = int
+        wgs_available = bool
+
+    # GenomicData = {
+    #     "genomic": {
+    #         "actionable_aberrations": str,
+    #         "putative_functionally_relevant_variants": str,
+    #         "other_variants": str,
+    #     },
+    #     "actionable_aberrations": GeneData,
+    #     "putative_functionally_relevant_variants": GeneData,
+    #     "other_variants": GeneData,
+    #     "samples_info": {
+    #         "name": str,
+    #         "row": list  # of SampleInfo
+    #     }
+    # }
 
 
 @app.errorhandler(HTTPException)
@@ -122,8 +146,8 @@ def patient(patient_id):
             patient = {"id": rp["id"]}
             patientDTO = {}
             for key,val in rp._properties.items():
-                if key in schema.PatientDTO:
-                    patientDTO[key] = schema.PatientDTO[key](val)
+                if key in fields(schema.PatientDTO):
+                    patientDTO[key] = cast(schema.PatientDTO,key,val)
             patientDTOs.append(patientDTO)
         return flask.jsonify(patientDTOs)
 
@@ -142,11 +166,14 @@ def patients():
         patient = {"id": rp["id"]}
         patientDTO = {}
         for key,val in rp._properties.items():
-            if key in schema.PatientDTO:
-                patientDTO[key] = schema.PatientDTO[key](val)
+            if key in fields(schema.PatientDTO):
+                patientDTO[key] = cast(schema.PatientDTO,key,val)
         patientDTOs.append(patientDTO)
     return flask.jsonify(patientDTOs)
 
+@app.route("/api/genomic-overview/data/<patient_id>")
+def genomic(patient_id):
+    pass
 
 if __name__ == "__main__":
     app.run()
