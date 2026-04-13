@@ -35,65 +35,99 @@ def fields(cls):
 def cast(cls, key, val):
     return getattr(cls, key)(val)
 
-class schema:
-    class PatientDTO:
-        age_at_diagnosis = int
-        bmi_at_diagnosis = int
-        brca_mutation_status = str
-        chronic_illnesses_at_dg = bool
-        chronic_illnesses_type = str
-        clinical_trial = bool
-        cohort_code = str
-        current_treatment_phase = str
-        days_from_beva_maintenance_end_to_progression = int
-        days_to_death = int
-        days_to_progression = int
-        debulking_surgery_ids = bool
-        drug_trial_name = str
-        drug_trial_unblinded = bool
-        event_series = str
-        followup_time = int
-        germline_pathogenic_variant = str
-        height_at_diagnosis = int
-        histology = str
-        hr_signature_per_patient = str
-        hr_signature_pretreatment_wgs = str
-        hrd_myriad_status = str
-        maintenance_therapy = str
-        operation1_cancelled = bool
-        operation2_cancelled = bool
-        paired_fresh_samples_available = bool
-        patient_id = int
-        platinum_free_interval = int
-        platinum_free_interval_at_update = int
-        previous_cancer = bool
-        previous_cancer_diagnosis = str
-        primary_therapy_outcome = str
-        progression = bool
-        residual_tumor_ids = str
-        residual_tumor_pds = str
-        sequencing_available = bool
-        stage = str
-        survival = str  # FIXME should be bool
-        time_series = str
-        treatment_strategy = str
-        weight_at_diagnosis = int
-        wgs_available = bool
+class PatientDTO:
+    age_at_diagnosis = int
+    bmi_at_diagnosis = int
+    brca_mutation_status = str
+    chronic_illnesses_at_dg = bool
+    chronic_illnesses_type = str
+    clinical_trial = bool
+    cohort_code = str
+    current_treatment_phase = str
+    days_from_beva_maintenance_end_to_progression = int
+    days_to_death = int
+    days_to_progression = int
+    debulking_surgery_ids = bool
+    drug_trial_name = str
+    drug_trial_unblinded = bool
+    event_series = str
+    followup_time = int
+    germline_pathogenic_variant = str
+    height_at_diagnosis = int
+    histology = str
+    hr_signature_per_patient = str
+    hr_signature_pretreatment_wgs = str
+    hrd_myriad_status = str
+    maintenance_therapy = str
+    operation1_cancelled = bool
+    operation2_cancelled = bool
+    paired_fresh_samples_available = bool
+    patient_id = int
+    platinum_free_interval = int
+    platinum_free_interval_at_update = int
+    previous_cancer = bool
+    previous_cancer_diagnosis = str
+    primary_therapy_outcome = str
+    progression = bool
+    residual_tumor_ids = str
+    residual_tumor_pds = str
+    sequencing_available = bool
+    stage = str
+    survival = str  # FIXME should be bool
+    time_series = str
+    treatment_strategy = str
+    weight_at_diagnosis = int
+    wgs_available = bool
 
-    # GenomicData = {
-    #     "genomic": {
-    #         "actionable_aberrations": str,
-    #         "putative_functionally_relevant_variants": str,
-    #         "other_variants": str,
-    #     },
-    #     "actionable_aberrations": GeneData,
-    #     "putative_functionally_relevant_variants": GeneData,
-    #     "other_variants": GeneData,
-    #     "samples_info": {
-    #         "name": str,
-    #         "row": list  # of SampleInfo
-    #     }
-    # }
+class Genomic:
+    actionable_aberrations = str
+    putative_functionally_relevant_variants = str
+    other_variants = str
+
+class SampleInfoList:
+    name = str
+    row = list  # of SampleInfo
+
+class SampleInfo:
+    sample = str
+    purity = str
+    ploidy = str
+    tumor_site = str
+    sample_time = str
+    sample_type = str
+
+class GeneData:
+    description = str
+    alterations = list  # of AlterationData
+
+class AlterationData:
+    name = str
+    description = str
+    reported_sensitivity = str
+    row = list  # of AlterationSampleData*
+
+class AlterationSampleDataSNP:
+    samples = str
+    AD__0 = str  # __ => .
+    AD__1 = str  # __ => .
+    DP = str
+    AF = str
+    nMajor = str
+    nMinor = str
+    LOHstatus = str
+    expHomCI__cover = str  # __ => .
+
+class AlterationSampleDataCNV:
+    sample = str
+    nMajor = str
+    nMinor = str
+
+class GenomicData:
+    genomic = Genomic
+    actionable_aberrations = GeneData
+    putative_functionally_relevant_variants = GeneData
+    other_variants = GeneData
+    samples_info = SampleInfoList
 
 
 @app.errorhandler(HTTPException)
@@ -108,7 +142,7 @@ def handle_exception(e):
         "description": e.description,
     })
     response.content_type = "application/json"
-    app.logger.debug("└ERROR")
+    app.logger.debug(f"ERROR [{e.code}] {e.name} ⮧")
     return response
 
 
@@ -196,8 +230,8 @@ def patient(patient_id):
         rp = r["p"]
         patientDTO = {}
         for key,val in rp._properties.items():
-            if key in fields(schema.PatientDTO):
-                patientDTO[key] = cast(schema.PatientDTO,key,val)
+            if key in fields(PatientDTO):
+                patientDTO[key] = cast(PatientDTO,key,val)
         app.logger.debug("└OK")
         return flask.jsonify(patientDTO)
 
@@ -215,8 +249,8 @@ def patients():
         rp = r["p"]
         patientDTO = {}
         for key,val in rp._properties.items():
-            if key in fields(schema.PatientDTO):
-                patientDTO[key] = cast(schema.PatientDTO,key,val)
+            if key in fields(PatientDTO):
+                patientDTO[key] = cast(PatientDTO,key,val)
         data.append({
             "id": rp["id"],
             "DTO": patientDTO
@@ -227,7 +261,12 @@ def patients():
 
 @app.route("/api/genomic-overview/data/<patient_id>")
 def genomic(patient_id):
-    pass
+    """genomic data of one patient"""
+    app.logger.debug(f"Asking for {genomic.__doc__}...")
+    data = {}
+    app.logger.debug("└OK")
+    return flask.jsonify(data)
+
 
 if __name__ == "__main__":
     app.run()

@@ -39,10 +39,16 @@ else
 fi
 
 echo "Send a test query..." >&2
-${NEO_USER} cypher-shell --username neo4j --database oncodash --password "$(cat neo4j.pass)" "MATCH (p:Patient) RETURN p LIMIT 20;"
+${NEO_USER} cypher-shell --username neo4j --database oncodash --password "$(cat neo4j.pass)" "MATCH (p:Patient) RETURN p LIMIT 5;"
 
 
 echo "Starting Flask API..." >&2
+
+echo "###############################################" >&2
+echo "Neo4j  browser: http://localhost:7474/browser/" >&2
+echo "Flask REST API: http://127.0.0.1:5000/" >&2
+echo "###############################################" >&2
+
 export FLASK_APP="app.py"
 uv run flask --app app run --debug
 
