@@ -3,13 +3,15 @@ import re
 import sys
 import json
 import toml
-import flask
 import neo4j
+import flask
+import flask_cors
 import logging
 from markupsafe import escape
 from werkzeug.exceptions import HTTPException, NotFound
 
 app = flask.Flask(__name__)
+flask_cors.CORS(app)
 
 config = {
     "neo4j": {
@@ -134,6 +136,14 @@ class GenomicData:
     samples_info = SampleInfoList
 
 
+@app.before_request
+def handle_preflight():
+    if flask.request.method == "OPTIONS":
+        res = flask.Response()
+        res.headers['X-Content-Type-Options'] = '*'
+        return res
+
+
 @app.errorhandler(HTTPException)
 def handle_exception(e):
     """Return JSON instead of HTML for HTTP errors."""
@@ -146,7 +156,7 @@ def handle_exception(e):
         "description": e.description,
     })
     response.content_type = "application/json"
-    app.logger.debug(f"ERROR [{e.code}] {e.name} ⮧")
+    app.logger.debug(f"ERROR [{e.code}] {e.name}:")
     return response
 
 
@@ -212,10 +222,14 @@ def cypher(query):
     return records
 
 
-@app.route("/api/clinical-overview/data/<patient_id>")
+@app.route("/api/clinical-overview/data/<patient_id>/")
 def patient(patient_id):
     """data about a specific patient"""
     app.logger.debug(f"Asking for {patient.__doc__}: `{patient_id}`...")
+
+    if ":patient" not in patient_id:
+        patient_id = f"{patient_id}:patient"
+
     records = cypher(
         f"MATCH (p:Patient)"             \
         f" WHERE p.id = '{patient_id}'"  \
@@ -240,7 +254,7 @@ def patient(patient_id):
         return flask.jsonify(patientDTO)
 
 
-@app.route("/api/clinical-overview/data")
+@app.route("/api/clinical-overview/data/")
 def patients():
     """all patients at once"""
     app.logger.debug(f"Asking for {patients.__doc__}...")
@@ -256,26 +270,30 @@ def patients():
             if key in fields(PatientDTO):
                 patientDTO[key] = cast(PatientDTO,key,val)
         data.append({
-            "id": patient["id"],
+            "patient_id": patient["id"],
             "DTO": patientDTO
         })
     app.logger.debug("└OK")
     return flask.jsonify(data)
 
 
-@app.route("/api/genomic-overview/data/<patient_id>")
+@app.route("/api/genomic-overview/data/<patient_id>/")
 def genomic(patient_id):
     """genomic data of one patient"""
-    app.logger.debug(f"Asking for {genomic.__doc__}...")
+    app.logger.debug(f"Asking for {genomic.__doc__}: {patient_id}...")
     data = {}
 
     samples = {
         "name": "unknown",
         "row": [],
     }
+
+    if ":patient" not in patient_id:
+        patient_id = f"{patient_id}:patient"
+
     records = cypher(
         f"MATCH (p:Patient)-[pcs]->(s:Sample) "
-        f"WHERE p.id = '{patient_id}:patient' "
+        f"WHERE p.id = '{patient_id}' "
         f"RETURN s ;"
     )
     samples = {
