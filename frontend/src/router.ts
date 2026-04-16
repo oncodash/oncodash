@@ -10,9 +10,9 @@ const cookies = new Cookies()
  * Navigation guard to redirect to the login page if no cookies are detected.
  */
 const checkLogin: NavigationGuard = function (to) {
-  if (!cookies.get('token')) {
-    return { name: 'LoginPage', query: { to: to.fullPath } }
-  }
+  // if (!cookies.get('token')) {
+  //   return { name: 'LoginPage', query: { to: to.fullPath } }
+  // }
 
   return true
 }
