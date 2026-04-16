@@ -36,8 +36,9 @@ def cast(cls, key, val):
     return getattr(cls, key)(val)
 
 class PatientDTO:
+    """Properties of `patient` nodes"""
     age_at_diagnosis = int
-    bmi_at_diagnosis = int
+    bmi_at_diagnosis = float  # FIXME was int, but generated an error in Neo4j import, being unable to interpret floating point as int
     brca_mutation_status = str
     chronic_illnesses_at_dg = bool
     chronic_illnesses_type = str
@@ -79,26 +80,36 @@ class PatientDTO:
     weight_at_diagnosis = int
     wgs_available = bool
 
-class Genomic:
-    actionable_aberrations = str
-    putative_functionally_relevant_variants = str
-    other_variants = str
+class SampleInfo:
+    """properties attached to `sample` nodes"""
+    sample = str
+    purity = str # FIXME only for SNV
+    ploidy = str # FIXME only for AMP
+    tumor_site = str # OK
+    sample_time = str # OK
+    sample_type = str # FIXME _sside_ or sord ?
 
 class SampleInfoList:
     name = str
     row = list  # of SampleInfo
 
-class SampleInfo:
+class AlterationSampleDataCNV:
+    """Properties of `samples_carries_variant` edges from `sample` to `copy_number_amplification`"""
     sample = str
-    purity = str
-    ploidy = str
-    tumor_site = str
-    sample_time = str
-    sample_type = str
+    nMajor = str # OK
+    nMinor = str # OK
 
-class GeneData:
-    description = str
-    alterations = list  # of AlterationData
+class AlterationSampleDataSNP:
+    """Properties of `samples_carries_variant` edges from `sample` to `short_mutation`"""
+    samples = str # FIXME
+    AD__0 = str  # __ => .  # OK
+    AD__1 = str  # __ => .  # OK
+    DP = str  # OK
+    AF = str  # OK
+    nMajor = str # OK
+    nMinor = str # OK
+    LOHstatus = str # OK
+    expHomCI__cover = str  # __ => .  # OK
 
 class AlterationData:
     name = str
@@ -106,21 +117,14 @@ class AlterationData:
     reported_sensitivity = str
     row = list  # of AlterationSampleData*
 
-class AlterationSampleDataSNP:
-    samples = str
-    AD__0 = str  # __ => .
-    AD__1 = str  # __ => .
-    DP = str
-    AF = str
-    nMajor = str
-    nMinor = str
-    LOHstatus = str
-    expHomCI__cover = str  # __ => .
+class GeneData:
+    description = str
+    alterations = list  # of AlterationData
 
-class AlterationSampleDataCNV:
-    sample = str
-    nMajor = str
-    nMinor = str
+class Genomic:
+    actionable_aberrations = str
+    putative_functionally_relevant_variants = str
+    other_variants = str
 
 class GenomicData:
     genomic = Genomic
@@ -246,13 +250,13 @@ def patients():
     data = []
     app.logger.debug(f"│ {len(records)} records")
     for r in records:
-        rp = r["p"]
+        patient = r["p"]
         patientDTO = {}
-        for key,val in rp._properties.items():
+        for key,val in patient._properties.items():
             if key in fields(PatientDTO):
                 patientDTO[key] = cast(PatientDTO,key,val)
         data.append({
-            "id": rp["id"],
+            "id": patient["id"],
             "DTO": patientDTO
         })
     app.logger.debug("└OK")
@@ -264,8 +268,33 @@ def genomic(patient_id):
     """genomic data of one patient"""
     app.logger.debug(f"Asking for {genomic.__doc__}...")
     data = {}
+
+    samples = {
+        "name": "unknown",
+        "row": [],
+    }
+    records = cypher(
+        f"MATCH (p:Patient)-[pcs]->(s:Sample) "
+        f"WHERE p.id = '{patient_id}:patient' "
+        f"RETURN s ;"
+    )
+    samples = {
+        "name": "Unknown",
+        "row": []
+    }
+    for r in records:
+        sample = r["s"]
+        app.logger.debug(sample)
+        sampleInfo = {}
+        for key,val in sample._properties.items():
+            if key in fields(SampleInfo):
+                sampleInfo[key] = cast(sampleInfo,key,val)
+                app.logger.debug(sampleInfo)
+        samples["row"].append( sampleInfo )
+
+    app.logger.debug(f"│ {len(samples['row'])} samples")
     app.logger.debug("└OK")
-    return flask.jsonify(data)
+    return flask.jsonify(samples)
 
 
 if __name__ == "__main__":
