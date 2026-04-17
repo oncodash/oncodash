@@ -227,21 +227,23 @@ def patient(patient_id):
     """data about a specific patient"""
     app.logger.debug(f"Asking for {patient.__doc__}: `{patient_id}`...")
 
-    if ":patient" not in patient_id:
-        patient_id = f"{patient_id}:patient"
+    # if ":patient" not in patient_id:
+    #     patient_id = f"{patient_id}:patient"
+    # if "EOC" not in patient_id:
+    #     patient_id = f"EOC{patient_id}"
 
     records = cypher(
         f"MATCH (p:Patient)"             \
-        f" WHERE p.id = '{patient_id}'"  \
+        f" WHERE p.patient_id = {patient_id} "  \
          " RETURN ALL *")
     if len(records) == 0:
         msg = f"│ Found no patient with id: `{patient_id}`."
         app.logger.error(msg)
-        raise NotFound(msg)
+        flask.abort(422, description = msg)
     elif len(records) > 1:
         msg = f"│ Found {len(records)} patients with id: `{patient_id}`, but there can be only one."
         app.logger.error(msg)
-        raise NotFound(msg)
+        flask.abort(422, description = msg)
     else:
         app.logger.error("│ Found a patient")
         r = records[0]
@@ -265,14 +267,18 @@ def patients():
     app.logger.debug(f"│ {len(records)} records")
     for r in records:
         patient = r["p"]
-        patientDTO = {}
+
+        patient_id = str(patient["patient_id"])
+        # if ":patient" not in patient_id:
+        #     patient_id = f"{patient_id}:patient"
+        # if "EOC" not in patient_id:
+        #     patient_id = f"EOC{patient_id}"
+        patientDTO = {"patient_id": patient_id}
+
         for key,val in patient._properties.items():
             if key in fields(PatientDTO):
                 patientDTO[key] = cast(PatientDTO,key,val)
-        data.append({
-            "patient_id": patient["id"],
-            "DTO": patientDTO
-        })
+        data.append(patientDTO)
     app.logger.debug("└OK")
     return flask.jsonify(data)
 
@@ -283,23 +289,19 @@ def genomic(patient_id):
     app.logger.debug(f"Asking for {genomic.__doc__}: {patient_id}...")
     data = {}
 
-    samples = {
+    sample_info_list = {
         "name": "unknown",
         "row": [],
     }
 
-    if ":patient" not in patient_id:
-        patient_id = f"{patient_id}:patient"
+    # if ":patient" not in patient_id:
+    #     patient_id = f"{patient_id}:patient"
 
     records = cypher(
         f"MATCH (p:Patient)-[pcs]->(s:Sample) "
-        f"WHERE p.id = '{patient_id}' "
+        f"WHERE p.patient_id = {patient_id} "
         f"RETURN s ;"
     )
-    samples = {
-        "name": "Unknown",
-        "row": []
-    }
     for r in records:
         sample = r["s"]
         app.logger.debug(sample)
@@ -308,11 +310,33 @@ def genomic(patient_id):
             if key in fields(SampleInfo):
                 sampleInfo[key] = cast(sampleInfo,key,val)
                 app.logger.debug(sampleInfo)
-        samples["row"].append( sampleInfo )
+        sample_info_list["row"].append( sampleInfo )
 
-    app.logger.debug(f"│ {len(samples['row'])} samples")
+    app.logger.debug(f"│ {len(sample_info_list['row'])} sample_info_list")
     app.logger.debug("└OK")
-    return flask.jsonify(samples)
+
+    genomic_data = {
+        "actionable_aberrations": "",
+        "putative_functionally_relevant_variants": "",
+        "other_variants": "",
+    }
+
+    alterations = []
+
+    gene_data = {
+        "description": "",
+        "alterations": alterations,
+    }
+
+    genomic_data = {
+        "genomic" : genomic_data,
+        "actionable_aberrations": gene_data,
+        "putative_functionally_relevant_variants": gene_data,
+        "other_variants": gene_data,
+        "samples_info": sample_info_list,
+    }
+
+    return flask.jsonify(genomic_data)
 
 
 if __name__ == "__main__":
