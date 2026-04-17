@@ -290,36 +290,76 @@ def genomic(patient_id):
     # if ":patient" not in patient_id:
     #     patient_id = f"{patient_id}:patient"
 
+    # Actionable alterations
+    actionable_alteration_query = \
+        f"MATCH path = (start:Patient)-[*1]->()-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(gs:GeneStatus)-[vbt:VariantBiomarkerForTreatment]->(end:Treatment) "\
+        f"WHERE (start.id = '{patient_id}')"\
+        f"AND (vbt.fda_level IN ['1.0','2.0']) "\
+        f"RETURN DISTINCT scv, sv "
+
+    # Putative relevant alterations
+    putative_alteration_query = \
+        f"MATCH path = (start:Patient)-[*1]->()-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(gs:GeneStatus)-[vbt:VariantBiomarkerForTreatment]->(end:Treatment) "\
+        f"WHERE (start.id = '{patient_id}:patient') "\
+        f"AND (vbt.fda_level IN ['3.0','4.0']) "\
+        f"RETURN DISTINCT scv, sv "
+
+
     records = cypher(
-        f"MATCH (p:Patient)-[pcs]->(s:Sample) "
-        f"WHERE p.id = '{patient_id}' "
-        f"RETURN s ;"
+        # f"MATCH (p:Patient)-[*1]->()-[scv:SampleCarriesVariant]->(sv:SequenceVariant) "
+        f"MATCH (p:Patient)-[pcs]->(s:Sample)-[scv:SampleCarriesVariant]->(sv:SequenceVariant) "
+        f"WHERE (p.id = '{patient_id}') "
+        f"RETURN s, scv, sv ;"
+        # f"RETURN s;"
     )
+
+    alterations = []
 
     if len(records) == 0:
         msg = f"│ Found no sample for patient with id: `{patient_id}`."
+        app.logger.debug(msg)
         return flask.jsonify({})
-
+    
+    app.logger.debug(f"Found {len(records)} records")
     for r in records:
         sample = r["s"]
-        app.logger.debug(sample)
+        # app.logger.debug(sample)
         sampleInfo = {}
         for key,val in sample._properties.items():
             if key in fields(SampleInfo):
                 sampleInfo[key] = cast(sampleInfo,key,val)
-                app.logger.debug(sampleInfo)
+                # app.logger.debug(sampleInfo)
         sample_info_list["row"].append( sampleInfo )
 
-    app.logger.debug(f"│ {len(sample_info_list['row'])} sample_info_list")
-    app.logger.debug("└OK")
+        sample_carries_variant = r["scv"]
+        # app.logger.debug(sample_carries_variant)
 
-    genomic_data = {
-        "actionable_aberrations": "",
+        alterationData = {}
+        alterationData["name"] = "FIXME add a name"
+        alterationData["decsr"] = "FIXME add a description"
+        alterationData["reported_sensitivity"] = "FIXME ad a sensibility"
+        
+        alterationSampleData = {}
+        for key,val in sample_carries_variant._properties.items():
+            if key in fields(AlterationSampleDataCNV):
+                alterationSampleData[key] = cast(AlterationSampleDataCNV,key,val)
+                # app.logger.debug(alterationSampleData)
+        alterationSampleData["sample"] = sample["sample"]
+        if "row" not in alterationData.keys():
+            alterationData["row"] = []
+        alterationData["row"].append(alterationSampleData)
+        alterations.append(alterationData)
+
+    app.logger.debug(f"│ {len(sample_info_list['row'])} sample_info_list")
+    app.logger.debug(f"│ {len(alterations)} alterations")
+
+    actionable_aberrations = ", ".join(a["name"] for a in alterations)
+    app.logger.debug(actionable_aberrations)
+    genomic_sub_data = {
+        "actionable_aberrations": actionable_aberrations,
         "putative_functionally_relevant_variants": "",
         "other_variants": "",
     }
-
-    alterations = []
 
     gene_data = {
         "description": "",
@@ -327,13 +367,15 @@ def genomic(patient_id):
     }
 
     genomic_data = {
-        "genomic" : genomic_data,
+        "genomic" : genomic_sub_data,
         "actionable_aberrations": gene_data,
         "putative_functionally_relevant_variants": gene_data,
         "other_variants": gene_data,
         "samples_info": sample_info_list,
     }
 
+    app.logger.debug(genomic_data)
+    app.logger.debug("└OK")
     return flask.jsonify(genomic_data)
 
 
