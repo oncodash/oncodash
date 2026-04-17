@@ -65,7 +65,7 @@ class PatientDTO:
     operation1_cancelled = bool
     operation2_cancelled = bool
     paired_fresh_samples_available = bool
-    patient_id = int
+    patient_id = str
     platinum_free_interval = int
     platinum_free_interval_at_update = int
     previous_cancer = bool
@@ -222,19 +222,38 @@ def cypher(query):
     return records
 
 
+@app.route("/api/clinical-overview/data/")
+def patients():
+    """all patients at once"""
+    app.logger.debug(f"Asking for {patients.__doc__}...")
+    records = cypher(
+        "MATCH (p:Patient)"  \
+        " RETURN ALL *")
+    data = []
+    app.logger.debug(f"│ {len(records)} records")
+    for r in records:
+        patient = r["p"]
+
+        patient_id = str(patient["id"])
+        patientDTO = {"patient_id": patient_id}
+
+        for key,val in patient._properties.items():
+            if key in fields(PatientDTO):
+                patientDTO[key] = cast(PatientDTO,key,val)
+        patientDTO["patient_id"] = patient["id"]
+        data.append(patientDTO)
+    app.logger.debug("└OK")
+    return flask.jsonify(data)
+
+
 @app.route("/api/clinical-overview/data/<patient_id>/")
 def patient(patient_id):
     """data about a specific patient"""
     app.logger.debug(f"Asking for {patient.__doc__}: `{patient_id}`...")
 
-    # if ":patient" not in patient_id:
-    #     patient_id = f"{patient_id}:patient"
-    # if "EOC" not in patient_id:
-    #     patient_id = f"EOC{patient_id}"
-
     records = cypher(
         f"MATCH (p:Patient)"             \
-        f" WHERE p.patient_id = {patient_id} "  \
+        f" WHERE p.id = '{patient_id}' "  \
          " RETURN ALL *")
     if len(records) == 0:
         msg = f"│ Found no patient with id: `{patient_id}`."
@@ -252,35 +271,9 @@ def patient(patient_id):
         for key,val in rp._properties.items():
             if key in fields(PatientDTO):
                 patientDTO[key] = cast(PatientDTO,key,val)
+        patientDTO["patient_id"] = rp["id"]
         app.logger.debug("└OK")
         return flask.jsonify(patientDTO)
-
-
-@app.route("/api/clinical-overview/data/")
-def patients():
-    """all patients at once"""
-    app.logger.debug(f"Asking for {patients.__doc__}...")
-    records = cypher(
-        "MATCH (p:Patient)"  \
-        " RETURN ALL *")
-    data = []
-    app.logger.debug(f"│ {len(records)} records")
-    for r in records:
-        patient = r["p"]
-
-        patient_id = str(patient["patient_id"])
-        # if ":patient" not in patient_id:
-        #     patient_id = f"{patient_id}:patient"
-        # if "EOC" not in patient_id:
-        #     patient_id = f"EOC{patient_id}"
-        patientDTO = {"patient_id": patient_id}
-
-        for key,val in patient._properties.items():
-            if key in fields(PatientDTO):
-                patientDTO[key] = cast(PatientDTO,key,val)
-        data.append(patientDTO)
-    app.logger.debug("└OK")
-    return flask.jsonify(data)
 
 
 @app.route("/api/genomic-overview/data/<patient_id>/")
@@ -299,7 +292,7 @@ def genomic(patient_id):
 
     records = cypher(
         f"MATCH (p:Patient)-[pcs]->(s:Sample) "
-        f"WHERE p.patient_id = {patient_id} "
+        f"WHERE p.id = '{patient_id}' "
         f"RETURN s ;"
     )
     for r in records:

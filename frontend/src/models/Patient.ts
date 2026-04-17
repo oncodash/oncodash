@@ -1,7 +1,7 @@
 import { GenomicData } from "./GenomicData"
 import { PatientDTO } from "./PatientDTO"
 
-export type PatientID = number
+export type PatientID = string
 
 /**
  * The main class representing a single Patient with

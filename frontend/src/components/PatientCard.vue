@@ -1,8 +1,7 @@
 <template>
   <div class="patient-card">
     <div class="header">
-      <span class="id">PATIENT {{ patient.patient_id }}</span>
-      <span class="cohort">Cohort {{ patient.cohort_code }}</span>
+      <span class="id">{{ patient.patient_id }}</span>
     </div>
 
     <div class="content">

@@ -41,7 +41,7 @@ const router = createRouter({
       path: '/patients/:id',
       component: async () => await import('./components/PatientPage.vue'),
       name: 'PatientPage',
-      props: route => ({ id: parseInt(route.params.id as string) }),
+      props: route => ({ id: route.params.id as string }),
       beforeEnter: checkLogin
     },
     {
