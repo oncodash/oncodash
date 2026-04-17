@@ -29,7 +29,7 @@ export interface PatientDTO {
   operation1_cancelled: boolean | null
   operation2_cancelled: boolean | null
   paired_fresh_samples_available: boolean | null
-  patient_id: number
+  patient_id: string
   platinum_free_interval: number | null
   platinum_free_interval_at_update: number | null
   previous_cancer: boolean | null
