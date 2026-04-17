@@ -76,9 +76,9 @@
       <details
         open
         class="gene-section"
-        v-for="(geneData, geneName) in genomicData[genomicGroup]">
+        v-for="(geneData, aberrationCategory) in genomicData[genomicGroup]">
         <summary class="gene-header">
-          <h2 :id="geneName">{{ geneName }}</h2>
+          <h2 :id="aberrationCategory">{{ aberrationCategory }}</h2>
         </summary>
 
         <p>{{ geneData.description }}</p>
@@ -194,7 +194,10 @@ function aggregateActionableDrugs(): string[] {
 
     let drugs: string[] = []
 
+    // console.log(genomicData.value?.[group])
+
     Object.values(genomicData.value?.[group]).forEach(geneData => {
+      // console.log(geneData)
       geneData.alterations.forEach(alteration => {
         const drugList = alteration.reported_sensitivity
           .replace('Responsive:', '')

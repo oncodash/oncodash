@@ -307,19 +307,20 @@ def genomic(patient_id):
 
     records = cypher(
         # f"MATCH (p:Patient)-[*1]->()-[scv:SampleCarriesVariant]->(sv:SequenceVariant) "
-        f"MATCH (p:Patient)-[pcs]->(s:Sample)-[scv:SampleCarriesVariant]->(sv:SequenceVariant) "
+        f"MATCH (p:Patient)-[pcs]->(s:Sample)-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(gs:GeneStatus)-[:GeneStatusAffectsGene]->(g:Gene) "
         f"WHERE (p.id = '{patient_id}') "
-        f"RETURN s, scv, sv ;"
+        f"RETURN s, scv, sv, g ;"
         # f"RETURN s;"
     )
 
     alterations = []
+    genome = {}
 
     if len(records) == 0:
         msg = f"│ Found no sample for patient with id: `{patient_id}`."
         app.logger.debug(msg)
         return flask.jsonify({})
-    
+
     app.logger.debug(f"Found {len(records)} records")
     for r in records:
         sample = r["s"]
@@ -329,54 +330,67 @@ def genomic(patient_id):
             if key in fields(SampleInfo):
                 sampleInfo[key] = cast(sampleInfo,key,val)
                 # app.logger.debug(sampleInfo)
-        sample_info_list["row"].append( sampleInfo )
+        # sample_info_list["row"].append( sampleInfo )
 
         sample_carries_variant = r["scv"]
         # app.logger.debug(sample_carries_variant)
 
         alterationData = {}
-        alterationData["name"] = "FIXME add a name"
-        alterationData["decsr"] = "FIXME add a description"
-        alterationData["reported_sensitivity"] = "FIXME ad a sensibility"
-        
+        alterationData["name"] = "FIXME"
+        alterationData["description"] = "FIXME"
+        alterationData["reported_sensitivity"] = "FIXME"
+
         alterationSampleData = {}
         for key,val in sample_carries_variant._properties.items():
             if key in fields(AlterationSampleDataCNV):
                 alterationSampleData[key] = cast(AlterationSampleDataCNV,key,val)
                 # app.logger.debug(alterationSampleData)
-        alterationSampleData["sample"] = sample["sample"]
+        alterationSampleData["sample"] = sample["id"]
         if "row" not in alterationData.keys():
             alterationData["row"] = []
         alterationData["row"].append(alterationSampleData)
         alterations.append(alterationData)
 
+        gene = r["g"]._properties["gene_symbol"]
+        if gene not in genome.keys():
+            gene_data = {
+                "description": "FIXME",
+                "alterations": [],
+            }
+            genome[gene] = gene_data
+
+        genome[gene]["alterations"] += alterations
+
     app.logger.debug(f"│ {len(sample_info_list['row'])} sample_info_list")
     app.logger.debug(f"│ {len(alterations)} alterations")
 
-    actionable_aberrations = ", ".join(a["name"] for a in alterations)
-    app.logger.debug(actionable_aberrations)
-    genomic_sub_data = {
-        "actionable_aberrations": actionable_aberrations,
-        "putative_functionally_relevant_variants": "",
-        "other_variants": "",
-    }
 
-    gene_data = {
-        "description": "",
-        "alterations": alterations,
+    genomic_sub_data = {
+        "actionable_aberrations": [len(alterations), 'ACTIONABLE ABERRATIONS'],
+        "putative_functionally_relevant_variants": [len(alterations), 'PUTATIVE FUNCTIONALLY RELEVANT'] ,
+        "other_variants": [len(alterations), 'OTHER VARIANTS'],
     }
 
     genomic_data = {
         "genomic" : genomic_sub_data,
-        "actionable_aberrations": gene_data,
-        "putative_functionally_relevant_variants": gene_data,
-        "other_variants": gene_data,
+        "actionable_aberrations": genome,
+        "putative_functionally_relevant_variants": genome,
+        "other_variants": genome,
         "samples_info": sample_info_list,
     }
 
-    app.logger.debug(genomic_data)
+    # with open("genomic_data.json", 'w') as fd:
+    #     json.dump(genomic_data, fd)
+
+
+    response = app.response_class(
+        response=json.dumps(genomic_data),
+        mimetype='application/json'
+    )
+
     app.logger.debug("└OK")
-    return flask.jsonify(genomic_data)
+    # return flask.jsonify(genomic_data)
+    return response
 
 
 if __name__ == "__main__":
