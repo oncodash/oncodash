@@ -295,6 +295,11 @@ def genomic(patient_id):
         f"WHERE p.id = '{patient_id}' "
         f"RETURN s ;"
     )
+
+    if len(records) == 0:
+        msg = f"│ Found no sample for patient with id: `{patient_id}`."
+        return flask.jsonify({})
+
     for r in records:
         sample = r["s"]
         app.logger.debug(sample)
