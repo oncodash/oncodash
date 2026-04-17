@@ -12,6 +12,7 @@ COPY ./vite.config.ts ./vite.config.ts
 # Setup env variables for build
 ARG ONCODASH_API_URL
 ARG ONCODASH_PUBLIC_PATH
+ARG ONCODASH_AIFORIA_BRIDGE_URL
 
 # Install all dependencies
 RUN npm ci
@@ -19,6 +20,7 @@ RUN npm ci
 # Setup env variables for build
 ENV ONCODASH_API_URL=${ONCODASH_API_URL}
 ENV ONCODASH_PUBLIC_PATH=${ONCODASH_PUBLIC_PATH}
+ENV ONCODASH_AIFORIA_BRIDGE_URL=${ONCODASH_AIFORIA_BRIDGE_URL}
 ENV NODE_ENV="production"
 RUN npm run build
 

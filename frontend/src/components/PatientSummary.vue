@@ -7,6 +7,11 @@
       <PatientField field="Cohort" :value="patient.cohort_code" />
       <PatientField field="Age at diagnosis" :value="patient.age_at_diagnosis" />
       <PatientField field="Stage" :value="patient.stage" />
+      <div v-if="aiforiaEnabled" class="aiforia-row">
+        <a :href="`${aiforiaBridgeUrl}?patientRef=${patient.cohort_code}`"
+           target="_blank"
+           class="aiforia-btn">View in Aiforia &#x2197;</a>
+      </div>
     </div>
 
     <div>
@@ -31,6 +36,9 @@ import { Patient } from '../models/Patient'
 defineProps<{
   patient: Patient
 }>()
+
+const aiforiaBridgeUrl = import.meta.env.ONCODASH_AIFORIA_BRIDGE_URL as string
+const aiforiaEnabled = !!aiforiaBridgeUrl
 </script>
 
 <style scoped>
@@ -46,5 +54,31 @@ defineProps<{
 
 .patient-summary>div {
   flex: 1 1;
+}
+
+.aiforia-row {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--spacing);
+  align-items: center;
+  margin-top: 4px;
+  padding-left: calc(50% + var(--spacing) / 2);
+}
+
+.aiforia-btn {
+  display: inline-block;
+  padding: 4px 12px;
+  color: var(--primary);
+  font-size: 0.85em;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.aiforia-btn:hover {
+  background-color: var(--primary);
+  color: white;
 }
 </style>

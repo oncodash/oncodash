@@ -34,6 +34,7 @@ services:
       args:
         - ONCODASH_PUBLIC_PATH=/
         - ONCODASH_API_URL=https://oncodash.ing.unimore.it
+        - ONCODASH_AIFORIA_BRIDGE_URL=${ONCODASH_AIFORIA_BRIDGE_URL:-}
     ports:
       - "3001:3001"
 

@@ -26,6 +26,9 @@ export default defineConfig({
     'import.meta.env.ONCODASH_API_URL': JSON.stringify(process.env.ONCODASH_API_URL) || "'http://127.0.0.1:8888'",
 
     // Public URL in case of proxy rewrites to handle
-    'import.meta.env.ONCODASH_PUBLIC_PATH': JSON.stringify(process.env.ONCODASH_PUBLIC_PATH) || "'/'"
+    'import.meta.env.ONCODASH_PUBLIC_PATH': JSON.stringify(process.env.ONCODASH_PUBLIC_PATH) || "'/'",
+
+    // URL of the Aiforia Integration Bridge for contextual launch
+    'import.meta.env.ONCODASH_AIFORIA_BRIDGE_URL': JSON.stringify(process.env.ONCODASH_AIFORIA_BRIDGE_URL) || "''"
   }
 })
