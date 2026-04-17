@@ -38,8 +38,8 @@ else
     $server start
 fi
 
-# echo "Send a test query..." >&2
-# ${NEO_USER} cypher-shell --username neo4j --database oncodash --password "$(cat neo4j.pass)" "MATCH (p:Patient) RETURN p LIMIT 5;"
+echo "Send a test query..." >&2
+${NEO_USER} cypher-shell --username neo4j --database oncodash --password "$(cat neo4j.pass)" "MATCH (p:Patient) RETURN p LIMIT 5;"
 
 
 echo "Starting Flask API..." >&2
