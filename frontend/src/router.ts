@@ -1,15 +1,15 @@
 import { NavigationGuard, createRouter, createWebHistory } from 'vue-router'
-import Cookies from 'universal-cookie'
+// import Cookies from 'universal-cookie'
 
 // =========================================================================
 
 const base = import.meta.env.ONCODASH_PUBLIC_PATH
-const cookies = new Cookies()
+// const cookies = new Cookies()
 
 /**
  * Navigation guard to redirect to the login page if no cookies are detected.
  */
-const checkLogin: NavigationGuard = function (to) {
+const checkLogin: NavigationGuard = function (/*to*/) {
   // if (!cookies.get('token')) {
   //   return { name: 'LoginPage', query: { to: to.fullPath } }
   // }
