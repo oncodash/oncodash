@@ -51,6 +51,7 @@ export default {
         "last_date_of_primary_therapy": ["red", "triangle"],
 
         "ctdna": ["brown", "circle"],
+        "ctdna_sample": ["brown", "circle"],
         "fresh_sample": ["green", "circle"],
         "fresh_sample_sequenced": ["grey", "circle"],
         "radiology": ["red", "circle"],
