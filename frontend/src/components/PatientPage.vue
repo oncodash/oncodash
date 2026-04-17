@@ -1,7 +1,7 @@
 <template>
   <AppLoader />
 
-  <h1>PATIENT {{ id }}</h1>
+  <h1>{{ id }}</h1>
 
   <PatientSummary :patient="patient" v-if="patient"></PatientSummary>
 
