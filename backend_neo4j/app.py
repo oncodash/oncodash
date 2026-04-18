@@ -10,6 +10,8 @@ import logging
 from markupsafe import escape
 from werkzeug.exceptions import HTTPException, NotFound
 
+import oncodashapi
+
 app = flask.Flask(__name__)
 flask_cors.CORS(app)
 
@@ -28,14 +30,7 @@ with open("neo4j.pass") as fd:
     config["neo4j"]["passwd"] = fd.readline().strip()
 config["neo4j"]["auth"] = (config["neo4j"]["user"], config["neo4j"]["passwd"])
 
-
-def fields(cls):
-    for f in dir(cls):
-        if not re.match(r'^__', f):
-            yield f
-
-def cast(cls, key, val):
-    return getattr(cls, key)(val)
+api = oncodashapi.API(app, config)
 
 class PatientDTO:
     """Properties of `patient` nodes"""
@@ -160,24 +155,12 @@ def handle_exception(e):
     return response
 
 
-def endpoints():
-    links = {}
-    module = sys.modules[__name__]
-    for rule in app.url_map.iter_rules():
-        func = rule.endpoint
-        if hasattr(module, func):
-            doc = getattr(module, func).__doc__
-            url = str(rule)
-            links[url] = doc
-    return links
-
-
 @app.route("/")
 def root():
     """Map of this website."""
     app.logger.debug(f"Asking for {root.__doc__}...")
     html = "<ul>"
-    for url,doc in endpoints().items():
+    for url,doc in api.endpoints().items():
         if url == '/':
             continue
         a = escape(url)
@@ -191,7 +174,7 @@ def root():
 def map():
     """API map as JSON"""
     app.logger.debug(f"Asking for {map.__doc__}...")
-    links = endpoints()
+    links = api.endpoints()
     app.logger.debug("└OK")
     return flask.jsonify(links)
 
@@ -213,20 +196,11 @@ def ping():
     return flask.jsonify({"info": api_info})
 
 
-def cypher(query):
-    with neo4j.GraphDatabase.driver(config["neo4j"]["uri"], auth=config["neo4j"]["auth"]) as db:
-        app.logger.debug(f"│ {query}")
-        records, _, _ = db.execute_query(
-            query,
-            name=config["neo4j"]["user"], database_ = config["neo4j"]["database"])
-    return records
-
-
 @app.route("/api/clinical-overview/data/")
 def patients():
     """all patients at once"""
     app.logger.debug(f"Asking for {patients.__doc__}...")
-    records = cypher(
+    records = api.cypher(
         "MATCH (p:Patient)"  \
         " RETURN ALL *")
     data = []
@@ -234,14 +208,10 @@ def patients():
     for r in records:
         patient = r["p"]
 
-        patient_id = str(patient["id"])
-        patientDTO = {"patient_id": patient_id}
-
-        for key,val in patient._properties.items():
-            if key in fields(PatientDTO):
-                patientDTO[key] = cast(PatientDTO,key,val)
+        patientDTO = api.cast_as(patient, PatientDTO)
         patientDTO["patient_id"] = patient["id"]
         data.append(patientDTO)
+
     app.logger.debug("└OK")
     return flask.jsonify(data)
 
@@ -251,7 +221,7 @@ def patient(patient_id):
     """data about a specific patient"""
     app.logger.debug(f"Asking for {patient.__doc__}: `{patient_id}`...")
 
-    records = cypher(
+    records = api.cypher(
         f"MATCH (p:Patient)"             \
         f" WHERE p.id = '{patient_id}' "  \
          " RETURN ALL *")
@@ -266,13 +236,12 @@ def patient(patient_id):
     else:
         app.logger.error("│ Found a patient")
         r = records[0]
-        rp = r["p"]
-        patientDTO = {}
-        for key,val in rp._properties.items():
-            if key in fields(PatientDTO):
-                patientDTO[key] = cast(PatientDTO,key,val)
-        patientDTO["patient_id"] = rp["id"]
+        pat = r["p"]
+
+        patientDTO = api.cast_as(pat, PatientDTO)
+        patientDTO["patient_id"] = pat["id"]
         app.logger.debug("└OK")
+
         return flask.jsonify(patientDTO)
 
 
@@ -287,88 +256,74 @@ def genomic(patient_id):
         "row": [],
     }
 
-    # if ":patient" not in patient_id:
-    #     patient_id = f"{patient_id}:patient"
+    # # if ":patient" not in patient_id:
+    # #     patient_id = f"{patient_id}:patient"
 
-    # Actionable alterations
-    actionable_alteration_query = \
-        f"MATCH path = (start:Patient)-[*1]->()-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(gs:GeneStatus)-[vbt:VariantBiomarkerForTreatment]->(end:Treatment) "\
-        f"WHERE (start.id = '{patient_id}')"\
-        f"AND (vbt.fda_level IN ['1.0','2.0']) "\
-        f"RETURN DISTINCT scv, sv "
+    # # Actionable alterations
+    # actionable_alteration_query = \
+    #     f"MATCH path = (start:Patient)-[*1]->()-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(gs:GeneStatus)-[vbt:VariantBiomarkerForTreatment]->(end:Treatment) "\
+    #     f"WHERE (start.id = '{patient_id}')"\
+    #     f"AND (vbt.fda_level IN ['1.0','2.0']) "\
+    #     f"RETURN DISTINCT scv, sv "
 
-    # Putative relevant alterations
-    putative_alteration_query = \
-        f"MATCH path = (start:Patient)-[*1]->()-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(gs:GeneStatus)-[vbt:VariantBiomarkerForTreatment]->(end:Treatment) "\
-        f"WHERE (start.id = '{patient_id}:patient') "\
-        f"AND (vbt.fda_level IN ['3.0','4.0']) "\
-        f"RETURN DISTINCT scv, sv "
+    # # Putative relevant alterations
+    # putative_alteration_query = \
+    #     f"MATCH path = (start:Patient)-[*1]->()-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(gs:GeneStatus)-[vbt:VariantBiomarkerForTreatment]->(end:Treatment) "\
+    #     f"WHERE (start.id = '{patient_id}:patient') "\
+    #     f"AND (vbt.fda_level IN ['3.0','4.0']) "\
+    #     f"RETURN DISTINCT scv, sv "
 
 
-    records = cypher(
-        # f"MATCH (p:Patient)-[*1]->()-[scv:SampleCarriesVariant]->(sv:SequenceVariant) "
-        f"MATCH (p:Patient)-[pcs]->(s:Sample)-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(gs:GeneStatus)-[:GeneStatusAffectsGene]->(g:Gene) "
-        f"WHERE (p.id = '{patient_id}') "
-        f"RETURN s, scv, sv, g ;"
-        # f"RETURN s;"
+    # // Actionable alterations lists
+    # MATCH path = (start:Patient)-[*1]->(s:Sample)-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(gs:GeneStatus)-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)
+    # WHERE (start.id = '{patient_id}:patient')
+    # AND (vbt.fda_level IN ['1.0','2.0'])
+    # RETURN DISTINCT s, scv, sv
+
+    # // Putative relevant alterations lists
+    # MATCH path = (start:Patient)-[*1]->(s:Sample)-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(gs:GeneStatus)-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)
+    # WHERE (start.id = '{patient_id}:patient')
+    # AND (vbt.fda_level IN ['1.0','2.0'])
+    # RETURN DISTINCT s, scv, sv
+
+    # // Other variants lists
+    # MATCH path = (start:Patient)-[*1]->(s:Sample)-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(end:GeneStatus)
+    # WHERE not (end)--(:Treatment)
+    # AND (start.id = '{patient_id}:patient')
+    # RETURN DISTINCT s, scv, sv
+
+    # Actionable aberrations
+    actionable_records = api.cypher(
+        f"MATCH (p:Patient)"
+            "-[pcs]->(s:Sample)"
+            "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
+            "-[]->(gs:GeneStatus)"
+            "-[:GeneStatusAffectsGene]->(g:Gene)"
+            "-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)"
+        f" WHERE (p.id = '{patient_id}')"
+         " AND (vbt.fda_level IN ['1.0','2.0'])"
+         " RETURN DISTINCT s, scv, sv, g ;"
     )
 
-    alterations = []
-    genome = {}
-
-    if len(records) == 0:
-        msg = f"│ Found no sample for patient with id: `{patient_id}`."
+    if len(actionable_records) == 0:
+        msg = f"│ Found no sample."
         app.logger.debug(msg)
-        return flask.jsonify({})
+        genome = {}
+    else:
+        app.logger.debug(f"│ Found {len(records)} samples.")
+        genome = api.genome_of(patient_id, actionable_records)
+        # app.logger.debug(f"{{genome}")
 
-    app.logger.debug(f"Found {len(records)} records")
-    for r in records:
-        sample = r["s"]
-        # app.logger.debug(sample)
-        sampleInfo = {}
-        for key,val in sample._properties.items():
-            if key in fields(SampleInfo):
-                sampleInfo[key] = cast(sampleInfo,key,val)
-                # app.logger.debug(sampleInfo)
-        # sample_info_list["row"].append( sampleInfo )
+    nb_alterations = 0
+    for gene in genome:
+        nb_alterations += len(genome[gene]["alterations"])
 
-        sample_carries_variant = r["scv"]
-        # app.logger.debug(sample_carries_variant)
-
-        alterationData = {}
-        alterationData["name"] = "FIXME"
-        alterationData["description"] = "FIXME"
-        alterationData["reported_sensitivity"] = "FIXME"
-
-        alterationSampleData = {}
-        for key,val in sample_carries_variant._properties.items():
-            if key in fields(AlterationSampleDataCNV):
-                alterationSampleData[key] = cast(AlterationSampleDataCNV,key,val)
-                # app.logger.debug(alterationSampleData)
-        alterationSampleData["sample"] = sample["id"]
-        if "row" not in alterationData.keys():
-            alterationData["row"] = []
-        alterationData["row"].append(alterationSampleData)
-        alterations.append(alterationData)
-
-        gene = r["g"]._properties["gene_symbol"]
-        if gene not in genome.keys():
-            gene_data = {
-                "description": "FIXME",
-                "alterations": [],
-            }
-            genome[gene] = gene_data
-
-        genome[gene]["alterations"] += alterations
-
-    app.logger.debug(f"│ {len(sample_info_list['row'])} sample_info_list")
-    app.logger.debug(f"│ {len(alterations)} alterations")
-
+    app.logger.debug(f"│ Found {nb_alterations} alterations on {len(genome.keys())} genes.")
 
     genomic_sub_data = {
-        "actionable_aberrations": [len(alterations), 'ACTIONABLE ABERRATIONS'],
-        "putative_functionally_relevant_variants": [len(alterations), 'PUTATIVE FUNCTIONALLY RELEVANT'] ,
-        "other_variants": [len(alterations), 'OTHER VARIANTS'],
+        "actionable_aberrations": [nb_alterations, 'ACTIONABLE ABERRATIONS'],
+        "putative_functionally_relevant_variants": [nb_alterations, 'PUTATIVE FUNCTIONALLY RELEVANT'] ,
+        "other_variants": [nb_alterations, 'OTHER VARIANTS'],
     }
 
     genomic_data = {
@@ -381,16 +336,14 @@ def genomic(patient_id):
 
     # with open("genomic_data.json", 'w') as fd:
     #     json.dump(genomic_data, fd)
-
-
-    response = app.response_class(
-        response=json.dumps(genomic_data),
-        mimetype='application/json'
-    )
+    # response = app.response_class(
+    #     response=json.dumps(genomic_data),
+    #     mimetype='application/json'
+    # )
+    # return response
 
     app.logger.debug("└OK")
-    # return flask.jsonify(genomic_data)
-    return response
+    return flask.jsonify(genomic_data)
 
 
 if __name__ == "__main__":
