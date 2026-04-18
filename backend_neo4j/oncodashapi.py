@@ -159,15 +159,12 @@ class API:
         self.app.logger.debug(f"│ Parse {len(records)} records of patient {patient_id}")
 
         genome = {}
-        sample_info_list = {
-            "name" : f"{patient_id}",
-            "row": [],
-        }
+        samples = []
 
         for r in records:
             sample = r["s"]
             sampleInfo = self.cast_as(sample, SampleInfo)
-            sample_info_list["row"].append( sampleInfo )
+            samples.append( sampleInfo )
 
             sample_carries_variant = r["scv"]
 
@@ -194,10 +191,89 @@ class API:
 
             genome[gene]["alterations"].append(alterationData)
 
-        self.app.logger.debug(f"│ │ {len(sample_info_list['row'])} samples")
+        self.app.logger.debug(f"│ │ {len(samples)} samples")
         self.app.logger.debug(f"│ │ {len(genome.keys())} genes")
         self.app.logger.debug( "│ └OK")
 
-        return genome, sample_info_list
+        return genome, samples
 
+
+    def actionables(self, patient_id):
+        records = self.cypher(
+            " MATCH (start:Patient)"
+                "-[*1]->(s:Sample)"
+                "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
+                "-[]->(gs:GeneStatus)"
+                "-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)"
+            f" WHERE (start.id = '{patient_id}')"
+                " AND (vbt.fda_level IN ['1.0','2.0'])"
+            " RETURN DISTINCT s, scv, sv"
+            " NEXT"
+            " MATCH (gs)"
+                "-[:GeneStatusAffectsGene]->(g:Gene)"
+            " RETURN DISTINCT s, scv, sv, g"
+        )
+        self.app.logger.debug(f"│ Found {len(records)} samples.")
+        genome, samples = self.genome_of(patient_id, records)
+
+        nb_alterations = 0
+        for gene in genome:
+            nb_alterations += len(genome[gene]["alterations"])
+
+        self.app.logger.debug(f"│ Found {nb_alterations} alterations on {len(genome.keys())} genes.")
+
+        return genome, samples, nb_alterations
+
+
+    def relevants(self, patient_id):
+        records = self.cypher(
+            " MATCH (start:Patient)"
+                "-[*1]->(s:Sample)"
+                "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
+                "-[]->(gs:GeneStatus)"
+                "-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)"
+            f" WHERE (start.id = '{patient_id}')"
+                " AND (vbt.fda_level IN ['3.0','4.0'])"
+            " RETURN DISTINCT s, scv, sv"
+            " NEXT"
+            " MATCH (gs)"
+                "-[:GeneStatusAffectsGene]->(g:Gene)"
+            " RETURN DISTINCT s, scv, sv, g"
+        )
+        self.app.logger.debug(f"│ Found {len(records)} samples.")
+        genome, samples = self.genome_of(patient_id, records)
+
+        nb_alterations = 0
+        for gene in genome:
+            nb_alterations += len(genome[gene]["alterations"])
+
+        self.app.logger.debug(f"│ Found {nb_alterations} alterations on {len(genome.keys())} genes.")
+
+        return genome, samples, nb_alterations
+
+
+    def others(self, patient_id):
+        records = self.cypher(
+            " MATCH (start:Patient)"
+                "-[*1]->(s:Sample)"
+                "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
+                "-[]->(gs:GeneStatus)"
+            f" WHERE (start.id = '{patient_id}')"
+                " AND not (gs)--(:Treatment)"
+            " RETURN DISTINCT s, scv, sv"
+            " NEXT"
+            " MATCH (gs)"
+                "-[:GeneStatusAffectsGene]->(g:Gene)"
+            " RETURN DISTINCT s, scv, sv, g"
+        )
+        self.app.logger.debug(f"│ Found {len(records)} samples.")
+        genome, samples = self.genome_of(patient_id, records)
+
+        nb_alterations = 0
+        for gene in genome:
+            nb_alterations += len(genome[gene]["alterations"])
+
+        self.app.logger.debug(f"│ Found {nb_alterations} alterations on {len(genome.keys())} genes.")
+
+        return genome, samples, nb_alterations
 
