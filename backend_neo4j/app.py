@@ -150,13 +150,7 @@ def patient(patient_id):
 def genomic(patient_id):
     """genomic data of one patient"""
     app.logger.debug(f"Asking for {genomic.__doc__}: {patient_id}...")
-    data = {}
-
-    sample_info_list = {
-        "name": "unknown",
-        "row": [],
-    }
-
+    
     # # if ":patient" not in patient_id:
     # #     patient_id = f"{patient_id}:patient"
 
@@ -205,52 +199,33 @@ def genomic(patient_id):
         #  " RETURN DISTINCT s, scv, sv, g ;"
         #  
     # Actionable aberrations
-    actionable_records = api.cypher(
-        " MATCH (start:Patient)"
-            "-[*1]->(s:Sample)"
-            "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
-            "-[]->(gs:GeneStatus)"
-            "-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)"
-        f" WHERE (start.id = '{patient_id}')"
-            " AND (vbt.fda_level IN ['1.0','2.0'])"
-        " RETURN DISTINCT s, scv, sv"
-        " NEXT"
-        " MATCH (gs)"
-            "-[:GeneStatusAffectsGene]->(g:Gene)"
-        " RETURN DISTINCT s, scv, sv, g"
-    )
+    # 
+    actionable_genome, actionable_samples, nb_actionable_alterations = \
+        api.actionables(patient_id)
 
-    if len(actionable_records) == 0:
-        msg = f"│ Found no sample."
-        app.logger.debug(msg)
-        genome = {}
-        sample_info_list = {
-            "name" : f"{patient_id}",
-            "row": [],
-        }
-    else:
-        app.logger.debug(f"│ Found {len(actionable_records)} samples.")
-        genome, sample_info_list = api.genome_of(patient_id, actionable_records)
-        # app.logger.debug(f"{{genome}")
+    relevant_genome, relevant_samples, nb_relevant_alterations = \
+        api.relevants(patient_id)
 
-    nb_alterations = 0
-    for gene in genome:
-        nb_alterations += len(genome[gene]["alterations"])
+    other_genome, other_samples, nb_other_alterations = \
+        api.others(patient_id)
 
-    app.logger.debug(f"│ Found {nb_alterations} alterations on {len(genome.keys())} genes.")
+    samples = {
+        "name": f"{patient_id}",
+        "row": actionable_samples + relevant_samples + other_samples,
+    }
 
     genomic_sub_data = {
-        "actionable_aberrations": [nb_alterations, 'ACTIONABLE ABERRATIONS'],
-        "putative_functionally_relevant_variants": [nb_alterations, 'PUTATIVE FUNCTIONALLY RELEVANT'] ,
-        "other_variants": [nb_alterations, 'OTHER VARIANTS'],
+        "actionable_aberrations": [nb_actionable_alterations, 'ACTIONABLE ABERRATIONS'],
+        "putative_functionally_relevant_variants": [nb_relevant_alterations, 'PUTATIVE FUNCTIONALLY RELEVANT'] ,
+        "other_variants": [nb_other_alterations, 'OTHER VARIANTS'],
     }
 
     genomic_data = {
         "genomic" : genomic_sub_data,
-        "actionable_aberrations": genome,
-        "putative_functionally_relevant_variants": genome,
-        "other_variants": genome,
-        "samples_info": sample_info_list,
+        "actionable_aberrations": actionable_genome,
+        "putative_functionally_relevant_variants": relevant_genome,
+        "other_variants": other_genome,
+        "samples_info": samples,
     }
 
     # with open("genomic_data.json", 'w') as fd:
