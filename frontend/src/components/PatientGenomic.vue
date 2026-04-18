@@ -86,14 +86,14 @@
         <details class="alteration-section" v-for="alteration in geneData.alterations">
           <summary class="alteration-header">
             <h3>
-              Alteration -
+              {{ alteration.alt_type }} —
               <span class="alteration-name">{{ alteration.name }}</span>
             </h3>
           </summary>
 
           <div class="alteration-data">
             <p class="alteration-drugs">
-              Associated drugs -
+              Associated drugs —
               <span v-if="alteration.reported_sensitivity !== 'None'">
                 {{ formatDrugs(alteration.reported_sensitivity).effect }} :
               </span>

@@ -35,9 +35,10 @@ export interface AlterationData {
   description: string
   reported_sensitivity: string
   row: Array<AlterationSampleData>
+  alt_type: string
 }
 
-export type AlterationSampleData = AlterationSampleDataSNP | AlterationSampleDataCNV
+export type AlterationSampleData = AlterationSampleDataSNP | AlterationSampleDataCNV | AlterationSampleDataSV
 
 export interface AlterationSampleDataSNP {
   samples: string
@@ -55,4 +56,8 @@ export interface AlterationSampleDataCNV {
   sample: string
   nMajor: string
   nMinor: string
+}
+
+export interface AlterationSampleDataSV {
+  sample: string
 }

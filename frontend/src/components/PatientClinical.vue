@@ -2,7 +2,6 @@
   <section class="clinical-data">
     <div>
       <div class="title">BASELINE</div>
-      <PatientField field="Cohort" :value="patient.cohort_code" />
       <PatientField field="Age at diagnosis" :value="patient.age_at_diagnosis" />
       <PatientField field="BMI at diagnosis" :value="patient.bmi_at_diagnosis + ' kg/m²'" />
       <PatientField field="Previous cancer" :value="patient.previous_cancer" />
