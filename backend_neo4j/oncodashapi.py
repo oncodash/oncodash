@@ -68,6 +68,9 @@ class SampleInfoList:
     name = str
     row = list  # of SampleInfo
 
+class AlterationSampleDataSV:
+    sample = str
+
 class AlterationSampleDataCNV:
     """Properties of `samples_carries_variant` edges from `sample` to `copy_number_amplification`"""
     sample = str
@@ -153,6 +156,17 @@ class API:
                 dic[key] = self.cast(cls, key, val)
         return dic
 
+    def search_alteration(self, name, alterations):
+        for a in alterations:
+            if a["name"] == name:
+                return a
+        return None
+
+    def search_sample(self, id, samples):
+        for s in samples:
+            if s["sample"] == id:
+                return s
+        return None
 
     def genome_of(self, patient_id, records):
 
@@ -162,26 +176,9 @@ class API:
         samples = []
 
         for r in records:
-            sample = r["s"]
-            sampleInfo = self.cast_as(sample, SampleInfo)
-            if sampleInfo not in samples: # FIXME use hashable for better efficiency
-                samples.append( sampleInfo )
-
-            sample_carries_variant = r["scv"]
-            alterationSampleData = self.cast_as(sample_carries_variant, AlterationSampleDataCNV)
-            # TODO SNP
-            alterationSampleData["sample"] = sample["id"]
-
-            alterationData = {}
-            alterationData["name"] = r["sv"]._properties["id"]
-            alterationData["description"] = "FIXME description"
-            alterationData["reported_sensitivity"] = "FIXME sensitivity"
-
-            if "row" not in alterationData.keys():
-                alterationData["row"] = []
-
-            if alterationSampleData not in alterationData["row"]: # FIXME use hashable for better efficiency
-                alterationData["row"].append(alterationSampleData)
+            # self.app.logger.debug("##### RECORDS #####")
+            # for k in r.keys():
+            #     self.app.logger.debug(f"{k}: {r[k]}")
 
             gene = r["g"]._properties["gene_symbol"]
             if gene not in genome.keys():
@@ -191,7 +188,55 @@ class API:
                 }
                 genome[gene] = gene_data
 
-            if alterationData not in genome[gene]["alterations"]: # FIXME use hashable for better efficiency
+            sample = r["s"]
+            existing = self.search_sample(sample["id"], samples)
+            if not existing:
+                sampleInfo = self.cast_as(sample, SampleInfo)
+                sampleInfo["sample"] = sample._properties["id"]
+                samples.append( sampleInfo )
+
+            sample_carries_variant = r["scv"]
+
+            labels = r["sv"]._labels
+            alterationSampleData = {}
+            alt_type = "unknown"
+            if "ShortMutation" in labels:
+                alterationSampleData = self.cast_as(sample_carries_variant, AlterationSampleDataSNP)
+                alt_type = "short mutation"
+            elif "StructuralVariant" in labels:
+                alterationSampleData = self.cast_as(sample_carries_variant, AlterationSampleDataSV)
+                alt_type = "structural variant"
+            elif "CopyNumberAmplification" in labels:
+                alterationSampleData = self.cast_as(sample_carries_variant, AlterationSampleDataSV)
+                alt_type = "copy number amplification"
+            else:
+                self.app.logger.error(f"I don't know what kind of mutation has labels: {labels}")
+
+            alterationSampleData["sample"] = sample["id"]
+
+            alteration_name = r["sv"]._properties["id"]
+            existing = self.search_alteration(alteration_name, genome[gene]["alterations"])
+            if existing:
+                existing_sample = self.search_sample(alterationSampleData["sample"], existing["row"])
+                if not existing_sample:
+                    existing["row"].append(alterationSampleData)
+                if "t" in r.keys():
+                    effect = "FIXME effect"
+                    drug = r["t"]._properties["id"].split(":")[0]
+                    existing["reported_sensitivity"] += f" {drug}"
+            else:
+                alterationData = {}
+                alterationData["name"] = alteration_name
+                alterationData["description"] = "FIXME description"
+                alterationData["row"] = [alterationSampleData]
+                alterationData["alt_type"] = alt_type
+                if "t" in r.keys():
+                    effect = "FIXME_effect"
+                    drug = r["t"]._properties["id"].split(":")[0]
+                    alterationData["reported_sensitivity"] = f"{effect}:{drug}"
+                else:
+                    alterationData["reported_sensitivity"] = "none"
+
                 genome[gene]["alterations"].append(alterationData)
 
         self.app.logger.debug(f"│ │ {len(samples)} samples")
@@ -207,14 +252,14 @@ class API:
                 "-[pcs:PatientCarriesSample]->(s:Sample)"
                 "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
                 "-[]->(gs:GeneStatus)"
-                "-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)"
+                "-[vbt:VariantBiomarkerForTreatment]->(t:Treatment)"
             f" WHERE (p.id = '{patient_id}')"
                 " AND (vbt.fda_level IN ['1.0','2.0'])"
-            " RETURN DISTINCT s, scv, sv"
+            " RETURN DISTINCT s, scv, sv, t"
             " NEXT"
             " MATCH (sv)-[]->(gs)"
                 "-[:GeneStatusAffectsGene]->(g:Gene)"
-            " RETURN DISTINCT s, scv, sv, g"
+            " RETURN DISTINCT s, scv, sv, g, t"
         )
         genome, samples = self.genome_of(patient_id, records)
 
@@ -231,14 +276,14 @@ class API:
                 "-[pcs:PatientCarriesSample]->(s:Sample)"
                 "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
                 "-[]->(gs:GeneStatus)"
-                "-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)"
+                "-[vbt:VariantBiomarkerForTreatment]->(t:Treatment)"
             f" WHERE (p.id = '{patient_id}')"
                 " AND (vbt.fda_level IN ['3.0','4.0'])"
-            " RETURN DISTINCT s, scv, sv"
+            " RETURN DISTINCT s, scv, sv, t"
             " NEXT"
             " MATCH (sv)-[]->(gs)"
                 "-[:GeneStatusAffectsGene]->(g:Gene)"
-            " RETURN DISTINCT s, scv, sv, g"
+            " RETURN DISTINCT s, scv, sv, g, t"
         )
         genome, samples = self.genome_of(patient_id, records)
 

@@ -212,9 +212,14 @@ def genomic(patient_id):
         api.others(patient_id)
     app.logger.debug(f"│ Found {nb_other_alterations} alterations on {len(other_genome.keys())} genes in {len(other_samples)} samples.")
 
+    seen_samples = []
+    for s in actionable_samples + relevant_samples + other_samples:
+        if s not in seen_samples:
+            seen_samples.append(s)
+
     samples = {
         "name": f"{patient_id}",
-        "row": actionable_samples + relevant_samples + other_samples,
+        "row": seen_samples,
     }
 
     genomic_sub_data = {

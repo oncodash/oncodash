@@ -4,7 +4,6 @@
 
     <div>
       <PatientField field="Patient ID" :value="patient.patient_id" />
-      <PatientField field="Cohort" :value="patient.cohort_code" />
       <PatientField field="Age at diagnosis" :value="patient.age_at_diagnosis" />
       <PatientField field="Stage" :value="patient.stage" />
     </div>
