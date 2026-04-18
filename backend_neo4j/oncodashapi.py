@@ -213,14 +213,11 @@ class API:
                 "-[:GeneStatusAffectsGene]->(g:Gene)"
             " RETURN DISTINCT s, scv, sv, g"
         )
-        self.app.logger.debug(f"│ Found {len(records)} samples.")
         genome, samples = self.genome_of(patient_id, records)
 
         nb_alterations = 0
         for gene in genome:
             nb_alterations += len(genome[gene]["alterations"])
-
-        self.app.logger.debug(f"│ Found {nb_alterations} alterations on {len(genome.keys())} genes.")
 
         return genome, samples, nb_alterations
 
@@ -240,14 +237,11 @@ class API:
                 "-[:GeneStatusAffectsGene]->(g:Gene)"
             " RETURN DISTINCT s, scv, sv, g"
         )
-        self.app.logger.debug(f"│ Found {len(records)} samples.")
         genome, samples = self.genome_of(patient_id, records)
 
         nb_alterations = 0
         for gene in genome:
             nb_alterations += len(genome[gene]["alterations"])
-
-        self.app.logger.debug(f"│ Found {nb_alterations} alterations on {len(genome.keys())} genes.")
 
         return genome, samples, nb_alterations
 
@@ -266,14 +260,11 @@ class API:
                 "-[:GeneStatusAffectsGene]->(g:Gene)"
             " RETURN DISTINCT s, scv, sv, g"
         )
-        self.app.logger.debug(f"│ Found {len(records)} samples.")
         genome, samples = self.genome_of(patient_id, records)
 
         nb_alterations = 0
         for gene in genome:
             nb_alterations += len(genome[gene]["alterations"])
-
-        self.app.logger.debug(f"│ Found {nb_alterations} alterations on {len(genome.keys())} genes.")
 
         return genome, samples, nb_alterations
 

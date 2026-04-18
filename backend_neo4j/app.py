@@ -202,12 +202,15 @@ def genomic(patient_id):
     # 
     actionable_genome, actionable_samples, nb_actionable_alterations = \
         api.actionables(patient_id)
+    app.logger.debug(f"│ Found {nb_actionable_alterations} alterations on {len(actionable_genome.keys())} genes.")
 
     relevant_genome, relevant_samples, nb_relevant_alterations = \
         api.relevants(patient_id)
+    app.logger.debug(f"│ Found {nb_relevant_alterations} alterations on {len(relevant_genome.keys())} genes.")
 
     other_genome, other_samples, nb_other_alterations = \
         api.others(patient_id)
+    app.logger.debug(f"│ Found {nb_other_alterations} alterations on {len(other_genome.keys())} genes.")
 
     samples = {
         "name": f"{patient_id}",
