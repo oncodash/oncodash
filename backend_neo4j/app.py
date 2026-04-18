@@ -32,105 +32,6 @@ config["neo4j"]["auth"] = (config["neo4j"]["user"], config["neo4j"]["passwd"])
 
 api = oncodashapi.API(app, config)
 
-class PatientDTO:
-    """Properties of `patient` nodes"""
-    age_at_diagnosis = int
-    bmi_at_diagnosis = float  # FIXME was int, but generated an error in Neo4j import, being unable to interpret floating point as int
-    brca_mutation_status = str
-    chronic_illnesses_at_dg = bool
-    chronic_illnesses_type = str
-    clinical_trial = bool
-    cohort_code = str
-    current_treatment_phase = str
-    days_from_beva_maintenance_end_to_progression = int
-    days_to_death = int
-    days_to_progression = int
-    debulking_surgery_ids = bool
-    drug_trial_name = str
-    drug_trial_unblinded = bool
-    event_series = str
-    followup_time = int
-    germline_pathogenic_variant = str
-    height_at_diagnosis = int
-    histology = str
-    hr_signature_per_patient = str
-    hr_signature_pretreatment_wgs = str
-    hrd_myriad_status = str
-    maintenance_therapy = str
-    operation1_cancelled = bool
-    operation2_cancelled = bool
-    paired_fresh_samples_available = bool
-    patient_id = str
-    platinum_free_interval = int
-    platinum_free_interval_at_update = int
-    previous_cancer = bool
-    previous_cancer_diagnosis = str
-    primary_therapy_outcome = str
-    progression = bool
-    residual_tumor_ids = str
-    residual_tumor_pds = str
-    sequencing_available = bool
-    stage = str
-    survival = str  # FIXME should be bool
-    time_series = str
-    treatment_strategy = str
-    weight_at_diagnosis = int
-    wgs_available = bool
-
-class SampleInfo:
-    """properties attached to `sample` nodes"""
-    sample = str
-    purity = str # FIXME only for SNV
-    ploidy = str # FIXME only for AMP
-    tumor_site = str # OK
-    sample_time = str # OK
-    sample_type = str # FIXME _sside_ or sord ?
-
-class SampleInfoList:
-    name = str
-    row = list  # of SampleInfo
-
-class AlterationSampleDataCNV:
-    """Properties of `samples_carries_variant` edges from `sample` to `copy_number_amplification`"""
-    sample = str
-    nMajor = str # OK
-    nMinor = str # OK
-
-class AlterationSampleDataSNP:
-    """Properties of `samples_carries_variant` edges from `sample` to `short_mutation`"""
-    samples = str # FIXME
-    AD__0 = str  # __ => .  # OK
-    AD__1 = str  # __ => .  # OK
-    DP = str  # OK
-    AF = str  # OK
-    nMajor = str # OK
-    nMinor = str # OK
-    LOHstatus = str # OK
-    expHomCI__cover = str  # __ => .  # OK
-
-class AlterationData:
-    name = str
-    description = str
-    reported_sensitivity = str
-    row = list  # of AlterationSampleData*
-
-class GeneData:
-    description = str
-    alterations = list  # of AlterationData
-
-class Genomic:
-    actionable_aberrations = str
-    putative_functionally_relevant_variants = str
-    other_variants = str
-
-class GenomicData:
-    genomic = Genomic
-    actionable_aberrations = GeneData
-    putative_functionally_relevant_variants = GeneData
-    other_variants = GeneData
-    samples_info = SampleInfoList
-
-
 @app.before_request
 def handle_preflight():
     if flask.request.method == "OPTIONS":
@@ -208,7 +109,7 @@ def patients():
     for r in records:
         patient = r["p"]
 
-        patientDTO = api.cast_as(patient, PatientDTO)
+        patientDTO = api.cast_as(patient, oncodashapi.PatientDTO)
         patientDTO["patient_id"] = patient["id"]
         data.append(patientDTO)
 
@@ -238,7 +139,7 @@ def patient(patient_id):
         r = records[0]
         pat = r["p"]
 
-        patientDTO = api.cast_as(pat, PatientDTO)
+        patientDTO = api.cast_as(pat, oncodashapi.PatientDTO)
         patientDTO["patient_id"] = pat["id"]
         app.logger.debug("└OK")
 
@@ -292,26 +193,44 @@ def genomic(patient_id):
     # AND (start.id = '{patient_id}:patient')
     # RETURN DISTINCT s, scv, sv
 
+
+        # f"MATCH (p:Patient)"
+        #     "-[pcs]->(s:Sample)"
+        #     "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
+        #     "-[]->(gs:GeneStatus)"
+        #     "-[:GeneStatusAffectsGene]->(g:Gene)"
+        #     "-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)"
+        # f" WHERE (p.id = '{patient_id}')"
+        #  " AND (vbt.fda_level IN ['1.0','2.0'])"
+        #  " RETURN DISTINCT s, scv, sv, g ;"
+        #  
     # Actionable aberrations
     actionable_records = api.cypher(
-        f"MATCH (p:Patient)"
-            "-[pcs]->(s:Sample)"
+        " MATCH (start:Patient)"
+            "-[*1]->(s:Sample)"
             "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
             "-[]->(gs:GeneStatus)"
-            "-[:GeneStatusAffectsGene]->(g:Gene)"
             "-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)"
-        f" WHERE (p.id = '{patient_id}')"
-         " AND (vbt.fda_level IN ['1.0','2.0'])"
-         " RETURN DISTINCT s, scv, sv, g ;"
+        f" WHERE (start.id = '{patient_id}')"
+            " AND (vbt.fda_level IN ['1.0','2.0'])"
+        " RETURN DISTINCT s, scv, sv"
+        " NEXT"
+        " MATCH (gs)"
+            "-[:GeneStatusAffectsGene]->(g:Gene)"
+        " RETURN DISTINCT s, scv, sv, g"
     )
 
     if len(actionable_records) == 0:
         msg = f"│ Found no sample."
         app.logger.debug(msg)
         genome = {}
+        sample_info_list = {
+            "name" : f"{patient_id}",
+            "row": [],
+        }
     else:
-        app.logger.debug(f"│ Found {len(records)} samples.")
-        genome = api.genome_of(patient_id, actionable_records)
+        app.logger.debug(f"│ Found {len(actionable_records)} samples.")
+        genome, sample_info_list = api.genome_of(patient_id, actionable_records)
         # app.logger.debug(f"{{genome}")
 
     nb_alterations = 0
