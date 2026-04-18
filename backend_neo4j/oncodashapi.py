@@ -164,32 +164,35 @@ class API:
         for r in records:
             sample = r["s"]
             sampleInfo = self.cast_as(sample, SampleInfo)
-            samples.append( sampleInfo )
+            if sampleInfo not in samples: # FIXME use hashable for better efficiency
+                samples.append( sampleInfo )
 
             sample_carries_variant = r["scv"]
-
-            alterationData = {}
-            alterationData["name"] = "FIXME"
-            alterationData["description"] = "FIXME"
-            alterationData["reported_sensitivity"] = "FIXME"
-
             alterationSampleData = self.cast_as(sample_carries_variant, AlterationSampleDataCNV)
             # TODO SNP
-
             alterationSampleData["sample"] = sample["id"]
+
+            alterationData = {}
+            alterationData["name"] = r["sv"]._properties["id"]
+            alterationData["description"] = "FIXME description"
+            alterationData["reported_sensitivity"] = "FIXME sensitivity"
+
             if "row" not in alterationData.keys():
                 alterationData["row"] = []
-            alterationData["row"].append(alterationSampleData)
+
+            if alterationSampleData not in alterationData["row"]: # FIXME use hashable for better efficiency
+                alterationData["row"].append(alterationSampleData)
 
             gene = r["g"]._properties["gene_symbol"]
             if gene not in genome.keys():
                 gene_data = {
-                    "description": "FIXME",
+                    "description": r["g"]._properties["name"],
                     "alterations": [],
                 }
                 genome[gene] = gene_data
 
-            genome[gene]["alterations"].append(alterationData)
+            if alterationData not in genome[gene]["alterations"]: # FIXME use hashable for better efficiency
+                genome[gene]["alterations"].append(alterationData)
 
         self.app.logger.debug(f"│ │ {len(samples)} samples")
         self.app.logger.debug(f"│ │ {len(genome.keys())} genes")
@@ -200,16 +203,16 @@ class API:
 
     def actionables(self, patient_id):
         records = self.cypher(
-            " MATCH (start:Patient)"
-                "-[*1]->(s:Sample)"
+            " MATCH (p:Patient)"
+                "-[pcs:PatientCarriesSample]->(s:Sample)"
                 "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
                 "-[]->(gs:GeneStatus)"
                 "-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)"
-            f" WHERE (start.id = '{patient_id}')"
+            f" WHERE (p.id = '{patient_id}')"
                 " AND (vbt.fda_level IN ['1.0','2.0'])"
             " RETURN DISTINCT s, scv, sv"
             " NEXT"
-            " MATCH (gs)"
+            " MATCH (sv)-[]->(gs)"
                 "-[:GeneStatusAffectsGene]->(g:Gene)"
             " RETURN DISTINCT s, scv, sv, g"
         )
@@ -224,16 +227,16 @@ class API:
 
     def relevants(self, patient_id):
         records = self.cypher(
-            " MATCH (start:Patient)"
-                "-[*1]->(s:Sample)"
+            " MATCH (p:Patient)"
+                "-[pcs:PatientCarriesSample]->(s:Sample)"
                 "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
                 "-[]->(gs:GeneStatus)"
                 "-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)"
-            f" WHERE (start.id = '{patient_id}')"
+            f" WHERE (p.id = '{patient_id}')"
                 " AND (vbt.fda_level IN ['3.0','4.0'])"
             " RETURN DISTINCT s, scv, sv"
             " NEXT"
-            " MATCH (gs)"
+            " MATCH (sv)-[]->(gs)"
                 "-[:GeneStatusAffectsGene]->(g:Gene)"
             " RETURN DISTINCT s, scv, sv, g"
         )
@@ -248,15 +251,15 @@ class API:
 
     def others(self, patient_id):
         records = self.cypher(
-            " MATCH (start:Patient)"
-                "-[*1]->(s:Sample)"
+            " MATCH (p:Patient)"
+                "-[pcs:PatientCarriesSample]->(s:Sample)"
                 "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
                 "-[]->(gs:GeneStatus)"
-            f" WHERE (start.id = '{patient_id}')"
+            f" WHERE (p.id = '{patient_id}')"
                 " AND not (gs)--(:Treatment)"
             " RETURN DISTINCT s, scv, sv"
             " NEXT"
-            " MATCH (gs)"
+            " MATCH (sv)-[]->(gs)"
                 "-[:GeneStatusAffectsGene]->(g:Gene)"
             " RETURN DISTINCT s, scv, sv, g"
         )
