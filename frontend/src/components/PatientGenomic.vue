@@ -372,6 +372,12 @@ table tbody tr:hover {
   margin: 0.1em;
 }
 
+.genomic-number .genes .gene-link:hover {
+    background-color: var(--primary);
+    color: white;
+    text-decoration: none;
+}
+
 .genomic-summaries {
   padding: var(--spacing);
   display: flex;
