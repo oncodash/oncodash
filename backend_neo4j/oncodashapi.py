@@ -202,17 +202,28 @@ class API:
             alt_type = "unknown"
             if "ShortMutation" in labels:
                 alterationSampleData = self.cast_as(sample_carries_variant, AlterationSampleDataSNP)
+                alterationSampleData["sample"] = sample["id"]
+                alterationSampleData["AD.1"] = alterationSampleData["AD__1"]
+                del alterationSampleData["AD__1"]
+                alterationSampleData["AD.0"] = alterationSampleData["AD__0"]
+                del alterationSampleData["AD__0"]
+                alterationSampleData["sample"] = alterationSampleData["sample"].replace(":sample", "")
                 alt_type = "short mutation"
             elif "StructuralVariant" in labels:
                 alterationSampleData = self.cast_as(sample_carries_variant, AlterationSampleDataSV)
+                alterationSampleData["sample"] = sample["id"]
+                self.app.logger.debug(sample_carries_variant)
+                self.app.logger.debug(alterationSampleData)
+                alterationSampleData["sample"] = alterationSampleData["sample"].replace(":sample", "")
                 alt_type = "structural variant"
             elif "CopyNumberAmplification" in labels:
                 alterationSampleData = self.cast_as(sample_carries_variant, AlterationSampleDataSV)
+                alterationSampleData["sample"] = sample["id"]
+                alterationSampleData["sample"] = alterationSampleData["sample"].replace(":sample", "")
                 alt_type = "copy number amplification"
             else:
                 self.app.logger.error(f"I don't know what kind of mutation has labels: {labels}")
 
-            alterationSampleData["sample"] = sample["id"]
 
             alteration_name = r["sv"]._properties["id"]
             existing = self.search_alteration(alteration_name, genome[gene]["alterations"])
