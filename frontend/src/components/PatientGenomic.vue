@@ -202,6 +202,7 @@ function aggregateActionableDrugs(): string[] {
         const drugList = alteration.reported_sensitivity
           .replace('Responsive:', '')
           .replace('Resistant:', '')
+          .replace('Unknown effect:', '')
           .trim()
           .split(' ')
 
@@ -350,16 +351,25 @@ table tbody tr:hover {
   font-size: 50px;
 }
 
+.genomic-number .name {
+    flex-basis: 2em;
+}
+
 .genomic-number .genes {
+  padding: 0.5em;
   display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 4px;
   justify-content: center;
+  width: 100%;
 }
 
 .genomic-number .genes .gene-link {
   border: 1px solid var(--primary);
   border-radius: 20px;
   padding: 0 8px;
+  margin: 0.1em;
 }
 
 .genomic-summaries {
