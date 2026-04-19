@@ -53,7 +53,7 @@
       </thead>
       <tbody>
         <tr v-for="row in genomicData.samples_info.row">
-          <td>{{ row.sample }}</td>
+          <td>{{ row.sample.replace(':sample', '') }}</td>
           <td>{{ row.purity }}</td>
           <td>{{ row.ploidy }}</td>
           <td>{{ row.tumor_site }}</td>
@@ -87,7 +87,7 @@
           <summary class="alteration-header">
             <h3>
               {{ alteration.alt_type }} —
-              <span class="alteration-name">{{ alteration.name }}</span>
+              <span class="alteration-name">{{ alteration.name.replace(":"+alteration.alt_type.replace(' ', '_'), '') }}</span>
             </h3>
           </summary>
 
