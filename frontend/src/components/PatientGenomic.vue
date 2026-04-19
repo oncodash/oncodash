@@ -86,8 +86,8 @@
         <details class="alteration-section" v-for="alteration in geneData.alterations">
           <summary class="alteration-header">
             <h3>
-              {{ alteration.alt_type }} —
-              <span class="alteration-name">{{ alteration.name.replace(":"+alteration.alt_type.replace(' ', '_'), '') }}</span>
+              <span class="alteration-type">{{ alteration.alt_type }}</span> —
+              <span class="alteration-name">{{ alteration.name.replace(":"+alteration.alt_type.replaceAll(' ', '_'), '') }}</span>
             </h3>
           </summary>
 
