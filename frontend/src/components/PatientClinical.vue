@@ -25,10 +25,18 @@
       <PatientField field="Germ line pathogenic variants" :value="patient.germline_pathogenic_variant" />
     </div>
   </section>
-
+  <hr />
   <section class="timelines">
     <PatientTimelines v-if="patient.time_series" :patient="patient"/>
     <div v-else class="no-data">No time series available for this patient</div>
+  </section>
+
+  <section class="aiforia">
+      <div v-if="aiforiaEnabled" class="aiforia-row">
+        <a :href="`${aiforiaBridgeUrl}?patientRef=${patient.cohort_code}`"
+           target="_blank"
+           class="aiforia-btn">View histopathology samples in Aiforia &#x2197;</a>
+      </div>
   </section>
 </template>
 
@@ -46,6 +54,9 @@ function patientBMI(): string {
     return props.patient.bmi_at_diagnosis.toFixed(2) + ' kg/m²'; // FIXME round before toFixed
 }
 
+const aiforiaBridgeUrl = import.meta.env.ONCODASH_AIFORIA_BRIDGE_URL as string
+const aiforiaEnabled = !!aiforiaBridgeUrl
+
 </script>
 
 <style scoped>
@@ -57,8 +68,13 @@ function patientBMI(): string {
   padding: var(--spacing);
 }
 
+hr {
+    margin-left: 2em;
+    margin-right: 2em;
+    border: thin solid lightgrey;
+}
+
 .timelines {
-  padding: var(--spacing);
 }
 
 .clinical-data>* {
@@ -75,5 +91,28 @@ function patientBMI(): string {
   text-align: center;
   padding: var(--spacing);
   font-style: italic;
+}
+
+.aiforia-row {
+  gap: var(--spacing);
+  text-align: center;
+}
+
+.aiforia-btn {
+  margin: 1em;
+  display: inline-block;
+  padding: 4px 12px;
+  color: var(--primary);
+  font-size: 0.85em;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.aiforia-btn:hover {
+  background-color: var(--primary);
+  color: white;
 }
 </style>

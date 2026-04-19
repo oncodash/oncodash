@@ -6,11 +6,6 @@
       <PatientField field="Patient ID" :value="patientID()" />
       <PatientField field="Age at diagnosis" :value="patient.age_at_diagnosis" />
       <PatientField field="Stage" :value="patient.stage" />
-      <div v-if="aiforiaEnabled" class="aiforia-row">
-        <a :href="`${aiforiaBridgeUrl}?patientRef=${patient.cohort_code}`"
-           target="_blank"
-           class="aiforia-btn">View in Aiforia &#x2197;</a>
-      </div>
     </div>
 
     <div>
@@ -35,9 +30,6 @@ import { Patient } from '../models/Patient'
 const props = defineProps<{
   patient: Patient
 }>()
-
-const aiforiaBridgeUrl = import.meta.env.ONCODASH_AIFORIA_BRIDGE_URL as string
-const aiforiaEnabled = !!aiforiaBridgeUrl
 
 function patientID(): string {
     return props.patient.patient_id.replace(":patient", "");
