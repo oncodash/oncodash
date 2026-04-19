@@ -3,7 +3,8 @@
     <div>
       <div class="title">BASELINE</div>
       <PatientField field="Age at diagnosis" :value="patient.age_at_diagnosis" />
-      <PatientField field="BMI at diagnosis" :value="patient.bmi_at_diagnosis + ' kg/m²'" />
+      <!-- <PatientField field="BMI at diagnosis" :value="patient.bmi_at_diagnosis + ' kg/m²'" /> -->
+      <PatientField field="BMI at diagnosis" :value="patientBMI()" />
       <PatientField field="Previous cancer" :value="patient.previous_cancer" />
     </div>
 
@@ -33,13 +34,19 @@
 </template>
 
 <script setup lang="ts">
+
 import { Patient } from '../models/Patient'
 import PatientField from './PatientField.vue'
 import PatientTimelines from './PatientTimelines.vue'
 
-defineProps<{
+const props = defineProps<{
   patient: Patient
 }>()
+
+function patientBMI(): string {
+    return props.patient.bmi_at_diagnosis.toFixed(2) + ' kg/m²'; // FIXME round before toFixed
+}
+
 </script>
 
 <style scoped>
