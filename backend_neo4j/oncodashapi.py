@@ -221,9 +221,9 @@ class API:
                 if not existing_sample:
                     existing["row"].append(alterationSampleData)
                 if "t" in r.keys():
-                    effect = "FIXME effect"
+                    effect = "Unknown effect" # FIXME effect
                     drug = r["t"]._properties["id"].split(":")[0]
-                    existing["reported_sensitivity"] += f" {drug}"
+                    existing["drugs"].append(drug)
             else:
                 alterationData = {}
                 alterationData["name"] = alteration_name
@@ -231,13 +231,25 @@ class API:
                 alterationData["row"] = [alterationSampleData]
                 alterationData["alt_type"] = alt_type
                 if "t" in r.keys():
-                    effect = "FIXME_effect"
+                    effect = "Unknown effect"  # FIXME effect
                     drug = r["t"]._properties["id"].split(":")[0]
-                    alterationData["reported_sensitivity"] = f"{effect}:{drug}"
+                    alterationData["effect"] = effect
+                    alterationData["drugs"] = [drug]
                 else:
-                    alterationData["reported_sensitivity"] = "none"
+                    alterationData["effect"] = ""
+                    alterationData["drugs"] = []
 
                 genome[gene]["alterations"].append(alterationData)
+
+        for gene in genome:
+            for alt in genome[gene]["alterations"]:
+                drugs = []
+                for drug in set(alt["drugs"]):
+                    drugs.append(drug.strip().replace(" "," ").replace(":"," "))
+                if drugs:
+                    alt["reported_sensitivity"] = f"{alt['effect']}: {' '.join(drugs)}"
+                else:
+                    alt["reported_sensitivity"] = "none"
 
         self.app.logger.debug(f"│ │ {len(samples)} samples")
         self.app.logger.debug(f"│ │ {len(genome.keys())} genes")
@@ -266,6 +278,8 @@ class API:
         nb_alterations = 0
         for gene in genome:
             nb_alterations += len(genome[gene]["alterations"])
+            for a in genome[gene]["alterations"]:
+                self.app.logger.debug(a["reported_sensitivity"])
 
         return genome, samples, nb_alterations
 
