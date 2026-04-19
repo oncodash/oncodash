@@ -3,7 +3,7 @@
     <img src="../assets/patient.svg">
 
     <div>
-      <PatientField field="Patient ID" :value="patient.patient_id" />
+      <PatientField field="Patient ID" :value="patientID()" />
       <PatientField field="Age at diagnosis" :value="patient.age_at_diagnosis" />
       <PatientField field="Stage" :value="patient.stage" />
       <div v-if="aiforiaEnabled" class="aiforia-row">
@@ -32,12 +32,16 @@
 import PatientField from './PatientField.vue'
 import { Patient } from '../models/Patient'
 
-defineProps<{
+const props = defineProps<{
   patient: Patient
 }>()
 
 const aiforiaBridgeUrl = import.meta.env.ONCODASH_AIFORIA_BRIDGE_URL as string
 const aiforiaEnabled = !!aiforiaBridgeUrl
+
+function patientID(): string {
+    return props.patient.patient_id.replace(":patient", "");
+}
 </script>
 
 <style scoped>

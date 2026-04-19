@@ -3,7 +3,6 @@
     <div>
       <div class="title">BASELINE</div>
       <PatientField field="Age at diagnosis" :value="patient.age_at_diagnosis" />
-      <!-- <PatientField field="BMI at diagnosis" :value="patient.bmi_at_diagnosis + ' kg/m²'" /> -->
       <PatientField field="BMI at diagnosis" :value="patientBMI()" />
       <PatientField field="Previous cancer" :value="patient.previous_cancer" />
     </div>

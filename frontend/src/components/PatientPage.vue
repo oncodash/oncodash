@@ -1,7 +1,7 @@
 <template>
   <AppLoader />
 
-  <h1>{{ id }}</h1>
+  <h1>{{ patientID() }}</h1>
 
   <PatientSummary :patient="patient" v-if="patient"></PatientSummary>
 
@@ -43,6 +43,12 @@ onMounted(async (): Promise<void> => {
     console.error(err)
   })
 })
+
+
+function patientID(): string {
+    return props.id.replace(":patient", "");
+}
+
 </script>
 
 <style scoped>

@@ -1,7 +1,7 @@
 <template>
   <div class="patient-card">
     <div class="header">
-      <span class="id">{{ patient.patient_id }}</span>
+      <span class="id">{{ patientID() }}</span>
     </div>
 
     <div class="content">
@@ -29,6 +29,11 @@ import { Patient } from '../models/Patient'
 const props = defineProps<{
   patient: Patient
 }>()
+
+function patientID(): string {
+    return props.patient.patient_id.replace(":patient", "");
+}
+
 </script>
 
 <style scoped>
