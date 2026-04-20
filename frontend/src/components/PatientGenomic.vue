@@ -11,16 +11,6 @@
     </div>
 
     <div class="genomic-number">
-      <div class="number">{{ genomicData.genomic.putative_functionally_relevant_variants[0] }}</div>
-      <div class="name">{{ genomicData.genomic.putative_functionally_relevant_variants[1] }}</div>
-      <div class="genes">
-        <a v-if="putativelyActionableGenes.length" class="gene-link" v-for="gene in putativelyActionableGenes" :href="'#' + gene">
-          {{ gene }}
-        </a>
-      </div>
-    </div>
-
-    <div class="genomic-number">
       <div class="number">{{ genomicData.genomic.other_variants[0] }}</div>
       <div class="name">{{ genomicData.genomic.other_variants[1] }}</div>
       <div class="genes">
@@ -159,11 +149,6 @@ const actionableGroups = computed(() => {
 const actionableGenes = computed(() => {
   if (!genomicData.value) return []
   return Object.keys(genomicData.value?.actionable_aberrations)
-})
-
-const putativelyActionableGenes = computed(() => {
-  if (!genomicData.value) return []
-  return Object.keys(genomicData.value?.putative_functionally_relevant_variants)
 })
 
 const otherGenes = computed(() => {
