@@ -51,7 +51,11 @@ const props = defineProps<{
 }>()
 
 function patientBMI(): string {
-    return props.patient.bmi_at_diagnosis.toFixed(2) + ' kg/m²'; // FIXME round before toFixed
+    if (props.patient.bmi_at_diagnosis) {
+        return props.patient.bmi_at_diagnosis.toFixed(2) + ' kg/m²'; // FIXME round before toFixed
+    } else {
+        return "-";
+    }
 }
 
 const aiforiaBridgeUrl = import.meta.env.ONCODASH_AIFORIA_BRIDGE_URL as string

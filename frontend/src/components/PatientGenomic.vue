@@ -140,7 +140,7 @@ import { onMounted, ref } from 'vue'
 import { computed } from '@vue/reactivity'
 import api from '../api'
 import { Patient } from '../models/Patient'
-import { AlterationSampleData, GenomicData } from '../models/GenomicData'
+import { AlterationSampleData/*, AlterationSampleDataCNV, AlterationSampleDataSNP, AlterationSampleDataSV*/, GenomicData } from '../models/GenomicData'
 
 const props = defineProps<{
   patient: Patient
@@ -289,7 +289,11 @@ function buildPubmedLink(pmid: string): string {
  * @returns If the cell should be highlighted or not
  */
 function highlightCell(column: string, row: AlterationSampleData): boolean {
-  return (column === 'nMinor' || column === 'nMajor') && MajorMinorNot11(row)
+    if (row.is_of_type == "AlterationSampleDataCNV" || row.is_of_type == "AlterationSampleDataSNP") {
+        return (column === 'nMinor' || column === 'nMajor') && MajorMinorNot11(row)
+    } else {
+        return false
+    }
 }
 
 /**
@@ -299,9 +303,14 @@ function highlightCell(column: string, row: AlterationSampleData): boolean {
  * @returns If the combination is 1:1 or not
  */
 function MajorMinorNot11(row: AlterationSampleData): boolean {
-  if (row.nMajor === '1' && row.nMinor === '1') return false
-  if (row.nMajor === 'NA' || row.nMinor === 'NA') return false
-  return true
+
+    if (row.is_of_type == "AlterationSampleDataCNV" || row.is_of_type == "AlterationSampleDataSNP") {
+        if (row.nMajor === '1' && row.nMinor === '1') return false
+        if (row.nMajor === 'NA' || row.nMinor === 'NA') return false
+    } else {
+        return false
+    }
+return true
 }
 </script>
 

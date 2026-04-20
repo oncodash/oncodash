@@ -50,14 +50,41 @@ export interface AlterationSampleDataSNP {
   nMinor: string
   LOHstatus: string
   "expHomCI.cover": string
+
+ /* FIXME ugly hack */
+  is_of_type: 'AlterationSampleDataSNP'
 }
 
 export interface AlterationSampleDataCNV {
   sample: string
   nMajor: string
   nMinor: string
+
+ /* FIXME ugly hack */
+  is_of_type: 'AlterationSampleDataCNV'
+  samples: string
+  "AD.0": string
+  "AD.1": string
+  DP: string
+  AF: string
+  // nMajor: string
+  // nMinor: string
+  LOHstatus: string
+  "expHomCI.cover": string
 }
 
 export interface AlterationSampleDataSV {
+  is_of_type: 'AlterationSampleDataSV'
   sample: string
+
+ /* FIXME ugly hack */
+  samples: string
+  "AD.0": string
+  "AD.1": string
+  DP: string
+  AF: string
+  nMajor: string
+  nMinor: string
+  LOHstatus: string
+  "expHomCI.cover": string
 }
