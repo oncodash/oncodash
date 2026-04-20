@@ -217,7 +217,7 @@ class API:
                 alterationSampleData["sample"] = alterationSampleData["sample"].replace(":sample", "")
                 alt_type = "structural variant"
             elif "CopyNumberAmplification" in labels:
-                alterationSampleData = self.cast_as(sample_carries_variant, AlterationSampleDataSV)
+                alterationSampleData = self.cast_as(sample_carries_variant, AlterationSampleDataCNV)
                 alterationSampleData["sample"] = sample["id"]
                 alterationSampleData["sample"] = alterationSampleData["sample"].replace(":sample", "")
                 alt_type = "copy number amplification"
@@ -227,12 +227,12 @@ class API:
 
             alteration_name = r["sv"]._properties["id"]
             existing = self.search_alteration(alteration_name, genome[gene]["alterations"])
+            effect = "Responsive to:" # FIXME extract effect from data
             if existing:
                 existing_sample = self.search_sample(alterationSampleData["sample"], existing["row"])
                 if not existing_sample:
                     existing["row"].append(alterationSampleData)
                 if "t" in r.keys():
-                    effect = "Unknown effect" # FIXME effect
                     drug = r["t"]._properties["id"].split(":")[0]
                     existing["drugs"].append(drug)
             else:
@@ -242,7 +242,6 @@ class API:
                 alterationData["row"] = [alterationSampleData]
                 alterationData["alt_type"] = alt_type
                 if "t" in r.keys():
-                    effect = "Unknown effect"  # FIXME effect
                     drug = r["t"]._properties["id"].split(":")[0]
                     alterationData["effect"] = effect
                     alterationData["drugs"] = [drug]

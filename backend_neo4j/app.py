@@ -140,7 +140,7 @@ def patient(patient_id):
         app.logger.error(msg)
         flask.abort(422, description = msg)
     else:
-        app.logger.error("│ Found a patient")
+        app.logger.debug("│ Found a patient")
         r = records[0]
         pat = r["p"]
 
