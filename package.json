@@ -1,7 +1,0 @@
-{
-  "version": "0.5.3",
-  "dependencies": {
-    "chart.js": "^3.8.2",
-    "chartjs-plugin-zoom": "^1.2.1"
-  }
-}

@@ -1,1 +1,0 @@
-Example/Template configuration file for both development and production. Pick up the one you want to use, change it if needed and copy it in the root project folder using the name "conf.json".

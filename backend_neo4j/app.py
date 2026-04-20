@@ -15,9 +15,14 @@ import oncodashapi
 app = flask.Flask(__name__)
 flask_cors.CORS(app)
 
+if 'ONCODASH_NEO4J_HOST' in os.environ:
+    neo4j_host = os.environ['ONCODASH_NEO4J_HOST']
+else:
+    neo4j_host = "neo4j://localhost:7687"
+
 config = {
     "neo4j": {
-        "uri": "neo4j://localhost:7687",
+        "uri": neo4j_host,
         "user": "neo4j",
         "base": "oncodash",
     }
