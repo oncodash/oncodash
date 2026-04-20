@@ -85,7 +85,7 @@
             <p class="alteration-drugs">
               Associated drugs —
               <span v-if="alteration.reported_sensitivity !== 'None'">
-                {{ formatDrugs(alteration.reported_sensitivity).effect }} :
+                {{ formatDrugs(alteration.reported_sensitivity).effect }}:
               </span>
               <span
                 v-if="alteration.reported_sensitivity !== 'None'" class="drug"

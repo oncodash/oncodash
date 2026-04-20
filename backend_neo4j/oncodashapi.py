@@ -230,7 +230,7 @@ class API:
 
             alteration_name = r["sv"]._properties["id"]
             existing = self.search_alteration(alteration_name, genome[gene]["alterations"])
-            effect = "Responsive to:" # FIXME extract effect from data
+            effect = "Responsive" # FIXME extract effect from data
             if existing:
                 existing_sample = self.search_sample(alterationSampleData["sample"], existing["row"])
                 if not existing_sample:
