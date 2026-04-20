@@ -179,13 +179,18 @@ class API:
             # self.app.logger.debug("##### RECORDS #####")
             # for k in r.keys():
             #     self.app.logger.debug(f"{k}: {r[k]}")
-
             gene = r["g"]._properties["gene_symbol"]
             if gene not in genome.keys():
-                gene_data = {
-                    "description": r["g"]._properties["name"],
-                    "alterations": [],
-                }
+                if "name" in r["g"]._properties: 
+                    gene_data = {
+                        "description": r["g"]._properties["name"],
+                        "alterations": [],
+                    }
+                else:
+                    gene_data = {
+                        "description": "",
+                        "alterations": [],
+                    }
                 genome[gene] = gene_data
 
             sample = r["s"]
@@ -212,8 +217,6 @@ class API:
             elif "StructuralVariant" in labels:
                 alterationSampleData = self.cast_as(sample_carries_variant, AlterationSampleDataSV)
                 alterationSampleData["sample"] = sample["id"]
-                self.app.logger.debug(sample_carries_variant)
-                self.app.logger.debug(alterationSampleData)
                 alterationSampleData["sample"] = alterationSampleData["sample"].replace(":sample", "")
                 alt_type = "structural variant"
             elif "CopyNumberAmplification" in labels:
@@ -269,69 +272,122 @@ class API:
 
 
     def actionables(self, patient_id):
-        records = self.cypher(
-            " MATCH (p:Patient)"
-                "-[pcs:PatientCarriesSample]->(s:Sample)"
-                "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
-                "-[]->(gs:GeneStatus)"
-                "-[vbt:VariantBiomarkerForTreatment]->(t:Treatment)"
-            f" WHERE (p.id = '{patient_id}')"
-                " AND (vbt.fda_level IN ['1.0','2.0'])"
-            " RETURN DISTINCT s, scv, sv, t"
-            " NEXT"
-            " MATCH (sv)-[]->(gs)"
-                "-[:GeneStatusAffectsGene]->(g:Gene)"
-            " RETURN DISTINCT s, scv, sv, g, t"
-        )
+    #     records = self.cypher(
+    #         " MATCH (p:Patient)"
+    #             "-[pcs:PatientCarriesSample]->(s:Sample)"
+    #             "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
+    #             "-[]->(gs:GeneStatus)"
+    #             "-[vbt:VariantBiomarkerForTreatment]->(t:Treatment)"
+    #         f" WHERE (p.id = '{patient_id}')"
+    #             " AND (vbt.fda_level IN ['1.0','2.0'])"
+    #         " RETURN DISTINCT s, scv, sv, t"
+    #         " NEXT"
+    #         " MATCH (sv)-[]->(gs)"
+    #             "-[:GeneStatusAffectsGene]->(g:Gene)"
+    #         " RETURN DISTINCT s, scv, sv, g, t"
+    #     )
+    # #     Actionable mutations
+        query = \
+            " MATCH (start:Patient)" \
+                "-[*1]->(s:Sample)" \
+                "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)" \
+                "-[]->(gs:GeneStatus)" \
+                "-[]->(t:Treatment)" \
+            f" WHERE (start.id = '{patient_id}')" \
+                "AND (gs.gene_role = 'loss' AND scv.homogenous = true)" \
+            " RETURN DISTINCT s, scv, sv, t" \
+            " UNION" \
+            " MATCH (start:Patient)" \
+                "-[*1]->(s:Sample)" \
+                "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)" \
+                "-[]->(gs:GeneStatus)" \
+                "-[]->(t:Treatment)" \
+            f" WHERE (start.id = '{patient_id}')" \
+            " AND (gs.gene_role = 'gain' AND scv.expressed = true)" \
+            " RETURN DISTINCT s, scv, sv, t" \
+            " NEXT" \
+            " MATCH (start)-[]->(s)-[scv]->(sv)-[]->(gs)-[:GeneStatusAffectsGene]-> (g:Gene)" \
+            " RETURN DISTINCT s, scv, sv, g, t" 
+        records = self.cypher(query)
         genome, samples = self.genome_of(patient_id, records)
 
         nb_alterations = 0
         for gene in genome:
             nb_alterations += len(genome[gene]["alterations"])
-            for a in genome[gene]["alterations"]:
-                self.app.logger.debug(a["reported_sensitivity"])
+            # for a in genome[gene]["alterations"]:
+            #     self.app.logger.debug(a["reported_sensitivity"])
 
         return genome, samples, nb_alterations
 
 
-    def relevants(self, patient_id):
-        records = self.cypher(
-            " MATCH (p:Patient)"
-                "-[pcs:PatientCarriesSample]->(s:Sample)"
-                "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
-                "-[]->(gs:GeneStatus)"
-                "-[vbt:VariantBiomarkerForTreatment]->(t:Treatment)"
-            f" WHERE (p.id = '{patient_id}')"
-                " AND (vbt.fda_level IN ['3.0','4.0'])"
-            " RETURN DISTINCT s, scv, sv, t"
-            " NEXT"
-            " MATCH (sv)-[]->(gs)"
-                "-[:GeneStatusAffectsGene]->(g:Gene)"
-            " RETURN DISTINCT s, scv, sv, g, t"
-        )
-        genome, samples = self.genome_of(patient_id, records)
+    # def relevants(self, patient_id):
+    #     records = self.cypher(
+    #         " MATCH (p:Patient)"
+    #             "-[pcs:PatientCarriesSample]->(s:Sample)"
+    #             "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
+    #             "-[]->(gs:GeneStatus)"
+    #             "-[vbt:VariantBiomarkerForTreatment]->(t:Treatment)"
+    #         f" WHERE (p.id = '{patient_id}')"
+    #             " AND (vbt.fda_level IN ['3.0','4.0'])"
+    #         " RETURN DISTINCT s, scv, sv, t"
+    #         " NEXT"
+    #         " MATCH (sv)-[]->(gs)"
+    #             "-[:GeneStatusAffectsGene]->(g:Gene)"
+    #         " RETURN DISTINCT s, scv, sv, g, t"
+    #     )
+    #     genome, samples = self.genome_of(patient_id, records)
 
-        nb_alterations = 0
-        for gene in genome:
-            nb_alterations += len(genome[gene]["alterations"])
+    #     nb_alterations = 0
+    #     for gene in genome:
+    #         nb_alterations += len(genome[gene]["alterations"])
 
-        return genome, samples, nb_alterations
+    #     return genome, samples, nb_alterations
 
 
     def others(self, patient_id):
+        # records = self.cypher(
+        #     " MATCH (p:Patient)"
+        #         "-[pcs:PatientCarriesSample]->(s:Sample)"
+        #         "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
+        #         "-[]->(gs:GeneStatus)"
+        #     f" WHERE (p.id = '{patient_id}')"
+        #         " AND not (gs)--(:Treatment)"
+        #     " RETURN DISTINCT s, scv, sv"
+        #     " NEXT"
+        #     " MATCH (sv)-[]->(gs)"
+        #         "-[:GeneStatusAffectsGene]->(g:Gene)"
+        #     " RETURN DISTINCT s, scv, sv, g"
+        # )
+        # Not relevant
         records = self.cypher(
-            " MATCH (p:Patient)"
-                "-[pcs:PatientCarriesSample]->(s:Sample)"
+            " CALL {"
+            "MATCH (start:Patient)"
+                "-[*1]->()"
                 "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
                 "-[]->(gs:GeneStatus)"
-            f" WHERE (p.id = '{patient_id}')"
-                " AND not (gs)--(:Treatment)"
+            f" WHERE (start.id = '{patient_id}')"
+                " AND (gs.gene_role = 'loss' AND scv.homogenous = true)"
+            " RETURN sv.id AS actionable_id"
+            " UNION"
+            " MATCH (start:Patient)"
+                "-[*1]->(s:Sample)"
+                "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
+                "-[]->(gs:GeneStatus)"
+            f" WHERE (start.id = '{patient_id}')"
+                " AND (gs.gene_role = 'gain' AND scv.expressed = true)"
+            " RETURN sv.id AS actionable_id"
+            " }"
+            " WITH collect(actionable_id) AS actionable_ids"
+            " MATCH (start:Patient)"
+                "-[*1]->(s:Sample)"
+                "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
+            f" WHERE (start.id = '{patient_id}')"
+                " AND NOT sv.id IN actionable_ids"
             " RETURN DISTINCT s, scv, sv"
             " NEXT"
-            " MATCH (sv)-[]->(gs)"
-                "-[:GeneStatusAffectsGene]->(g:Gene)"
+            " MATCH (start)-[]->(s)-[scv]->(sv)-[]->(gs)-[:GeneStatusAffectsGene]-> (g:Gene)"
             " RETURN DISTINCT s, scv, sv, g"
-        )
+            )
         genome, samples = self.genome_of(patient_id, records)
 
         nb_alterations = 0

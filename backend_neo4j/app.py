@@ -209,16 +209,16 @@ def genomic(patient_id):
         api.actionables(patient_id)
     app.logger.debug(f"│ Found {nb_actionable_alterations} alterations on {len(actionable_genome.keys())} genes in {len(actionable_samples)} samples.")
 
-    relevant_genome, relevant_samples, nb_relevant_alterations = \
-        api.relevants(patient_id)
-    app.logger.debug(f"│ Found {nb_relevant_alterations} alterations on {len(relevant_genome.keys())} genes in {len(relevant_samples)} samples.")
+    # relevant_genome, relevant_samples, nb_relevant_alterations = \
+    #     api.relevants(patient_id)
+    # app.logger.debug(f"│ Found {nb_relevant_alterations} alterations on {len(relevant_genome.keys())} genes in {len(relevant_samples)} samples.")
 
     other_genome, other_samples, nb_other_alterations = \
         api.others(patient_id)
     app.logger.debug(f"│ Found {nb_other_alterations} alterations on {len(other_genome.keys())} genes in {len(other_samples)} samples.")
 
     seen_samples = []
-    for s in actionable_samples + relevant_samples + other_samples:
+    for s in actionable_samples + other_samples: #+ relevant_samples:
         if s not in seen_samples:
             seen_samples.append(s)
 
@@ -229,14 +229,14 @@ def genomic(patient_id):
 
     genomic_sub_data = {
         "actionable_aberrations": [nb_actionable_alterations, 'ACTIONABLE ABERRATIONS'],
-        "putative_functionally_relevant_variants": [nb_relevant_alterations, 'PUTATIVE FUNCTIONALLY RELEVANT'] ,
+        # "putative_functionally_relevant_variants": [nb_relevant_alterations, 'PUTATIVE FUNCTIONALLY RELEVANT'] ,
         "other_variants": [nb_other_alterations, 'OTHER VARIANTS'],
     }
 
     genomic_data = {
         "genomic" : genomic_sub_data,
         "actionable_aberrations": actionable_genome,
-        "putative_functionally_relevant_variants": relevant_genome,
+        # "putative_functionally_relevant_variants": relevant_genome,
         "other_variants": other_genome,
         "samples_info": samples,
     }
