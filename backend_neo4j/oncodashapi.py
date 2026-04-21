@@ -220,6 +220,7 @@ class API:
                 del alterationSampleData["AD__0"]
                 if "HGVS__change" in sample_carries_variant._properties:
                     alterationSampleData["HGVS.change"] = sample_carries_variant._properties["HGVS__change"]
+                    del alterationSampleData["HGVS__change"]
                 alterationSampleData["sample"] = alterationSampleData["sample"].replace(":sample", "")
                 alt_type = "short mutation"
             elif "StructuralVariant" in labels:
