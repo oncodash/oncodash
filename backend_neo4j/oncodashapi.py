@@ -237,7 +237,9 @@ class API:
                     existing["row"].append(alterationSampleData)
                 if "t" in r.keys():
                     drug = r["t"]._properties["id"].split(":")[0]
+                    tier = r["vbt"]["Tier"]
                     existing["drugs"].append(drug)
+                    existing["treatments"][drug] = tier
             else:
                 alterationData = {}
                 alterationData["name"] = alteration_name
@@ -250,11 +252,14 @@ class API:
                 alterationData["alt_type"] = alt_type
                 if "t" in r.keys():
                     drug = r["t"]._properties["id"].split(":")[0]
+                    tier = r["vbt"]["Tier"]
                     alterationData["effect"] = effect
                     alterationData["drugs"] = [drug]
+                    alterationData["treatments"] = {drug: tier}
                 else:
                     alterationData["effect"] = ""
                     alterationData["drugs"] = []
+                    alterationData["treatments"] = {}
 
                 genome[gene]["alterations"].append(alterationData)
 
@@ -276,30 +281,8 @@ class API:
 
 
     def actionables(self, patient_id):
-  # #     Actionable mutations
-        # query = \
-        #     " MATCH (start:Patient)" \
-        #         "-[*1]->(s:Sample)" \
-        #         "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)" \
-        #         "-[]->(gs:GeneStatus)" \
-        #         "-[]->(t:Treatment)" \
-        #     f" WHERE (start.id = '{patient_id}')" \
-        #         "AND (gs.gene_role = 'loss' AND scv.homogenous = true)" \
-        #     " RETURN DISTINCT s, scv, sv, t" \
-        #     " UNION" \
-        #     " MATCH (start:Patient)" \
-        #         "-[*1]->(s:Sample)" \
-        #         "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)" \
-        #         "-[]->(gs:GeneStatus)" \
-        #         "-[]->(t:Treatment)" \
-        #     f" WHERE (start.id = '{patient_id}')" \
-        #     " AND (gs.gene_role = 'gain' AND scv.expressed = true)" \
-        #     " RETURN DISTINCT s, scv, sv, t" \
-        #     " NEXT" \
-        #     " MATCH (start)-[]->(s)-[scv]->(sv)-[]->(gs)-[:GeneStatusAffectsGene]-> (g:Gene)" \
-        #     " RETURN DISTINCT s, scv, sv, g, t" 
 
-# Actionable 
+        # Actionable
         query = \
             " MATCH path = (start:Patient)" \
                 "-[*1]->(s:Sample)" \
@@ -322,7 +305,7 @@ class API:
             " MATCH (sv)-[]->(gs)-[:GeneStatusAffectsGene]->(g:Gene)" \
             " RETURN DISTINCT s, scv, sv, vbt, t, gs, g" \
             " ORDER BY vbt.Tier, g.gene_symbol"
-            
+
         records = self.cypher(query)
         genome, samples = self.genome_of(patient_id, records)
 
@@ -333,30 +316,6 @@ class API:
             #     self.app.logger.debug(a["reported_sensitivity"])
 
         return genome, samples, nb_alterations
-
-
-    # def relevants(self, patient_id):
-    #     records = self.cypher(
-    #         " MATCH (p:Patient)"
-    #             "-[pcs:PatientCarriesSample]->(s:Sample)"
-    #             "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
-    #             "-[]->(gs:GeneStatus)"
-    #             "-[vbt:VariantBiomarkerForTreatment]->(t:Treatment)"
-    #         f" WHERE (p.id = '{patient_id}')"
-    #             " AND (vbt.fda_level IN ['3.0','4.0'])"
-    #         " RETURN DISTINCT s, scv, sv, t"
-    #         " NEXT"
-    #         " MATCH (sv)-[]->(gs)"
-    #             "-[:GeneStatusAffectsGene]->(g:Gene)"
-    #         " RETURN DISTINCT s, scv, sv, g, t"
-    #     )
-    #     genome, samples = self.genome_of(patient_id, records)
-
-    #     nb_alterations = 0
-    #     for gene in genome:
-    #         nb_alterations += len(genome[gene]["alterations"])
-
-    #     return genome, samples, nb_alterations
 
 
     def others(self, patient_id):

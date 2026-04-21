@@ -87,10 +87,15 @@
               <span v-if="alteration.reported_sensitivity !== 'None'">
                 {{ formatDrugs(alteration.reported_sensitivity).effect }}:
               </span>
-              <span
+              <!-- <span
                 v-if="alteration.reported_sensitivity !== 'None'" class="drug"
                 v-for="drug in formatDrugs(alteration.reported_sensitivity).drugList">
                 {{ drug }}
+              </span> -->
+              <span
+                v-if="alteration.reported_sensitivity !== 'None'" class="drug"
+                v-for="(tier, drug) in alteration.treatments">
+                <span class="drug-name">{{ drug }}<sup class="drug-tier">{{ tier }}</sup></span>
               </span>
               <span v-else>None</span>
             </p>
@@ -361,7 +366,7 @@ table tbody tr:hover {
 
 .genomic-number .genes .gene-link {
   border: 1px solid var(--primary);
-  border-radius: 20px;
+  border-radius: 3px;
   padding: 0 8px;
   margin: 0.1em;
 }
@@ -389,9 +394,20 @@ table tbody tr:hover {
 }
 
 .drug {
-  border: 1px solid var(--black-translucent);
+  border-left: thin solid hsla(0, 0%, 20%, 20%);;
+  border-top:  thin solid hsla(0, 0%, 20%, 20%);;
+  border-right:  thin solid var(--black-translucent);
+  border-bottom: thin solid var(--black-translucent);
   border-radius: 18px;
   padding: 4px 8px;
+}
+
+.drug:hover {
+  background-color: var(--grey-light);
+}
+
+.drug-tier {
+    color: var(--primary);
 }
 
 .samples-summary {
@@ -490,4 +506,6 @@ summary h3 {
 .highlight-cell {
   color: orangered;
 }
+
+
 </style>
