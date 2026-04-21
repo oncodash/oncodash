@@ -311,7 +311,7 @@ class API:
             " RETURN DISTINCT s, scv, sv, t" \
             " NEXT" \
             " MATCH (start)-[]->(s)-[scv]->(sv)-[]->(gs)-[:GeneStatusAffectsGene]-> (g:Gene)" \
-            " RETURN DISTINCT s, scv, sv, g, t" 
+            " RETURN DISTINCT s, scv, sv, g, t"
         records = self.cypher(query)
         genome, samples = self.genome_of(patient_id, records)
 
