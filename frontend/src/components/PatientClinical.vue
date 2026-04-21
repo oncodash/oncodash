@@ -25,35 +25,38 @@
       <PatientField field="Germ line pathogenic variants" :value="patient.germline_pathogenic_variant" />
     </div>
   </section>
-  <hr />
-  <!-- <section class="timelines"> -->
-    <!-- <PatientTimelines v-if="patient.time_series" :patient="patient"/> -->
-    <!-- <div v-else class="no-data">No time series available for this patient</div> -->
-  <!-- </section> -->
 
   <section class="timelines">
-     <div class="aiforia-row">
-        <a :href="`/images/timeline_${patient.cohort_code}.png`"
-           target="_blank"
-           class="aiforia-btn">View timeline &#x2197;</a>
-        <hr />
+     <hr />
+     <div class="images-row">
+        <h3>Clinical Timeline</h3>
+        <a      :href="`../assets/images/timeline_${patient.patient_id}.png`">
+            <img :src="`../assets/images/timeline_${patient.patient_id}.png`"
+                 :alt="`Clinical timeline for patient ${patient.patient_id}.`"
+            />
+        </a>
+      </div>
+  </section>
+
+  <section class="graph">
+     <hr />
+     <div class="images-row">
+        <h3>Signaling network</h3>
+        <a      :href="`../assets/images/graph_${patient.patient_id}.png`">
+            <img :src="`../assets/images/graph_${patient.patient_id}.png`"
+                 :alt="`Signaling network for patient ${patient.patient_id}.`"
+            />
+        </a>
       </div>
   </section>
 
   <section class="aiforia">
-      <div v-if="aiforiaEnabled" class="aiforia-row">
+      <hr />
+      <div v-if="aiforiaEnabled" class="images-row">
+        <h3>Histopathology Images</h3>
         <a :href="`${aiforiaBridgeUrl}?patientRef=${patient.cohort_code}`"
            target="_blank"
            class="aiforia-btn">View histopathology samples in Aiforia &#x2197;</a>
-        <hr />
-      </div>
-  </section>
-
-  <section class="grqph">
-     <div class="aiforia-row">
-        <a :href="`/images/graph_${patient.cohort_code}.png`"
-           target="_blank"
-           class="aiforia-btn">View graph &#x2197;</a>
       </div>
   </section>
 </template>
@@ -115,9 +118,13 @@ hr {
   font-style: italic;
 }
 
-.aiforia-row {
+.images-row {
   gap: var(--spacing);
   text-align: center;
+}
+
+.images-row img {
+    width: 50%;
 }
 
 .aiforia-btn {
