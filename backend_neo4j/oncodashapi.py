@@ -276,42 +276,53 @@ class API:
 
 
     def actionables(self, patient_id):
-    #     records = self.cypher(
-    #         " MATCH (p:Patient)"
-    #             "-[pcs:PatientCarriesSample]->(s:Sample)"
-    #             "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
-    #             "-[]->(gs:GeneStatus)"
-    #             "-[vbt:VariantBiomarkerForTreatment]->(t:Treatment)"
-    #         f" WHERE (p.id = '{patient_id}')"
-    #             " AND (vbt.fda_level IN ['1.0','2.0'])"
-    #         " RETURN DISTINCT s, scv, sv, t"
-    #         " NEXT"
-    #         " MATCH (sv)-[]->(gs)"
-    #             "-[:GeneStatusAffectsGene]->(g:Gene)"
-    #         " RETURN DISTINCT s, scv, sv, g, t"
-    #     )
-    # #     Actionable mutations
+  # #     Actionable mutations
+        # query = \
+        #     " MATCH (start:Patient)" \
+        #         "-[*1]->(s:Sample)" \
+        #         "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)" \
+        #         "-[]->(gs:GeneStatus)" \
+        #         "-[]->(t:Treatment)" \
+        #     f" WHERE (start.id = '{patient_id}')" \
+        #         "AND (gs.gene_role = 'loss' AND scv.homogenous = true)" \
+        #     " RETURN DISTINCT s, scv, sv, t" \
+        #     " UNION" \
+        #     " MATCH (start:Patient)" \
+        #         "-[*1]->(s:Sample)" \
+        #         "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)" \
+        #         "-[]->(gs:GeneStatus)" \
+        #         "-[]->(t:Treatment)" \
+        #     f" WHERE (start.id = '{patient_id}')" \
+        #     " AND (gs.gene_role = 'gain' AND scv.expressed = true)" \
+        #     " RETURN DISTINCT s, scv, sv, t" \
+        #     " NEXT" \
+        #     " MATCH (start)-[]->(s)-[scv]->(sv)-[]->(gs)-[:GeneStatusAffectsGene]-> (g:Gene)" \
+        #     " RETURN DISTINCT s, scv, sv, g, t" 
+
+# Actionable 
         query = \
-            " MATCH (start:Patient)" \
+            " MATCH path = (start:Patient)" \
                 "-[*1]->(s:Sample)" \
                 "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)" \
                 "-[]->(gs:GeneStatus)" \
-                "-[]->(t:Treatment)" \
-            f" WHERE (start.id = '{patient_id}')" \
-                "AND (gs.gene_role = 'loss' AND scv.homogenous = true)" \
-            " RETURN DISTINCT s, scv, sv, t" \
-            " UNION" \
-            " MATCH (start:Patient)" \
+                "-[vbt:VariantBiomarkerForTreatment]->(t:Treatment)" \
+            f"  WHERE (start.id = '{patient_id}')" \
+            "  AND (gs.gene_role = 'loss' AND scv.homogenous = true)" \
+            "  RETURN DISTINCT s, scv, sv, vbt, t" \
+            "  UNION" \
+            "  MATCH path = (start:Patient)" \
                 "-[*1]->(s:Sample)" \
                 "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)" \
                 "-[]->(gs:GeneStatus)" \
-                "-[]->(t:Treatment)" \
-            f" WHERE (start.id = '{patient_id}')" \
-            " AND (gs.gene_role = 'gain' AND scv.expressed = true)" \
-            " RETURN DISTINCT s, scv, sv, t" \
-            " NEXT" \
-            " MATCH (start)-[]->(s)-[scv]->(sv)-[]->(gs)-[:GeneStatusAffectsGene]-> (g:Gene)" \
-            " RETURN DISTINCT s, scv, sv, g, t"
+                "-[vbt:VariantBiomarkerForTreatment]->(t:Treatment)" \
+            f"  WHERE (start.id = '{patient_id}') " \
+            "  AND (gs.gene_role = 'gain' AND scv.expressed = true)" \
+            "  RETURN DISTINCT s, scv, sv, vbt, t" \
+            " NEXT " \
+            " MATCH (sv)-[]->(gs)-[:GeneStatusAffectsGene]->(g:Gene)" \
+            " RETURN DISTINCT s, scv, sv, vbt, t, gs, g" \
+            " ORDER BY vbt.Tier, g.gene_symbol"
+            
         records = self.cypher(query)
         genome, samples = self.genome_of(patient_id, records)
 
@@ -349,19 +360,6 @@ class API:
 
 
     def others(self, patient_id):
-        # records = self.cypher(
-        #     " MATCH (p:Patient)"
-        #         "-[pcs:PatientCarriesSample]->(s:Sample)"
-        #         "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
-        #         "-[]->(gs:GeneStatus)"
-        #     f" WHERE (p.id = '{patient_id}')"
-        #         " AND not (gs)--(:Treatment)"
-        #     " RETURN DISTINCT s, scv, sv"
-        #     " NEXT"
-        #     " MATCH (sv)-[]->(gs)"
-        #         "-[:GeneStatusAffectsGene]->(g:Gene)"
-        #     " RETURN DISTINCT s, scv, sv, g"
-        # )
         # Not relevant
         records = self.cypher(
             " CALL {"
