@@ -90,6 +90,7 @@ class AlterationSampleDataSNP:
     nMinor = str # OK
     LOHstatus = str # OK
     expHomCI__cover = str  # __ => .  # OK
+    HGVS__change = str  # __ => .  # OK
 
 class AlterationData:
     name = str
@@ -216,6 +217,8 @@ class API:
                 del alterationSampleData["AD__1"]
                 alterationSampleData["AD.0"] = alterationSampleData["AD__0"]
                 del alterationSampleData["AD__0"]
+                if "HGVS__change" in sample_carries_variant._properties:
+                    alterationSampleData["HGVS.change"] = sample_carries_variant._properties["HGVS__change"]
                 alterationSampleData["sample"] = alterationSampleData["sample"].replace(":sample", "")
                 alt_type = "short mutation"
             elif "StructuralVariant" in labels:
