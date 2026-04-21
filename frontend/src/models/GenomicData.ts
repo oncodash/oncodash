@@ -49,6 +49,7 @@ export interface AlterationSampleDataSNP {
   nMinor: string
   LOHstatus: string
   "expHomCI.cover": string
+  HGVS.change: string
 
  /* FIXME ugly hack */
   is_of_type: 'AlterationSampleDataSNP'
