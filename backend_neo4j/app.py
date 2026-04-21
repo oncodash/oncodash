@@ -155,65 +155,13 @@ def patient(patient_id):
 def genomic(patient_id):
     """genomic data of one patient"""
     app.logger.debug(f"Asking for {genomic.__doc__}: {patient_id}...")
-    
-    # # if ":patient" not in patient_id:
-    # #     patient_id = f"{patient_id}:patient"
 
-    # # Actionable alterations
-    # actionable_alteration_query = \
-    #     f"MATCH path = (start:Patient)-[*1]->()-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(gs:GeneStatus)-[vbt:VariantBiomarkerForTreatment]->(end:Treatment) "\
-    #     f"WHERE (start.id = '{patient_id}')"\
-    #     f"AND (vbt.fda_level IN ['1.0','2.0']) "\
-    #     f"RETURN DISTINCT scv, sv "
-
-    # # Putative relevant alterations
-    # putative_alteration_query = \
-    #     f"MATCH path = (start:Patient)-[*1]->()-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(gs:GeneStatus)-[vbt:VariantBiomarkerForTreatment]->(end:Treatment) "\
-    #     f"WHERE (start.id = '{patient_id}:patient') "\
-    #     f"AND (vbt.fda_level IN ['3.0','4.0']) "\
-    #     f"RETURN DISTINCT scv, sv "
-
-
-    # // Actionable alterations lists
-    # MATCH path = (start:Patient)-[*1]->(s:Sample)-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(gs:GeneStatus)-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)
-    # WHERE (start.id = '{patient_id}:patient')
-    # AND (vbt.fda_level IN ['1.0','2.0'])
-    # RETURN DISTINCT s, scv, sv
-
-    # // Putative relevant alterations lists
-    # MATCH path = (start:Patient)-[*1]->(s:Sample)-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(gs:GeneStatus)-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)
-    # WHERE (start.id = '{patient_id}:patient')
-    # AND (vbt.fda_level IN ['1.0','2.0'])
-    # RETURN DISTINCT s, scv, sv
-
-    # // Other variants lists
-    # MATCH path = (start:Patient)-[*1]->(s:Sample)-[scv:SampleCarriesVariant]->(sv:SequenceVariant)-[]->(end:GeneStatus)
-    # WHERE not (end)--(:Treatment)
-    # AND (start.id = '{patient_id}:patient')
-    # RETURN DISTINCT s, scv, sv
-
-
-        # f"MATCH (p:Patient)"
-        #     "-[pcs]->(s:Sample)"
-        #     "-[scv:SampleCarriesVariant]->(sv:SequenceVariant)"
-        #     "-[]->(gs:GeneStatus)"
-        #     "-[:GeneStatusAffectsGene]->(g:Gene)"
-        #     "-[vbt:VariantBiomarkerForTreatment]->(end:Treatment)"
-        # f" WHERE (p.id = '{patient_id}')"
-        #  " AND (vbt.fda_level IN ['1.0','2.0'])"
-        #  " RETURN DISTINCT s, scv, sv, g ;"
-        #  
     # Actionable aberrations
-    # 
-    actionable_genome, actionable_samples, nb_actionable_alterations = \
+    actionable_genome, actionable_samples, nb_actionable_alterations, actionable_ordered = \
         api.actionables(patient_id)
     app.logger.debug(f"│ Found {nb_actionable_alterations} alterations on {len(actionable_genome.keys())} genes in {len(actionable_samples)} samples.")
 
-    # relevant_genome, relevant_samples, nb_relevant_alterations = \
-    #     api.relevants(patient_id)
-    # app.logger.debug(f"│ Found {nb_relevant_alterations} alterations on {len(relevant_genome.keys())} genes in {len(relevant_samples)} samples.")
-
-    other_genome, other_samples, nb_other_alterations = \
+    other_genome, other_samples, nb_other_alterations, other_ordered = \
         api.others(patient_id)
     app.logger.debug(f"│ Found {nb_other_alterations} alterations on {len(other_genome.keys())} genes in {len(other_samples)} samples.")
 
@@ -229,25 +177,19 @@ def genomic(patient_id):
 
     genomic_sub_data = {
         "actionable_aberrations": [nb_actionable_alterations, 'ACTIONABLE ABERRATIONS'],
-        # "putative_functionally_relevant_variants": [nb_relevant_alterations, 'PUTATIVE FUNCTIONALLY RELEVANT'] ,
         "other_variants": [nb_other_alterations, 'OTHER VARIANTS'],
     }
 
     genomic_data = {
         "genomic" : genomic_sub_data,
         "actionable_aberrations": actionable_genome,
-        # "putative_functionally_relevant_variants": relevant_genome,
         "other_variants": other_genome,
+        "order": {
+            "actionable_aberrations": actionable_ordered,
+            "other_variants": other_ordered,
+        },
         "samples_info": samples,
     }
-
-    # with open("genomic_data.json", 'w') as fd:
-    #     json.dump(genomic_data, fd)
-    # response = app.response_class(
-    #     response=json.dumps(genomic_data),
-    #     mimetype='application/json'
-    # )
-    # return response
 
     app.logger.debug("└OK")
     return flask.jsonify(genomic_data)

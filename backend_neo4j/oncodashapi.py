@@ -172,14 +172,16 @@ class API:
 
         self.app.logger.debug(f"│ Parse {len(records)} records of patient {patient_id}")
 
+        ordered_genes = []
         genome = {}
         samples = []
 
         for r in records:
-            # self.app.logger.debug("##### RECORDS #####")
-            # for k in r.keys():
-            #     self.app.logger.debug(f"{k}: {r[k]}")
             gene = r["g"]._properties["gene_symbol"]
+            if gene not in ordered_genes:
+                ordered_genes.append( gene )
+                # self.app.logger.debug(f"##### GENE: {gene}")
+
             if gene not in genome.keys():
                 if "name" in r["g"]._properties: 
                     gene_data = {
@@ -277,7 +279,7 @@ class API:
         self.app.logger.debug(f"│ │ {len(genome.keys())} genes")
         self.app.logger.debug( "│ └OK")
 
-        return genome, samples
+        return genome, samples, ordered_genes
 
 
     def actionables(self, patient_id):
@@ -307,7 +309,7 @@ class API:
             " ORDER BY vbt.Tier, g.gene_symbol"
 
         records = self.cypher(query)
-        genome, samples = self.genome_of(patient_id, records)
+        genome, samples, ordered = self.genome_of(patient_id, records)
 
         nb_alterations = 0
         for gene in genome:
@@ -315,7 +317,7 @@ class API:
             # for a in genome[gene]["alterations"]:
             #     self.app.logger.debug(a["reported_sensitivity"])
 
-        return genome, samples, nb_alterations
+        return genome, samples, nb_alterations, ordered
 
 
     def others(self, patient_id):
@@ -349,11 +351,11 @@ class API:
             " MATCH (start)-[]->(s)-[scv]->(sv)-[]->(gs)-[:GeneStatusAffectsGene]-> (g:Gene)"
             " RETURN DISTINCT s, scv, sv, g"
             )
-        genome, samples = self.genome_of(patient_id, records)
+        genome, samples, ordered = self.genome_of(patient_id, records)
 
         nb_alterations = 0
         for gene in genome:
             nb_alterations += len(genome[gene]["alterations"])
 
-        return genome, samples, nb_alterations
+        return genome, samples, nb_alterations, ordered
 

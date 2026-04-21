@@ -4,12 +4,11 @@
 export interface GenomicData {
   genomic: {
     actionable_aberrations: [number, string]
-    putative_functionally_relevant_variants: [number, string]
     other_variants: [number, string]
   }
   actionable_aberrations: Record<string, GeneData>
-  putative_functionally_relevant_variants: Record<string, GeneData>
   other_variants: Record<string, GeneData>
+  order: Record<string, Array<string> >
   samples_info: {
     name: string
     row: Array<SampleInfo>

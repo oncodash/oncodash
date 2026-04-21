@@ -58,22 +58,22 @@
     <details open class="genomic-group" v-for="(metadata, genomicGroup) in genomicData.genomic">
       <summary class="genomic-header">
         <h1 class="genomic-title">
-          {{ metadata[1] }} -
           <span class="number">{{ metadata[0] }}</span>
+          {{ metadata[1] }}
         </h1>
       </summary>
 
       <details
         open
         class="gene-section"
-        v-for="(geneData, aberrationCategory) in genomicData[genomicGroup]">
+        v-for="geneName in genomicData.order[genomicGroup]">
         <summary class="gene-header">
-          <h2 :id="aberrationCategory">{{ aberrationCategory }}</h2>
+          <h2 :id="geneName">{{ geneName }}</h2>
         </summary>
 
-        <p>{{ geneData.description }}</p>
+        <p>{{ genomicData[genomicGroup][geneName].description }}</p>
 
-        <details class="alteration-section" v-for="alteration in geneData.alterations">
+        <details class="alteration-section" v-for="alteration in genomicData[genomicGroup][geneName].alterations">
           <summary class="alteration-header">
             <h3>
               <span class="alteration-type">{{ alteration.alt_type }}</span> —
@@ -87,11 +87,6 @@
               <span v-if="alteration.reported_sensitivity !== 'None'">
                 {{ formatDrugs(alteration.reported_sensitivity).effect }}:
               </span>
-              <!-- <span
-                v-if="alteration.reported_sensitivity !== 'None'" class="drug"
-                v-for="drug in formatDrugs(alteration.reported_sensitivity).drugList">
-                {{ drug }}
-              </span> -->
               <span
                 v-if="alteration.reported_sensitivity !== 'None'" class="drug"
                 v-for="(tier, drug) in alteration.treatments">
