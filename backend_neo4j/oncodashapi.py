@@ -70,6 +70,8 @@ class SampleInfoList:
 
 class AlterationSampleDataSV:
     sample = str
+    undisruptedCopyNumber = str
+    affectedCopyNumber = str
 
 class AlterationSampleDataCNV:
     """Properties of `samples_carries_variant` edges from `sample` to `copy_number_amplification`"""

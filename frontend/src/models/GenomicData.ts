@@ -75,6 +75,8 @@ export interface AlterationSampleDataCNV {
 export interface AlterationSampleDataSV {
   is_of_type: 'AlterationSampleDataSV'
   sample: string
+  undisruptedCopyNumber: string
+  affectedCopyNumber: string
 
  /* FIXME ugly hack */
   samples: string
