@@ -35,6 +35,7 @@ export interface AlterationData {
   reported_sensitivity: string
   row: Array<AlterationSampleData>
   alt_type: string
+  treatments: Record<string, string>
 }
 
 export type AlterationSampleData = AlterationSampleDataSNP | AlterationSampleDataCNV | AlterationSampleDataSV
@@ -49,7 +50,7 @@ export interface AlterationSampleDataSNP {
   nMinor: string
   LOHstatus: string
   "expHomCI.cover": string
-  HGVS.change: string
+  "HGVS.change": string
 
  /* FIXME ugly hack */
   is_of_type: 'AlterationSampleDataSNP'

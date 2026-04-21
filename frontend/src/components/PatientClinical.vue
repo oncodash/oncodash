@@ -30,8 +30,8 @@
      <hr />
      <div class="images-row">
         <h3>Clinical Timeline</h3>
-        <a      :href="`../assets/images/timeline_${patient.patient_id}.png`">
-            <img :src="`../assets/images/timeline_${patient.patient_id}.png`"
+        <a      :href="`/images/timeline_${patient.patient_id}.png`">
+            <img :src="`/images/timeline_${patient.patient_id}.png`"
                  :alt="`Clinical timeline for patient ${patient.patient_id}.`"
             />
         </a>
@@ -42,8 +42,8 @@
      <hr />
      <div class="images-row">
         <h3>Signaling network</h3>
-        <a      :href="`../assets/images/graph_${patient.patient_id}.png`">
-            <img :src="`../assets/images/graph_${patient.patient_id}.png`"
+        <a      :href="`/images/graph_${patient.patient_id}.png`">
+            <img :src="`/images/graph_${patient.patient_id}.png`"
                  :alt="`Signaling network for patient ${patient.patient_id}.`"
             />
         </a>
@@ -65,7 +65,7 @@
 
 import { Patient } from '../models/Patient'
 import PatientField from './PatientField.vue'
-import PatientTimelines from './PatientTimelines.vue'
+// import PatientTimelines from './PatientTimelines.vue'
 
 const props = defineProps<{
   patient: Patient

@@ -16,7 +16,7 @@ export class Patient {
   clinical_trial: boolean | null
   cohort_code: string | null
   current_treatment_phase: string | null
-  days_to_end: string
+  days_to_end: number | null
   days_from_beva_maintenance_end_to_progression: number | null
   days_to_death: number | null
   days_to_progression: number | null
@@ -119,8 +119,7 @@ export class Patient {
   }
 
   static hasGenomics(genomicData: GenomicData): boolean {
-    const noData = genomicData.genomic.putative_functionally_relevant_variants[0] === 0
-      && genomicData.genomic.actionable_aberrations[0] === 0
+    const noData =  genomicData.genomic.actionable_aberrations[0] === 0
       && genomicData.genomic.other_variants[0] === 0
 
     return !noData
