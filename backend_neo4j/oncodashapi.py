@@ -241,7 +241,11 @@ class API:
             else:
                 alterationData = {}
                 alterationData["name"] = alteration_name
-                alterationData["description"] = "FIXME description"
+                if "mutation_effect_description" in r['sv']._properties:
+                    alterationData["description"] = r['sv']._properties["mutation_effect_description"] #FIXME description"
+                    self.app.logger.debug(f"Found a SV description : {r['sv']._properties["mutation_effect_description"]}")
+                else:
+                    alterationData["description"] = "Unknown"
                 alterationData["row"] = [alterationSampleData]
                 alterationData["alt_type"] = alt_type
                 if "t" in r.keys():
