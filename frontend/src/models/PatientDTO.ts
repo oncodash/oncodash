@@ -12,6 +12,7 @@ export interface PatientDTO {
   cohort_code: string | null
   current_treatment_phase: string | null
   days_from_beva_maintenance_end_to_progression: number | null
+  days_to_end: number | null
   days_to_death: number | null
   days_to_progression: number | null
   debulking_surgery_ids: boolean | null

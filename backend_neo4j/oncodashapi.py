@@ -20,6 +20,7 @@ class PatientDTO:
     cohort_code = str
     current_treatment_phase = str
     days_from_beva_maintenance_end_to_progression = int
+    days_to_end = int
     days_to_death = int
     days_to_progression = int
     debulking_surgery_ids = bool
@@ -363,4 +364,25 @@ class API:
             nb_alterations += len(genome[gene]["alterations"])
 
         return genome, samples, nb_alterations, ordered
+
+
+    def calc_patient_details(self, patientDTO):
+
+        self.app.logger.debug(f"Patient is: {patientDTO['survival']}")
+        if patientDTO["survival"] == "Alive":
+            if "days_to_end" in patientDTO:
+                patientDTO["days_to_death"] = patientDTO["days_to_end"]
+            else:
+                self.app.logger.error("Patient has no days_to_end")
+            patientDTO["followup_time"] = ""
+        elif patientDTO["survival"] == "Dead":
+            patientDTO["days_to_death"] = ""
+            if "days_to_end" in patientDTO:
+                patientDTO["followup_time"] = patientDTO["days_to_end"]
+            else:
+                self.app.logger.error("Patient has no days_to_end")
+        else:
+            self.app.logger.error("Patient is neither Dead or Alive.")
+
+        return patientDTO
 

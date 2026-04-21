@@ -116,6 +116,7 @@ def patients():
 
         patientDTO = api.cast_as(patient, oncodashapi.PatientDTO)
         patientDTO["patient_id"] = patient["id"]
+        patientDTO = api.calc_patient_details(patientDTO)
         data.append(patientDTO)
 
     app.logger.debug("└OK")
@@ -146,6 +147,7 @@ def patient(patient_id):
 
         patientDTO = api.cast_as(pat, oncodashapi.PatientDTO)
         patientDTO["patient_id"] = pat["id"]
+        patientDTO = api.calc_patient_details(patientDTO)
         app.logger.debug("└OK")
 
         return flask.jsonify(patientDTO)

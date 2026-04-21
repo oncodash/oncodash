@@ -16,6 +16,7 @@ export class Patient {
   clinical_trial: boolean | null
   cohort_code: string | null
   current_treatment_phase: string | null
+  days_to_end: string
   days_from_beva_maintenance_end_to_progression: number | null
   days_to_death: number | null
   days_to_progression: number | null
@@ -64,6 +65,7 @@ export class Patient {
     this.cohort_code = patientDTO.cohort_code
     this.current_treatment_phase = patientDTO.current_treatment_phase
     this.days_from_beva_maintenance_end_to_progression = patientDTO.days_from_beva_maintenance_end_to_progression
+    this.days_to_end = patientDTO.days_to_end
     this.days_to_death = patientDTO.days_to_death
     this.days_to_progression = patientDTO.days_to_progression
     this.debulking_surgery_ids = patientDTO.debulking_surgery_ids
