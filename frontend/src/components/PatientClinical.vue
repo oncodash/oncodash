@@ -26,9 +26,18 @@
     </div>
   </section>
   <hr />
+  <!-- <section class="timelines"> -->
+    <!-- <PatientTimelines v-if="patient.time_series" :patient="patient"/> -->
+    <!-- <div v-else class="no-data">No time series available for this patient</div> -->
+  <!-- </section> -->
+
   <section class="timelines">
-    <PatientTimelines v-if="patient.time_series" :patient="patient"/>
-    <div v-else class="no-data">No time series available for this patient</div>
+     <div class="aiforia-row">
+        <a :href="`/images/timeline_${patient.cohort_code}.png`"
+           target="_blank"
+           class="aiforia-btn">View timeline &#x2197;</a>
+        <hr />
+      </div>
   </section>
 
   <section class="aiforia">
@@ -36,6 +45,15 @@
         <a :href="`${aiforiaBridgeUrl}?patientRef=${patient.cohort_code}`"
            target="_blank"
            class="aiforia-btn">View histopathology samples in Aiforia &#x2197;</a>
+        <hr />
+      </div>
+  </section>
+
+  <section class="grqph">
+     <div class="aiforia-row">
+        <a :href="`/images/graph_${patient.cohort_code}.png`"
+           target="_blank"
+           class="aiforia-btn">View graph &#x2197;</a>
       </div>
   </section>
 </template>
