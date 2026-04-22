@@ -63,7 +63,7 @@ class SampleInfo:
     ploidy = str # FIXME only for AMP
     tumor_site = str # OK
     sample_time = str # OK
-    sample_type = str # FIXME _sside_ or sord ?
+    # sample_type = str # FIXME _sside_ or sord ?
 
 class SampleInfoList:
     name = str
@@ -370,13 +370,14 @@ class API:
     def calc_patient_details(self, patientDTO):
 
         self.app.logger.debug(f"Patient is: {patientDTO['survival']}")
-        if patientDTO["survival"] == "Alive":
+        if patientDTO["survival"] == "Dead":
             if "days_to_end" in patientDTO:
                 patientDTO["days_to_death"] = patientDTO["days_to_end"]
             else:
                 self.app.logger.error("Patient has no days_to_end")
             patientDTO["followup_time"] = ""
-        elif patientDTO["survival"] == "Dead":
+
+        elif patientDTO["survival"] == "Alive":
             patientDTO["days_to_death"] = ""
             if "days_to_end" in patientDTO:
                 patientDTO["followup_time"] = patientDTO["days_to_end"]

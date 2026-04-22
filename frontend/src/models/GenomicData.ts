@@ -21,7 +21,7 @@ export interface SampleInfo {
   ploidy: string
   tumor_site: string
   sample_time: string
-  sample_type: string
+  // sample_type: string
 }
 
 export interface GeneData {

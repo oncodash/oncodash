@@ -38,7 +38,6 @@
           <th>Ploidy</th>
           <th>Tumor site</th>
           <th>Sample time</th>
-          <th>Sample type</th>
         </tr>
       </thead>
       <tbody>
@@ -48,13 +47,21 @@
           <td>{{ row.ploidy }}</td>
           <td>{{ row.tumor_site }}</td>
           <td>{{ row.sample_time }}</td>
-          <td>{{ row.sample_type }}</td>
         </tr>
       </tbody>
     </table>
   </section>
 
   <section class="genomic-data" v-if="genomicData">
+        <hr/>
+        <p id="signaling">
+            <a      :href="`/images/graph_${patient.patient_id}.png`">
+                Related signaling pathways:
+                <img :src="`/images/graph_${patient.patient_id}.png`"
+                     :alt="`Signaling network for patient ${patient.patient_id}.`"
+                />
+            </a>
+        </p>
     <details open class="genomic-group" v-for="(metadata, genomicGroup) in genomicData.genomic">
       <summary class="genomic-header">
         <h1 class="genomic-title">
@@ -502,5 +509,22 @@ summary h3 {
   color: orangered;
 }
 
+#signaling {
+    margin: 1em;
+    padding: 1em;
+}
+
+#signaling img {
+    vertical-align: middle;
+    width: 150px;
+    border: thin solid black;
+    box-shadow: 3px 3px 6px grey;
+}
+
+hr {
+    margin-left: 2em;
+    margin-right: 2em;
+    border: thin solid lightgrey;
+}
 
 </style>
