@@ -80,7 +80,8 @@
 
         <p>{{ genomicData[genomicGroup][geneName].description }}</p>
 
-        <details class="alteration-section" v-for="alteration in genomicData[genomicGroup][geneName].alterations">
+        <details class="alteration-section"
+                v-for="alteration in genomicData[genomicGroup][geneName].alterations">
           <summary class="alteration-header">
             <h3>
               <span class="alteration-type">{{ alteration.alt_type }}</span> —
@@ -111,15 +112,15 @@
             <table class="alteration-table">
               <thead>
                 <tr>
-                  <th v-for="column in Object.keys(alteration.row[0])">
+                  <th v-for="column in order_of(alteration.row[0])">
                     {{ column }}
                   </th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="row in alteration.row">
-                  <td v-for="(value, column) in row" :class="{ 'highlight-cell': highlightCell(column, row) }">
-                    {{ value }}
+                  <td v-for="column in order_of(row)" :class="{ 'highlight-cell': highlightCell(column, row) }">
+                    {{ row[column] }}
                   </td>
                 </tr>
               </tbody>
@@ -137,7 +138,9 @@ import { onMounted, ref } from 'vue'
 import { computed } from '@vue/reactivity'
 import api from '../api'
 import { Patient } from '../models/Patient'
-import { AlterationSampleData/*, AlterationSampleDataCNV, AlterationSampleDataSNP, AlterationSampleDataSV*/, GenomicData } from '../models/GenomicData'
+import { AlterationSampleData, GenomicData } from '../models/GenomicData'
+// import { AlterationSampleDataCNV, AlterationSampleDataSNP, AlterationSampleDataSV } from '../models/GenomicData'
+import { Orders } from '../models/GenomicData'
 
 const props = defineProps<{
   patient: Patient
@@ -176,6 +179,35 @@ onMounted(() => {
     })
 })
 
+function order_of(alt: AlterationSampleData): string[] {
+    var columns: string[] = [];
+    if (alt["DP"]) {
+        for(var c of Orders["AlterationSampleDataSNP"]) {
+            if (alt[c] != null) {
+                columns.push(c);
+            }
+        }
+        return columns;
+    } else if (alt["nMajor"]) {
+        for(var c of Orders["AlterationSampleDataCNV"]) {
+            if (alt[c] != null) {
+                columns.push(c);
+            }
+        }
+        return columns;
+    } else if (alt["undisruptedCopyNumber"]) {
+        for(var c of Orders["AlterationSampleDataSV"]) {
+            if (alt[c] != null) {
+                columns.push(c);
+            }
+        }
+        return columns;
+    } else {
+        alert("ERROR");
+        return [];
+    }
+}
+
 /**
  * Lists all the drugs involved in the current genomic data.
  * @returns The list of drugs
@@ -186,10 +218,13 @@ function aggregateActionableDrugs(): string[] {
 
     let drugs: string[] = []
 
-    // console.log(genomicData.value?.[group])
-
     Object.values(genomicData.value?.[group]).forEach(geneData => {
-      // console.log(geneData)
+      // console.log(geneData["alterations"][0].row[0])
+      // console.log(Orders[typeof geneData["alterations"][0]].split(","))
+      // console.log(Orders[typeof geneData["alterations"][0]])
+      // let alt = geneData["alterations"][0].row[0]
+      // console.log(order_of(alt))
+      // console.log(Orders[geneData["alterations"][0].row[0].is_of_type])
       geneData.alterations.forEach(alteration => {
         const drugList = alteration.reported_sensitivity
           .replace('Responsive:', '')
@@ -281,6 +316,7 @@ function buildPubmedLink(pmid: string): string {
  * @returns If the cell should be highlighted or not
  */
 function highlightCell(column: string, row: AlterationSampleData): boolean {
+    /* FIXME this does not do what one think it does */
     if (row.is_of_type == "AlterationSampleDataCNV" || row.is_of_type == "AlterationSampleDataSNP") {
         return (column === 'nMinor' || column === 'nMajor') && MajorMinorNot11(row)
     } else {
@@ -295,7 +331,7 @@ function highlightCell(column: string, row: AlterationSampleData): boolean {
  * @returns If the combination is 1:1 or not
  */
 function MajorMinorNot11(row: AlterationSampleData): boolean {
-
+    /* FIXME this does not do what one think it does */
     if (row.is_of_type == "AlterationSampleDataCNV" || row.is_of_type == "AlterationSampleDataSNP") {
         if (row.nMajor === '1' && row.nMinor === '1') return false
         if (row.nMajor === 'NA' || row.nMinor === 'NA') return false

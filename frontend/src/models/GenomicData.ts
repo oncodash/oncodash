@@ -41,7 +41,7 @@ export interface AlterationData {
 export type AlterationSampleData = AlterationSampleDataSNP | AlterationSampleDataCNV | AlterationSampleDataSV
 
 export interface AlterationSampleDataSNP {
-  samples: string
+  sample: string
   "AD.0": string
   "AD.1": string
   DP: string
@@ -63,7 +63,7 @@ export interface AlterationSampleDataCNV {
 
  /* FIXME ugly hack */
   is_of_type: 'AlterationSampleDataCNV'
-  samples: string
+
   "AD.0": string
   "AD.1": string
   DP: string
@@ -82,6 +82,7 @@ export interface AlterationSampleDataSV {
 
  /* FIXME ugly hack */
   samples: string
+
   "AD.0": string
   "AD.1": string
   DP: string
@@ -91,3 +92,10 @@ export interface AlterationSampleDataSV {
   LOHstatus: string
   "expHomCI.cover": string
 }
+
+export module Orders {
+  export var AlterationSampleDataSNP = ["sample", "HGVS.change", "AD.0", "AD.1", "DP", "AF", "nMajor", "nMinor", "LOHstatus", "expHomCI.cover"];
+  export var AlterationSampleDataCNV = ["sample", "nMajor", "nMinor"];
+  export var AlterationSampleDataSV = ["sample", "undisruptedCopyNumber", "affectedCopyNumber"];
+}
+
