@@ -41,7 +41,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="row in genomicData.samples_info.row">
+        <tr v-for="row in sorted(genomicData.samples_info.row, 'sample')">
           <td>{{ row.sample.replace(':sample', '') }}</td>
           <td>{{ row.purity }}</td>
           <td>{{ row.ploidy }}</td>
@@ -118,7 +118,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="row in alteration.row">
+                <tr v-for="row in sorted(alteration.row, 'sample')">
                   <td v-for="column in order_of(row)" :class="{ 'highlight-cell': highlightCell(column, row) }">
                     {{ row[column] }}
                   </td>
@@ -206,6 +206,10 @@ function order_of(alt: AlterationSampleData): string[] {
         alert("ERROR");
         return [];
     }
+}
+
+function sorted(table, column: string = "sample") {
+    return table.sort((lhs, rhs) => lhs[column] > rhs[column] ? 1 : lhs[column] < rhs[column] ? -1 : 0);
 }
 
 /**
